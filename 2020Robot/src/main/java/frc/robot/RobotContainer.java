@@ -9,30 +9,54 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
 /**
- * This class is where the bulk of the robot should be declared.  Since Command-based is a
- * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
- * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
- * (including subsystems, commands, and button mappings) should be declared here.
+ * This class is where the bulk of the robot should be declared. Since
+ * Command-based is a "declarative" paradigm, very little robot logic should
+ * actually be handled in the {@link Robot} periodic methods (other than the
+ * scheduler calls). Instead, the structure of the robot (including subsystems,
+ * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
+  private final ArcadeDrive driveBase = new ArcadeDrive();
 
-
+  private XboxController pilot = new XboxController(Constants.pilot);
+  private XboxController operator = new XboxController(Constants.operator);
 
   /**
-   * The container for the robot.  Contains subsystems, OI devices, and commands.
+   * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+
+    // Configure default commands
+    // Set the default drive command to split-stick arcade drive
+    driveBase.setDefaultCommand(
+        new RunCommand(() -> driveBase.driveRobot(pilot.getY(GenericHID.Hand.kLeft),
+                                                  pilot.getX(GenericHID.Hand.kRight)),
+        driveBase));
+
+  }
+
+  public double driveX(){
+    return pilot.getX(Hand.kRight);
+  }
+
+  public double driveY(){
+    return pilot.getY(Hand.kLeft);
   }
 
   /**
@@ -42,6 +66,8 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(pilot, XboxController.Button.kB.value)
+      .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) );
   }
 
 
