@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.sensors.ColorSensor;
+import frc.robot.sensors.FMSData;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ExampleSubsystem;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -74,6 +75,10 @@ public class RobotContainer {
 
     new JoystickButton(pilot, XboxController.Button.kA.value) 
       .whenHeld( new RunCommand( colorSensor::readColor )); 
+
+    // Testing
+    new JoystickButton(pilot, XboxController.Button.kStart.value)
+      .whenPressed( new RunCommand( FMSData::getColor ));
   }
 
 
