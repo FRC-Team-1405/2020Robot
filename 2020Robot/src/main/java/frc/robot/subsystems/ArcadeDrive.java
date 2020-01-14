@@ -9,8 +9,10 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -25,7 +27,7 @@ public class ArcadeDrive extends SubsystemBase {
   WPI_TalonSRX driveLeftSlave2 = new WPI_TalonSRX(Constants.driveLeftSlave2);
   WPI_TalonSRX driveRightSlave2 = new WPI_TalonSRX(Constants.driveRightSlave2);
   DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
-  
+  private AHRS gyro = new AHRS(I2C.Port.kMXP);
   boolean driveForward = true;
   
   public ArcadeDrive() {
@@ -54,8 +56,18 @@ public class ArcadeDrive extends SubsystemBase {
     }
   }
 
+  public double getVelocity(){
+   return Math.sqrt(gyro.getVelocityX()*gyro.getVelocityX() + gyro.getVelocityY()*gyro.getVelocityY());
+  }
+
+  public double getHeading(){
+    return gyro.pidGet();
+  }
+
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
+      SmartDashboard.putNumber("Velocity", getVelocity());
+      SmartDashboard.putNumber("Heading", getHeading());
     }
 }
