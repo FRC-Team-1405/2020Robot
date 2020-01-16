@@ -13,7 +13,10 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -33,6 +36,14 @@ public class ArcadeDrive extends SubsystemBase {
   CANSparkMax backLeft = new CANSparkMax(Constants.driveLeftSlave1, MotorType.kBrushless);
   CANSparkMax backRight = new CANSparkMax(Constants.driveRightSlave1, MotorType.kBrushless);
   DifferentialDrive driveBase = new DifferentialDrive(frontLeft, frontRight);
+  // WPI_TalonSRX driveLeft = new WPI_TalonSRX(Constants.driveLeft);
+  // WPI_TalonSRX driveRight = new WPI_TalonSRX(Constants.driveRight);
+  // WPI_TalonSRX driveLeftSlave1 = new WPI_TalonSRX(Constants.driveLeftSlave1);
+  // WPI_TalonSRX driveRightSlave1 = new WPI_TalonSRX(Constants.driveRightSlave1);
+  // WPI_TalonSRX driveLeftSlave2 = new WPI_TalonSRX(Constants.driveLeftSlave2);
+  // WPI_TalonSRX driveRightSlave2 = new WPI_TalonSRX(Constants.driveRightSlave2);
+  // DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
+  private AHRS gyro = new AHRS(I2C.Port.kMXP);
   boolean driveForward = true;
   
   public ArcadeDrive() {
@@ -63,8 +74,18 @@ public class ArcadeDrive extends SubsystemBase {
     }
   }
 
+  public double getVelocity(){
+   return Math.sqrt(gyro.getVelocityX()*gyro.getVelocityX() + gyro.getVelocityY()*gyro.getVelocityY());
+  }
+
+  public double getHeading(){
+    return gyro.pidGet();
+  }
+
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
+      SmartDashboard.putNumber("Velocity", getVelocity());
+      SmartDashboard.putNumber("Heading", getHeading());
     }
 }
