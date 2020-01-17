@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -15,10 +16,12 @@ import frc.robot.commands.ExampleCommand;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -36,6 +39,7 @@ public class RobotContainer {
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
+  private final ControlPanel controlPanel = new ControlPanel();
 
   private final ColorSensor colorSensor = new ColorSensor(); 
 
@@ -83,11 +87,32 @@ public class RobotContainer {
     new JoystickButton(pilot, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
+    new JoystickButton(pilot, XboxController.Button.kY.value)
+      .whenPressed( new RunCommand( controlPanel::positionControl ) );
+
     SmartDashboard.putNumber("Launcher/speed", 0);
     new JoystickButton(pilot, XboxController.Button.kBumperRight.value)
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Launcher/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.launch( 0.0); }));
-  }
+
+    SmartDashboard.putNumber("TurnPID/setPoint", 0.0);
+    SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
+    SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
+    SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
+    new JoystickButton(pilot, XboxController.Button.kX.value)
+      .whenHeld( new PIDCommand( new PIDController(Constants.TurnPID.kP, Constants.TurnPID.kI, Constants.TurnPID.kD),
+                                driveBase::getHeading,
+                                SmartDashboard.getNumber("TurnPID/setPoint", 0.0),
+                                output -> driveBase.driveRobot(0, output),
+                                driveBase
+                                )
+                                .beforeStarting( () -> {
+                                  Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
+                                  Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
+                                  Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
+                                })
+      );
+  };
 
 
   /**

@@ -23,7 +23,18 @@ public final class Constants {
     public final static int driveLeftSlave2 = 5;
     public final static int driveRightSlave2 = 6;
 
+    public final static int controlPanel = 7;
+
+    public final static int shooterLeft = 10;
+    public final static int shooterRight = 11;
+
     public final static int pilot = 0;
     public final static int operator = 1;
-    
+
+    public static class TurnPID {
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+        public static double kF = 0.0;
+    }
 }

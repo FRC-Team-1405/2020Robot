@@ -24,6 +24,7 @@ public class ArcadeDrive extends SubsystemBase {
   /**
    * Creates a new ArcadeDrive.
    */
+  
   // WPI_TalonSRX driveLeft = new WPI_TalonSRX(Constants.driveLeft);
   // WPI_TalonSRX driveRight = new WPI_TalonSRX(Constants.driveRight);
   // WPI_TalonSRX driveLeftSlave1 = new WPI_TalonSRX(Constants.driveLeftSlave1);
@@ -36,13 +37,7 @@ public class ArcadeDrive extends SubsystemBase {
   CANSparkMax backLeft = new CANSparkMax(Constants.driveLeftSlave1, MotorType.kBrushless);
   CANSparkMax backRight = new CANSparkMax(Constants.driveRightSlave1, MotorType.kBrushless);
   DifferentialDrive driveBase = new DifferentialDrive(frontLeft, frontRight);
-  // WPI_TalonSRX driveLeft = new WPI_TalonSRX(Constants.driveLeft);
-  // WPI_TalonSRX driveRight = new WPI_TalonSRX(Constants.driveRight);
-  // WPI_TalonSRX driveLeftSlave1 = new WPI_TalonSRX(Constants.driveLeftSlave1);
-  // WPI_TalonSRX driveRightSlave1 = new WPI_TalonSRX(Constants.driveRightSlave1);
-  // WPI_TalonSRX driveLeftSlave2 = new WPI_TalonSRX(Constants.driveLeftSlave2);
-  // WPI_TalonSRX driveRightSlave2 = new WPI_TalonSRX(Constants.driveRightSlave2);
-  // DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
+
   private AHRS gyro = new AHRS(I2C.Port.kMXP);
   boolean driveForward = true;
   
