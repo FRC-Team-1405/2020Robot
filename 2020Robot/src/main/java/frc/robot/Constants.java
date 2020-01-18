@@ -16,14 +16,30 @@ package frc.robot;
  * constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public final static int driveLeft = 3;
-    public final static int driveRight = 1;
-    public final static int driveLeftSlave1 = 4;
-    public final static int driveRightSlave1 = 2;
-    public final static int driveLeftSlave2 = 5;
-    public final static int driveRightSlave2 = 6;
+    public final static int driveLeft = 1;
+    public final static int driveRight = 2;
+    public final static int driveLeftSlave = 3;
+    public final static int driveRightSlave = 4;
+
+    public final static int controlPanel = 7;
+
+    public final static int shooterLeft = 10;
+    public final static int shooterRight = 11;
 
     public final static int pilot = 0;
     public final static int operator = 1;
-    
+
+    public static class TurnPID {
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+        public static double kF = 0.0;
+    }
+
+    public static class ControlPanelConstants {
+        public final static int ROTATION_DISTANCE = 10000 ; 
+        public final static double SPEED = .3;
+        public final static int COLOR_ADJUST = 1000;
+        public final static int POSITION_ADJUST = 50;
+    }
 }

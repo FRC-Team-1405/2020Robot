@@ -12,13 +12,14 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 
 public class Shooter extends SubsystemBase {
   /**
    * Creates a new Shooter.
    */ 
-  public WPI_TalonSRX left = new WPI_TalonSRX(10); 
-  public WPI_TalonSRX right = new WPI_TalonSRX(11); 
+  public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
+  public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
   
   public Shooter() {
     SmartDashboard.putBoolean("Shooter/isReady", false);

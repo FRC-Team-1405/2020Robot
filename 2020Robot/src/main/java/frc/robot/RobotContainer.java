@@ -8,17 +8,22 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.ExampleCommand;
+import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.ExampleSubsystem;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 
@@ -36,6 +41,7 @@ public class RobotContainer {
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
+  private final ControlPanel controlPanel = new ControlPanel();
 
   private final ColorSensor colorSensor = new ColorSensor(); 
 
@@ -88,8 +94,49 @@ public class RobotContainer {
     new JoystickButton(pilot, XboxController.Button.kBumperRight.value)
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
-  }
+    
+    new JoystickButton(pilot, XboxController.Button.kX.value)
+      .whenHeld( new TurnToAngle(driveBase, SmartDashboard.getNumber("TurnPID/setPoint", 0.0)).beforeStarting( () -> {
+                                  Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
+                                  Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
+                                  Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
+                                })
+      );
 
+      new JoystickButton(operator, XboxController.Button.kX.value)
+        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_DISTANCE),
+                                              () -> {},
+                                              (interrupted) -> { controlPanel.stop(); }, 
+                                              controlPanel::isRotationComplete,
+                                              controlPanel ) );
+
+      new JoystickButton(operator, XboxController.Button.kB.value)
+        .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
+                                              () -> {},
+                                              (interrupted) -> { controlPanel.stop(); },
+                                              controlPanel::checkColor,
+                                              controlPanel
+                                              )
+                        .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
+                                              () -> {},
+                                              (interrupted) -> { controlPanel.stop(); },
+                                              controlPanel::isRotationComplete,
+                                              controlPanel) ));
+
+      new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
+        .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
+                                              () -> {},
+                                              (interrupted) -> { controlPanel.stop(); },
+                                              controlPanel::isRotationComplete,
+                                              controlPanel));
+
+      new JoystickButton(operator, XboxController.Button.kBumperRight.value)
+      .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
+                                            () -> {},
+                                            (interrupted) -> { controlPanel.stop(); },
+                                            controlPanel::isRotationComplete,
+                                            controlPanel));
+  };
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
