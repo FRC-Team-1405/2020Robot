@@ -7,6 +7,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -21,8 +22,8 @@ public class ControlPanel extends SubsystemBase {
    * Creates a new ControlPanel.
    */
 
-  //WPI_TalonSRX controlMotor = new WPI_TalonSRX(Constants.controlPanel);
-  CANSparkMax controlMotor = new CANSparkMax(Constants.controlPanel, MotorType.kBrushless);
+  WPI_TalonSRX controlMotor = new WPI_TalonSRX(Constants.controlPanel);
+  //CANSparkMax controlMotor = new CANSparkMax(Constants.controlPanel, MotorType.kBrushless);
 
   private ColorSensor sensor = new ColorSensor();
   public ControlPanel() {
@@ -38,13 +39,20 @@ public class ControlPanel extends SubsystemBase {
     return FMSData.getColor() == sensor.readColor();
   }
 
-  public void rotationControl(){
-    //run motor x distance
+  public void rotationControl(double distance){
+    controlMotor.set(ControlMode.Position, distance);
+  }
+
+  public void stop() {
+    controlMotor.set(ControlMode.PercentOutput, 0);
+  }
+
+  private static final int MIN_POSITION_ERROR = 1000;
+  public boolean isRotationComplete(){
+    return controlMotor.getClosedLoopError() < MIN_POSITION_ERROR;
   }
  
   public void positionControl(){
-    while(!checkColor()){
-      //run motor
-    }
+    controlMotor.set(ControlMode.PercentOutput, Constants.ControlPanelConstants.SPEED);
   }
 }

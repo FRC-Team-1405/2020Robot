@@ -35,4 +35,11 @@ public final class Constants {
         public static double kD = 0.0;
         public static double kF = 0.0;
     }
+
+    public static class ControlPanelConstants {
+        public final static int ROTATION_DISTANCE = 10000 ; 
+        public final static double SPEED = .3;
+        public final static int COLOR_ADJUST = 1000;
+        public final static int POSITION_ADJUST = 50;
+    }
 }
