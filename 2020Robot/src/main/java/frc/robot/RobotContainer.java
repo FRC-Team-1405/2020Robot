@@ -19,6 +19,7 @@ import frc.robot.sensors.FMSData;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
@@ -45,8 +46,9 @@ public class RobotContainer {
 
   private final ColorSensor colorSensor = new ColorSensor(); 
 
-  private XboxController pilot = new XboxController(Constants.pilot);
+  private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
+  private Intake intake = new Intake();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -58,18 +60,18 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand(
-        new RunCommand(() -> driveBase.driveRobot(pilot.getY(GenericHID.Hand.kLeft),
-                                                  pilot.getX(GenericHID.Hand.kRight)),
+        new RunCommand(() -> driveBase.driveRobot(driver.getY(GenericHID.Hand.kLeft),
+                                                  driver.getX(GenericHID.Hand.kRight)),
         driveBase));
 
   }
 
   public double driveX(){
-    return pilot.getX(Hand.kRight);
+    return driver.getX(Hand.kRight);
   }
 
   public double driveY(){
-    return pilot.getY(Hand.kLeft);
+    return driver.getY(Hand.kLeft);
   }
 
   /**
@@ -79,23 +81,23 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
-    new JoystickButton(pilot, XboxController.Button.kB.value)
+    new JoystickButton(driver, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
 
-    new JoystickButton(pilot, XboxController.Button.kA.value) 
+    new JoystickButton(driver, XboxController.Button.kA.value) 
       .whenHeld( new RunCommand( colorSensor::readColor )); 
 
     // Testing
-    new JoystickButton(pilot, XboxController.Button.kStart.value)
+    new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
-    new JoystickButton(pilot, XboxController.Button.kBumperRight.value)
+    new JoystickButton(driver, XboxController.Button.kBumperRight.value)
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
-    
-    new JoystickButton(pilot, XboxController.Button.kX.value)
+
+    new JoystickButton(driver, XboxController.Button.kX.value)
       .whenHeld( new TurnToAngle(driveBase, SmartDashboard.getNumber("TurnPID/setPoint", 0.0)).beforeStarting( () -> {
                                   Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
                                   Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
@@ -136,7 +138,13 @@ public class RobotContainer {
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
                                             controlPanel));
+      new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
+      .whenHeld( new InstantCommand( intake :: enable))
+      .whenReleased(new InstantCommand(intake :: disable));
+                                                                   
+
   };
+
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
