@@ -60,18 +60,10 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand(
-        new RunCommand(() -> driveBase.driveRobot(driver.getY(GenericHID.Hand.kLeft),
+        new RunCommand(() -> driveBase.driveRobot(-driver.getY(GenericHID.Hand.kLeft),
                                                   driver.getX(GenericHID.Hand.kRight)),
         driveBase));
 
-  }
-
-  public double driveX(){
-    return driver.getX(Hand.kRight);
-  }
-
-  public double driveY(){
-    return driver.getY(Hand.kLeft);
   }
 
   /**
