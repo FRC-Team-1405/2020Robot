@@ -21,6 +21,9 @@ public final class Constants {
     public final static int driveLeftSlave = 3;
     public final static int driveRightSlave = 4;
 
+    public final static int intakeTalon = 5;
+    public final static int intakeDeploy = 6;
+
     public final static int controlPanel = 7;
 
     public final static int shooterLeft = 10;
@@ -41,5 +44,11 @@ public final class Constants {
         public final static double SPEED = .3;
         public final static int COLOR_ADJUST = 1000;
         public final static int POSITION_ADJUST = 50;
+    }
+
+    public static class IntakeConstants{
+        public final static int DEPLOY_POSITION = 1000;
+        public final static int RETRACT_POSITION = 0;
+        public static double SPEED = .8;
     }
 }
