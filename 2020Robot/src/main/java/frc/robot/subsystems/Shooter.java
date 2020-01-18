@@ -29,15 +29,22 @@ public class Shooter extends SubsystemBase {
 
   @Override
   public void periodic() {
-    // This method will be called once per scheduler run
+    // This method will be called once per scheduler run 
+    SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
+    SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
   }
 
-  public void launch(double distance){
+  public void launch(double leftDistance, double rightDistance){
     SmartDashboard.putString("Shooter/launch", "FIRE");
     SmartDashboard.putBoolean("Shooter/isReady", false); 
 
-    left.set(ControlMode.Velocity, distance); 
-    right.set(ControlMode.Velocity, -distance);  
+    left.set(ControlMode.Velocity, leftDistance); 
+    right.set(ControlMode.Velocity, rightDistance);  
+  }
+
+  public void stop(){
+    left.set(0.0); 
+    right.set(0.0);  
   }
 
   public boolean isReady(){

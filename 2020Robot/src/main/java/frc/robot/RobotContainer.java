@@ -83,10 +83,11 @@ public class RobotContainer {
     new JoystickButton(pilot, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-    SmartDashboard.putNumber("Launcher/speed", 0);
+    SmartDashboard.putNumber("Right/speed", 0); 
+    SmartDashboard.putNumber("Left/speed", 0); 
     new JoystickButton(pilot, XboxController.Button.kBumperRight.value)
-      .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Launcher/speed", 0)); }) )
-      .whenReleased( new InstantCommand( () -> { launcher.launch( 0.0); }));
+      .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
+      .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
   }
 
 
