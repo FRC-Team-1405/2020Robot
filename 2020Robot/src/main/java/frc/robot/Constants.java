@@ -27,7 +27,16 @@ public final class Constants {
     public final static int controlPanel = 7;
 
     public final static int shooterLeft = 10;
-    public final static int shooterRight = 11;
+    public final static int shooterRight = 11; 
+
+    //All climb/buddy climb motors here 
+    public final static int backClampMotorLeft = 12; 
+    public final static int frontClampMotorLeft = 13; 
+    public final static int frontClampMotorRight = 14; 
+    public final static int backClampMotorRight = 15;
+    public final static int buddyBarLiftMotorLeft = 16; 
+    public final static int buddyBarLiftMotorRight = 17; 
+    public final static int climbMotor = 18;  
 
     public final static int pilot = 0;
     public final static int operator = 1;
