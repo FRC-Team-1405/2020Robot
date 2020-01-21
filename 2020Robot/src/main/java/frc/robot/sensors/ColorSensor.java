@@ -23,13 +23,24 @@ public class ColorSensor {
     private final ColorSensorV3 colorSensor = new ColorSensorV3(I2CPort);
     private final ColorMatch colorMatcher = new ColorMatch();
 
-    private static final double CONFIDENCE = 0.75;
+    private static final double CONFIDENCE = 0.85;
 
     static public class Target {
         public static final Color BLUE = ColorMatch.makeColor(0.143, 0.427, 0.429);
         public static final Color GREEN = ColorMatch.makeColor(0.197, 0.561, 0.240);
         public static final Color RED = ColorMatch.makeColor(0.561, 0.232, 0.114);
         public static final Color YELLOW = ColorMatch.makeColor(0.361, 0.524, 0.113);
+        public static final String toFMSData(Color color) {
+            if (color.equals(BLUE))
+                return "B";
+            if (color.equals(GREEN))
+                return "G";
+            if (color.equals(RED))
+                return "R";
+            if (color.equals(YELLOW))
+                return "Y";
+            return "";
+        }
     }
 
     // Shuffelboard
@@ -50,13 +61,13 @@ public class ColorSensor {
     public Color readColor(){
         ColorMatchResult match = colorMatcher.matchClosestColor( colorSensor.getColor() );
 
-        SmartDashboard.putString(keyDetectedColor, match.color.toString());
         SmartDashboard.putNumber(keyConfidence, match.confidence);
 
         if (match.confidence < CONFIDENCE) {
-
+            SmartDashboard.putString(keyDetectedColor, "UNKNOWN");
             return null;
         } else {
+            SmartDashboard.putString(keyDetectedColor, Target.toFMSData(match.color));
             return match.color;
         }
     }

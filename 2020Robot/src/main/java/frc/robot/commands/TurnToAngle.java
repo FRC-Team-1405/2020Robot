@@ -31,15 +31,15 @@ public class TurnToAngle extends PIDCommand {
         // This should return the setpoint (can also be a constant)
         angle,
         // This uses the output
-        output -> driveBase.driveRobot(0, output)
+        output -> driveBase.driveRobot(0, output, false)
         );
     // Use addRequirements() here to declare subsystem dependencies.
     // Configure additional PID options by calling `getController` here.
     addRequirements(driveBase);
+    SmartDashboard.putNumber("TurnPID/setPoint", 0);
     SmartDashboard.putNumber("TurnPID/kP",Constants.TurnPID.kP);
     SmartDashboard.putNumber("TurnPID/kI",Constants.TurnPID.kI);
     SmartDashboard.putNumber("TurnPID/kD",Constants.TurnPID.kD);
-
   }
 
   // Returns true when the command should end.

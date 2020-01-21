@@ -50,11 +50,12 @@ public class ArcadeDrive extends SubsystemBase {
     driveForward = !driveForward;
   }
 
-  public void driveRobot(double xSpeed, double zRotation){
+  public void driveRobot(double xSpeed, double zRotation, boolean squareInputs){
+    System.out.printf("driveRobot %f %f\n", xSpeed, zRotation);
     if(driveForward){
-      driveBase.arcadeDrive(xSpeed, zRotation);
+      driveBase.arcadeDrive(xSpeed, zRotation, squareInputs);
     }else{
-      driveBase.arcadeDrive(-xSpeed, zRotation);
+      driveBase.arcadeDrive(-xSpeed, zRotation, squareInputs);
     }
   }
 
