@@ -7,11 +7,12 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import frc.robot.Constants;
-
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -30,12 +31,28 @@ public class Climber extends SubsystemBase {
    public WPI_TalonSRX frontClampMotorRight = new WPI_TalonSRX(Constants.frontClampMotorRight); 
    public WPI_TalonSRX backClampMotorRight = new WPI_TalonSRX(Constants.backClampMotorRight); 
 
-  public Climber() {
+  //Configurable values for the climb motor: 
+  public double reachPosition = 0.0; 
+  public double homePosition = 0.0; 
+
+  public Climber() { 
+
+    SmartDashboard.putNumber("Climb Position", reachPosition); 
+    SmartDashboard.putNumber("Home Position", homePosition); 
 
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  } 
+
+  public void reachUp(){  
+    
+    climbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+  } 
+
+  public void goHome(){ 
+    climbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
   }
 }
