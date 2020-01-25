@@ -38,7 +38,7 @@ public class RobotContainer {
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
 
-  private final LIDARCanifier lidar = new LIDARCanifier(17);
+  private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
