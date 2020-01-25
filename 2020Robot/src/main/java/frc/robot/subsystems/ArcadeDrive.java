@@ -68,6 +68,10 @@ public class ArcadeDrive extends SubsystemBase {
     return gyro.pidGet();
   }
 
+  public double absoluteAngle(double angle){
+    return (angle + getHeading());
+  }
+
     @Override
     public void periodic() {
       // This method will be called once per scheduler run

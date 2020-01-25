@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -82,8 +84,18 @@ public class RobotContainer {
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
 
+    DoubleSupplier setPoint = new DoubleSupplier(){
+      public double getAsDouble() {
+        return SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading();
+      }
+    };
+
+    SmartDashboard.putNumber("TurnPID/offset", 15);
     new JoystickButton(driver, XboxController.Button.kX.value)
-      .whenHeld( new TurnToAngle(driveBase, SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading()).beforeStarting( () -> {
+      .whenPressed( new InstantCommand( () -> {
+        SmartDashboard.putNumber("TurnPID/setPoint", driveBase.getHeading()+SmartDashboard.getNumber("turnPID/offset", 15));
+      }) )
+      .whenHeld( new TurnToAngle(driveBase, () -> SmartDashboard.getNumber("TurnPID/setPoint", 0.0) ).beforeStarting( () -> {
                                   Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
                                   Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
                                   Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;

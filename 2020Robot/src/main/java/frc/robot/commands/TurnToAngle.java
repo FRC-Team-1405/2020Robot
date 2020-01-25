@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
@@ -21,7 +23,7 @@ public class TurnToAngle extends PIDCommand {
    * Creates a new TurnToAngle.
    */
 
-  public TurnToAngle(ArcadeDrive driveBase, double angle) {
+  public TurnToAngle(ArcadeDrive driveBase, DoubleSupplier angle) {
     
     super(
         // The controller that the command will use
@@ -46,5 +48,9 @@ public class TurnToAngle extends PIDCommand {
   @Override
   public boolean isFinished() {
     return false;
+  }
+
+  public void setTurnAngle(double angle){
+    super.m_setpoint = () -> angle ;
   }
 }
