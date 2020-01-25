@@ -8,30 +8,36 @@
 package frc.robot.sensors;
 
 import com.ctre.phoenix.CANifier;
+import com.ctre.phoenix.CANifierControlFrame;
+import com.ctre.phoenix.CANifier.PWMChannel;
 
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpiutil.CircularBuffer;
 import frc.robot.Constants;
 import frc.robot.lib.MeanFilter;
 
-public class LIDARCanifier extends SubsystemBase {
+public class LIDARCanifier {
   /**
    * Creates a new LIDARCanifier.
    */
   CANifier canifier;
-  private double[] tempPWMData;
-  private CircularBuffer rollingLidarAverage;
-  private double lidarRawAveraged;
+  double[] tempPWMData = new double[]{0, 0};
+  
+  private MeanFilter filter = new MeanFilter(Constants.lidarBufferSize);
   public LIDARCanifier(int kCanifierID) { // 5190's code told me to always pass in 16 for this value. I don't know if that's true or not, so take that info with caution.
-    canifier = new CANifier(kCanifierID);
-    rollingLidarAverage = new CircularBuffer(Constants.lidarBufferSize);
-  }
+    canifier = new CANifier(kCanifierID);  }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
+  
+  public double readDistance() {
     canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData);
-    rollingLidarAverage.addFirst(tempPWMData[0]);
-    lidarRawAveraged = new MeanFilter(Constants.lidarBufferSize).filter(tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[0]);
+    canifier.getPWMInput(CANifier.PWMChannel.PWMChannel1, tempPWMData);
+    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[1]);
+    canifier.getPWMInput(CANifier.PWMChannel.PWMChannel2, tempPWMData);
+    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[2]);
+    canifier.getPWMInput(CANifier.PWMChannel.PWMChannel3, tempPWMData);
+    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[3]);
+
+    return filter.filter(tempPWMData[0]);
   }
 }

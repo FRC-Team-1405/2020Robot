@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
+import frc.robot.sensors.LIDARCanifier;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -37,6 +38,7 @@ public class RobotContainer {
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
 
+  private final LIDARCanifier lidar = new LIDARCanifier(17);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -75,6 +77,9 @@ public class RobotContainer {
     // Testing
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
+
+      new JoystickButton(driver, XboxController.Button.kBack.value)
+        .whenPressed( new RunCommand( lidar::readDistance));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
