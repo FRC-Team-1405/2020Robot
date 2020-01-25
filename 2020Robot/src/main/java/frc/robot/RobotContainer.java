@@ -15,6 +15,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
+import frc.robot.sensors.LEDStrip;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -24,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -38,6 +40,7 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
+  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0);
 
   private final ColorSensor colorSensor = new ColorSensor(); 
 
@@ -77,6 +80,9 @@ public class RobotContainer {
     // Testing
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
+
+    new JoystickButton(driver, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( ledStrip::testOn ));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
