@@ -49,7 +49,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean isReady(){
-    boolean ready = SmartDashboard.getBoolean("Shooter/isReady", false);
+    boolean ready = SmartDashboard.getBoolean("Shooter/isReady", false);    
     if (ready){
       SmartDashboard.putString("Shooter/launch", "");
     }

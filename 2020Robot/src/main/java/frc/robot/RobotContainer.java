@@ -40,7 +40,7 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
-  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0);
+  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
 
   private final ColorSensor colorSensor = new ColorSensor(); 
 
@@ -82,7 +82,7 @@ public class RobotContainer {
       .whenPressed( new RunCommand( FMSData::getColor ));
 
     new JoystickButton(driver, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand( ledStrip::testOn ));
+      .whenPressed( new InstantCommand( ledStrip::display ));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
