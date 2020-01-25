@@ -41,6 +41,8 @@ public final class Constants {
     public final static int pilot = 0;
     public final static int operator = 1;
 
+    public final static int lidarBufferSize = 20;
+
     public static class TurnPID {
         public static double kP = 0.0;
         public static double kI = 0.0;
