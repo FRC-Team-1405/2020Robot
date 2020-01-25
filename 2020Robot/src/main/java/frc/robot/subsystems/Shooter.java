@@ -18,6 +18,15 @@ public class Shooter extends SubsystemBase {
   /**
    * Creates a new Shooter.
    */ 
+    private class Setting {
+      public Setting(double pow, double dis) {
+        power = pow;
+        distance = dis;
+      }
+      public double power;
+      public double distance;
+    } ; 
+
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
   
@@ -54,5 +63,47 @@ public class Shooter extends SubsystemBase {
       SmartDashboard.putString("Shooter/launch", "");
     }
     return ready;
+  }
+
+  private double CalculatePower(double distance, Setting low, Setting high){ 
+    //From slope point formula (y-y_1) = m(x-x_1) -> y = m(x-x_1) + y_1
+    double power = ((high.power - low.power) / (high.distance - low.distance)) * ((distance - low.distance) + low.power);
+    return power;
+  }
+
+  Setting settings[] = new Setting[] {
+                                        new Setting(19200, 10),
+                                        new Setting(17200, 20),
+                                        new Setting(15100, 30), 
+                                        new Setting(13100, 40),
+                                        new Setting(11100, 50) };
+
+  public void fire(double distance){
+    SmartDashboard.putString("Shooter/fire", "FIRE");
+    SmartDashboard.putBoolean("Shooter/isReady", false);
+    int lowIndex = 0;
+    int highIndex = 0;
+
+    if(distance < settings[0].distance){
+      lowIndex = 0;
+      highIndex = 0;
+    }
+    else if(distance > settings[settings.length-1].distance){
+      lowIndex = settings.length-1;
+      highIndex = settings.length-1;
+    }
+    else{
+      for(int i = 1; i < settings.length-2; i++){
+        if(distance < settings[i].distance){
+          lowIndex = i-1;
+          highIndex = i;
+          break;
+        }
+      }
+    }
+    double power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
+    left.set(power);
+    right.set(power);
+    
   }
 }
