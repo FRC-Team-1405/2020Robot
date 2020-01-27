@@ -22,7 +22,8 @@ public class Climber extends SubsystemBase {
    */ 
   
    //This is a Falcon 500. Not sure if FX will work. 
-   public WPI_TalonFX climbMotor = new WPI_TalonFX(Constants.climbMotor); 
+   public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
+   public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
    
   //Regular bois go here: 
    public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
@@ -49,11 +50,10 @@ public class Climber extends SubsystemBase {
   } 
 
   public void reachUp(){  
-    
-    climbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+    leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
   } 
 
   public void goHome(){ 
-    climbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+    rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
   }
 }
