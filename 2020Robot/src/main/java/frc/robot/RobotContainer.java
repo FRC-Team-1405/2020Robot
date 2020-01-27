@@ -7,12 +7,15 @@
 
 package frc.robot;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
+import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
@@ -23,6 +26,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj.SPI;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -37,6 +41,7 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
+  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
 
   private final LIDARCanifier lidar = new LIDARCanifier(17);
   private final ColorSensor colorSensor = new ColorSensor(); 
@@ -78,8 +83,11 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-      new JoystickButton(driver, XboxController.Button.kBack.value)
-        .whenPressed( new RunCommand( lidar::readDistance));
+    new JoystickButton(driver, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( ledStrip::display ));
+    
+    new JoystickButton(driver, XboxController.Button.kBack.value)
+      .whenPressed( new RunCommand( lidar::readDistance));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
@@ -87,8 +95,18 @@ public class RobotContainer {
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
 
+    DoubleSupplier setPoint = new DoubleSupplier(){
+      public double getAsDouble() {
+        return SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading();
+      }
+    };
+
+    SmartDashboard.putNumber("TurnPID/offset", 15);
     new JoystickButton(driver, XboxController.Button.kX.value)
-      .whenHeld( new TurnToAngle(driveBase, SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading()).beforeStarting( () -> {
+      .whenPressed( new InstantCommand( () -> {
+        SmartDashboard.putNumber("TurnPID/setPoint", driveBase.getHeading()+SmartDashboard.getNumber("turnPID/offset", 15));
+      }) )
+      .whenHeld( new TurnToAngle(driveBase, () -> SmartDashboard.getNumber("TurnPID/setPoint", 0.0) ).beforeStarting( () -> {
                                   Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
                                   Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
                                   Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;

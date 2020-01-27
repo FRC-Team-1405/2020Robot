@@ -36,7 +36,11 @@ public final class Constants {
     public final static int backClampMotorRight = 15;
     public final static int buddyBarLiftMotorLeft = 16; 
     public final static int buddyBarLiftMotorRight = 17; 
-    public final static int climbMotor = 18;  
+    public final static int leftClimbMotor = 18; 
+    public final static int rightClimbMotor = 19;   
+
+    //Led strip length 
+    public final static int ledLength =60; 
 
     public final static int pilot = 0;
     public final static int operator = 1;
