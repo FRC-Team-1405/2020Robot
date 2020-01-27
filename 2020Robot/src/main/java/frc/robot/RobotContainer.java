@@ -16,6 +16,7 @@ import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
+import frc.robot.sensors.LIDARCanifier;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -42,6 +43,7 @@ public class RobotContainer {
   private final ControlPanel controlPanel = new ControlPanel();
   private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
 
+  private final LIDARCanifier lidar = new LIDARCanifier(17);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -83,6 +85,9 @@ public class RobotContainer {
 
     new JoystickButton(driver, XboxController.Button.kY.value)
       .whenPressed( new InstantCommand( ledStrip::display ));
+    
+    new JoystickButton(driver, XboxController.Button.kBack.value)
+      .whenPressed( new RunCommand( lidar::readDistance));
 
     SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
