@@ -30,13 +30,20 @@ public class LIDARCanifier {
   
   public double readDistance() {
     canifier.getPWMInput(CANifier.PWMChannel.PWMChannel0, tempPWMData);
-    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel0_0", tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel0_1", tempPWMData[1]);
+
     canifier.getPWMInput(CANifier.PWMChannel.PWMChannel1, tempPWMData);
-    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[1]);
+    SmartDashboard.putNumber("CANifier/Channel1_0", tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel1_1", tempPWMData[1]);
+
     canifier.getPWMInput(CANifier.PWMChannel.PWMChannel2, tempPWMData);
-    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[2]);
+    SmartDashboard.putNumber("CANifier/Channel2_0", tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel2_1", tempPWMData[1]);
+
     canifier.getPWMInput(CANifier.PWMChannel.PWMChannel3, tempPWMData);
-    SmartDashboard.putNumber("CANifier/Channel0", tempPWMData[3]);
+    SmartDashboard.putNumber("CANifier/Channel3_0", tempPWMData[0]);
+    SmartDashboard.putNumber("CANifier/Channel3_1", tempPWMData[1]);
 
     return filter.filter(tempPWMData[0]);
   }
