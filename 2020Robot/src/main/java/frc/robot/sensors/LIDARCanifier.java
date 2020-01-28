@@ -8,11 +8,8 @@
 package frc.robot.sensors;
 
 import com.ctre.phoenix.CANifier;
-import com.ctre.phoenix.CANifierControlFrame;
-import com.ctre.phoenix.CANifier.PWMChannel;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpiutil.CircularBuffer;
 import frc.robot.Constants;
 import frc.robot.lib.MeanFilter;
 
