@@ -41,7 +41,8 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
-  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  private final LEDStrip ledStrip = new LEDStrip(9, 60);
 
   private final LIDARCanifier lidar = new LIDARCanifier(17);
   private final ColorSensor colorSensor = new ColorSensor(); 
@@ -83,8 +84,12 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
+    // new JoystickButton(driver, XboxController.Button.kY.value)
+    //   .whenPressed( new InstantCommand( ledStrip::display ));
+    // new JoystickButton(driver, XboxController.Button.kY.value)
+    // .whenPressed( new InstantCommand( ledStrip::testOn ));
     new JoystickButton(driver, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand( ledStrip::display ));
+    .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenPressed( new RunCommand( lidar::readDistance));
