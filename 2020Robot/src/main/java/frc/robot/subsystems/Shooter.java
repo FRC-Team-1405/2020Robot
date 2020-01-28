@@ -9,10 +9,14 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import com.revrobotics.ControlType;
 
 public class Shooter extends SubsystemBase {
   /**
@@ -29,10 +33,20 @@ public class Shooter extends SubsystemBase {
 
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
-  
-  public Shooter() {
+  // public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
+  // public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
+
+  // public CANEncoder leftEncoder = new CANEncoder(left); 
+  // public CANEncoder rightEncoder = new CANEncoder(right); 
+
+  // CANPIDController leftPIDController = new CANPIDController(left);  
+  // CANPIDController rightPIDController = new CANPIDController(right); 
+
+  public Shooter() { 
     SmartDashboard.putBoolean("Shooter/isReady", false);
     SmartDashboard.putString("Shooter/launch", ""); 
+
+
 
     
   }
@@ -40,8 +54,8 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
-    SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
-    SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
+    //SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
+    //SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
   }
 
   public void launch(double leftDistance, double rightDistance){
@@ -50,6 +64,8 @@ public class Shooter extends SubsystemBase {
 
     left.set(ControlMode.Velocity, leftDistance); 
     right.set(ControlMode.Velocity, rightDistance);  
+    // leftPIDController.setReference(leftDistance, ControlType.kVelocity);
+    // rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
   }
 
   public void stop(){
