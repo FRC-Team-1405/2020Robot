@@ -7,6 +7,8 @@
 
 package frc.robot.sensors;
 
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
@@ -17,6 +19,18 @@ public class LEDStrip {
     SPI port; 
     int ledCount; 
     byte[] data; 
+
+    private AddressableLED led;
+    private AddressableLEDBuffer ledBuffer;
+
+    public LEDStrip(int port, int ledCount){
+        led = new AddressableLED(port);
+        ledBuffer = new AddressableLEDBuffer(ledCount);
+        led.setLength(ledBuffer.getLength());
+        led.setData(ledBuffer);
+        led.start();
+    }
+    
     public LEDStrip(SPI.Port portID, int ledCount){
         port = new SPI(portID); 
         this.ledCount = ledCount;  
@@ -68,6 +82,14 @@ public class LEDStrip {
         port.write(data, data.length);
    }
 
+   public void testLEDs(){
+    for (var i = 0; i < ledBuffer.getLength(); i++) {
+        ledBuffer.setRGB(i, 0, 255-i, i);
+     }
+     led.setData(ledBuffer);
+     led.start();
+   }
+
    public void testOn(){
     byte[] data = new byte[] {(byte) 0x00, (byte) 0x00, (byte)0x00, (byte)0x00,
                               (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
@@ -77,6 +99,28 @@ public class LEDStrip {
                               (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
                               (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
                               (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
+                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
                               (byte) 0xFF, (byte) 0xFF, (byte)0xFF, (byte)0xFF
                              };
     port.write(data, data.length);
