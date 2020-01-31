@@ -45,7 +45,7 @@ public class RobotContainer {
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
 
-  private final LIDARCanifier lidar = new LIDARCanifier(17);
+  private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
