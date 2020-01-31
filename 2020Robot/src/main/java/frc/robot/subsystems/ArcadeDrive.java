@@ -47,8 +47,8 @@ public class ArcadeDrive extends SubsystemBase {
     driveForward = !driveForward;
   }
 
+
   public void driveRobot(double xSpeed, double zRotation, boolean squareInputs){
-    //System.out.printf("driveRobot %f %f\n", xSpeed, zRotation);
     if(driveForward){
       driveBase.arcadeDrive(xSpeed, zRotation, squareInputs);
     }else{
@@ -61,7 +61,7 @@ public class ArcadeDrive extends SubsystemBase {
   }
 
   public double getHeading(){
-    return gyro.pidGet();
+    return Math.IEEEremainder(gyro.getAngle(), 360.0);
   }
 
     @Override

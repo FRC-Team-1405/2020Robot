@@ -42,6 +42,9 @@ public class TurnToAngle extends PIDCommand {
     SmartDashboard.putNumber("TurnPID/kP",Constants.TurnPID.kP);
     SmartDashboard.putNumber("TurnPID/kI",Constants.TurnPID.kI);
     SmartDashboard.putNumber("TurnPID/kD",Constants.TurnPID.kD);
+
+    this.getController().enableContinuousInput(-180, 180);
+    this.getController().setTolerance(0.5);
   }
 
   // Returns true when the command should end.

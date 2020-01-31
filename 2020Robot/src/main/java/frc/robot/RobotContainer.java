@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
@@ -94,11 +95,13 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenPressed( new RunCommand( lidar::readDistance));
 
-    SmartDashboard.putNumber("Right/speed", 0); 
-    SmartDashboard.putNumber("Left/speed", 0); 
+    // SmartDashboard.putNumber("Right/speed", 0); 
+    // SmartDashboard.putNumber("Left/speed", 0); 
+    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
+    //   .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
+    //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-      .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
-      .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+      .toggleWhenPressed( new TestShooter(launcher, driver::getPOV ) );
 
     DoubleSupplier setPoint = new DoubleSupplier(){
       public double getAsDouble() {
