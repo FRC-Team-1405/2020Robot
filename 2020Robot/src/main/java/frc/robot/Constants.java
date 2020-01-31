@@ -54,6 +54,13 @@ public final class Constants {
         public static double kF = 0.0;
     }
 
+    public static class DriveStraightPID {
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+        public static double kF = 0.0;
+    }
+
     public static class ControlPanelConstants {
         public final static int ROTATION_DISTANCE = 10000 ; 
         public final static double SPEED = .3;

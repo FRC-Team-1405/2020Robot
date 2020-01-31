@@ -12,6 +12,8 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.commands.Autonomous1;
+import frc.robot.commands.Autonomous2;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
@@ -39,13 +41,15 @@ import edu.wpi.first.wpilibj.SPI;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
+  private final Autonomous1 auto1 = new Autonomous1();
+  private final Autonomous2 auto2 = new Autonomous2();
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
 
-  private final LIDARCanifier lidar = new LIDARCanifier(17);
+  private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -93,7 +97,7 @@ public class RobotContainer {
     .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
     new JoystickButton(driver, XboxController.Button.kBack.value)
-      .whenPressed( new RunCommand( lidar::readDistance));
+      .whenHeld( new RunCommand( lidar::readDistance));
 
     // SmartDashboard.putNumber("Right/speed", 0); 
     // SmartDashboard.putNumber("Left/speed", 0); 
@@ -169,6 +173,6 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
+    return auto1;
   }
 }

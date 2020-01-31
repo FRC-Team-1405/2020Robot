@@ -25,7 +25,9 @@ public class LIDARCanifier {
   
   private MeanFilter filter = new MeanFilter(Constants.lidarBufferSize);
   public LIDARCanifier(int kCanifierID) { // 5190's code told me to always pass in 16 for this value. I don't know if that's true or not, so take that info with caution.
-    canifier = new CANifier(kCanifierID);  }
+    canifier = new CANifier(kCanifierID); 
+    canifier.configFactoryDefault();
+  }
 
   
   public double readDistance() {

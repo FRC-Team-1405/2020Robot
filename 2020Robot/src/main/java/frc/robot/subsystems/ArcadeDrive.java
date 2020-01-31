@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
@@ -50,12 +52,19 @@ public class ArcadeDrive extends SubsystemBase {
     driveForward = !driveForward;
   }
 
-
   public void driveRobot(double xSpeed, double zRotation, boolean squareInputs){
     if(driveForward){
       driveBase.arcadeDrive(xSpeed, zRotation, squareInputs);
     }else{
       driveBase.arcadeDrive(-xSpeed, zRotation, squareInputs);
+    }
+  }
+
+  public void driveRobot(DoubleSupplier xSpeedSupplier, double zRotation, boolean squareInputs){
+    if(driveForward){
+      driveBase.arcadeDrive(xSpeedSupplier.getAsDouble(), zRotation, squareInputs);
+    }else{
+      driveBase.arcadeDrive(-xSpeedSupplier.getAsDouble(), zRotation, squareInputs);
     }
   }
 
@@ -65,6 +74,10 @@ public class ArcadeDrive extends SubsystemBase {
 
   public double getHeading(){
     return Math.IEEEremainder(gyro.getAngle(), 360.0);
+  }
+
+  public double getRate(){
+    return gyro.getRate();
   }
 
     @Override
