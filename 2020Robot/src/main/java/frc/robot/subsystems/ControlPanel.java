@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.sensors.ColorSensor;
@@ -52,5 +53,10 @@ public class ControlPanel extends SubsystemBase {
  
   public void positionControl(){
     controlMotor.set(ControlMode.PercentOutput, Constants.ControlPanelConstants.SPEED);
+  }
+
+  public double findDistance(Color currentColor, Color neededColor) {
+    
+    return 0.0;
   }
 }

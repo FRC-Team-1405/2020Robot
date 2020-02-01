@@ -62,13 +62,13 @@ public final class Constants {
     }
 
     public static class ControlPanelConstants {
-        public final static int ROTATION_DISTANCE = 10000 ; 
+        public final static int ROTATION_DISTANCE = 10000; 
         public final static double SPEED = .3;
         public final static int COLOR_ADJUST = 1000;
         public final static int POSITION_ADJUST = 50;
     }
 
-    public static class IntakeConstants{
+    public static class IntakeConstants {
         public final static int DEPLOY_POSITION = 1000;
         public final static int RETRACT_POSITION = 0;
         public static double SPEED = .8;

@@ -70,5 +70,11 @@ public class ColorSensor {
             return match.color;
         }
     }
+    public boolean trueGreen(Color[] prevColorData) {
+        //                    B      
+        boolean[] values = new boolean[] {false, false, false, false};
+        for (Color color : prevColorData) { }
+        return true;
+    }
 }
 
