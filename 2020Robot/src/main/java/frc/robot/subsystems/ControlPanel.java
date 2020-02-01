@@ -69,7 +69,7 @@ public class ControlPanel extends SubsystemBase {
     }
     for (int i = 0; i < colors.length; i++) {
       if (colors[i] == targetColor) {
-        currentIndex = i;
+        targetIndex = i;
         break;
       }
     }
