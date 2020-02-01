@@ -10,8 +10,13 @@ package frc.robot;
 import java.util.Map;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
@@ -66,6 +71,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    initShuffleBoard();
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -74,6 +80,21 @@ public class RobotContainer {
                                                   driver.getX(GenericHID.Hand.kRight), true),
         driveBase));
 
+  }
+
+  SendableChooser<Integer> autoSelector;
+  private void initShuffleBoard(){
+    autoSelector = new SendableChooser<Integer>() ;
+    autoSelector.addOption("Shoot then drive.", 1);
+    autoSelector.addOption("Auto 2", 2);
+    autoSelector.addOption("Auto 3", 3);
+
+    ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
+    autoTab.add(autoSelector)
+            .withWidget(BuiltInWidgets.kComboBoxChooser);
+
+    SmartDashboard.putNumber("Auto/Selected_Auto", 1);
+    SmartDashboard.putNumber("Auto/Initial_Delay", 0);
   }
 
   /**
@@ -166,8 +187,7 @@ public class RobotContainer {
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable));
                
-      SmartDashboard.putNumber("Auto/Selected_Auto", 1);
-      SmartDashboard.putNumber("Auto/Initial_Delay", 0);
+
 
   };
 
@@ -176,7 +196,7 @@ public class RobotContainer {
   // which command to run.  Can base this choice on logical conditions evaluated at runtime.
   
   private int select() {
-    return (int) SmartDashboard.getNumber("Auto", 1);
+    return (int) autoSelector.getSelected();
   }
 
   // An example selectcommand.  Will select from the three commands based on the value returned

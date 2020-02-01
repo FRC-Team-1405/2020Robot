@@ -24,6 +24,8 @@ public class Autonomous1 extends SequentialCommandGroup {
   public Autonomous1(ArcadeDrive driveBase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super( new PrintCommand("Shooting"), new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new DriveDistance(driveBase, Constants.auto1Distance));
+    // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new PrintCommand("Shooting"), new DriveDistance(driveBase, Constants.auto1Distance));
+    super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new PrintCommand("*********************Shooting***********************"), new PrintCommand("~~~~~~~~~~~~~~~~~~~~~~~DriveDistance~~~~~~~~~~~~~~~~~~~~~~~~~"));
+
   }
 }
