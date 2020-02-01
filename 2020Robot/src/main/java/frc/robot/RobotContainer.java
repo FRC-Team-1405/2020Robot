@@ -130,7 +130,7 @@ public class RobotContainer {
       );
 
       new JoystickButton(operator, XboxController.Button.kX.value)
-        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_DISTANCE),
+        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
                                               () -> {},
                                               (interrupted) -> { controlPanel.stop(); }, 
                                               controlPanel::isRotationComplete,
