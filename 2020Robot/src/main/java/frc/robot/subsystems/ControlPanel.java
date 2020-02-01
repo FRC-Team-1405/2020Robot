@@ -13,7 +13,6 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.Constants.ControlPanelConstants;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 
@@ -57,7 +56,7 @@ public class ControlPanel extends SubsystemBase {
     controlMotor.set(ControlMode.PercentOutput, Constants.ControlPanelConstants.SPEED);
   }
 
-  public double findDistance(Color currentColor, Color targetColor, double turnWheelRadius) throws Exception {
+  public double findDistance(Color currentColor, Color targetColor) throws Exception {
     // TODO get an offset for future values
     // TODO get absolute turnWheelRadius
     int currentIndex = -1, targetIndex = -1;
@@ -75,6 +74,6 @@ public class ControlPanel extends SubsystemBase {
     }
     if (currentIndex == -1 || targetIndex == -1) { throw new Exception("Target/Current value not defined"); }
     //        find relative distance needed * length of one segment
-    return (targetIndex - currentIndex) * (turnWheelRadius / (4*Math.PI));
+    return (targetIndex - currentIndex) * Constants.ControlPanelConstants.ROTATION_SEGMENT_DISTANCE;
   }
 }
