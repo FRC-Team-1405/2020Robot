@@ -57,8 +57,9 @@ public class ControlPanel extends SubsystemBase {
     controlMotor.set(ControlMode.PercentOutput, Constants.ControlPanelConstants.SPEED);
   }
 
-  public double findDistance(Color currentColor, Color targetColor) throws Exception {
+  public double findDistance(Color currentColor, Color targetColor, double turnWheelRadius) throws Exception {
     // TODO get an offset for future values
+    // TODO get absolute turnWheelRadius
     int currentIndex = -1, targetIndex = -1;
     for (int i = 0; i < colors.length; i++) {
       if (colors[i] == currentColor) {
@@ -73,6 +74,7 @@ public class ControlPanel extends SubsystemBase {
       }
     }
     if (currentIndex == -1 || targetIndex == -1) { throw new Exception("Target/Current value not defined"); }
-    return (targetIndex - currentIndex) * ControlPanelConstants.ROTATION_DISTANCE;
+    //        find relative distance needed * length of one segment
+    return (targetIndex - currentIndex) * (turnWheelRadius / (4*Math.PI));
   }
 }
