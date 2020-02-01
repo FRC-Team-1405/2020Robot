@@ -10,6 +10,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -74,6 +75,8 @@ public class ControlPanel extends SubsystemBase {
     }
     if (currentIndex == -1 || targetIndex == -1) { throw new Exception("Target/Current value not defined"); }
     //        find relative distance needed * length of one segment
-    return (targetIndex - currentIndex) * Constants.ControlPanelConstants.ROTATION_SEGMENT_DISTANCE;
+    double distance = (targetIndex - currentIndex) * Constants.ControlPanelConstants.ROTATION_SEGMENT_DISTANCE;
+    SmartDashboard.putNumber("ControlPanel/turnDistance", distance);
+    return distance;
   }
 }
