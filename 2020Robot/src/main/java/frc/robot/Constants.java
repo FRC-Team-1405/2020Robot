@@ -66,6 +66,7 @@ public final class Constants {
         public final static double SPEED = .3;
         public final static int COLOR_ADJUST = 1000;
         public final static int POSITION_ADJUST = 50;
+        // TODO At some point, define a value that will set a motor rotation equivalent to turning one segment on the control panel (1'9/16")
     }
 
     public static class IntakeConstants {

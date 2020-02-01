@@ -13,6 +13,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.ControlPanelConstants;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 
@@ -22,6 +23,7 @@ public class ControlPanel extends SubsystemBase {
    */
 
   WPI_TalonSRX controlMotor = new WPI_TalonSRX(Constants.controlPanel);
+  Color[] colors = new Color[] {ColorSensor.Target.BLUE, ColorSensor.Target.GREEN, ColorSensor.Target.RED, ColorSensor.Target.YELLOW,};
   //CANSparkMax controlMotor = new CANSparkMax(Constants.controlPanel, MotorType.kBrushless);
 
   private ColorSensor sensor = new ColorSensor();
@@ -55,8 +57,22 @@ public class ControlPanel extends SubsystemBase {
     controlMotor.set(ControlMode.PercentOutput, Constants.ControlPanelConstants.SPEED);
   }
 
-  public double findDistance(Color currentColor, Color neededColor) {
-    
-    return 0.0;
+  public double findDistance(Color currentColor, Color targetColor) throws Exception {
+    // TODO get an offset for future values
+    int currentIndex = -1, targetIndex = -1;
+    for (int i = 0; i < colors.length; i++) {
+      if (colors[i] == currentColor) {
+        currentIndex = i;
+        break;
+      }
+    }
+    for (int i = 0; i < colors.length; i++) {
+      if (colors[i] == targetColor) {
+        currentIndex = i;
+        break;
+      }
+    }
+    if (currentIndex == -1 || targetIndex == -1) { throw new Exception("Target/Current value not defined"); }
+    return (targetIndex - currentIndex) * ControlPanelConstants.ROTATION_DISTANCE;
   }
 }
