@@ -42,6 +42,27 @@ public class DriveStraight extends PIDCommand {
     this.getController().setTolerance(0.5);
   }
 
+  public DriveStraight(ArcadeDrive driveBase, Double speed) {
+    super(
+        // The controller that the command will use
+        new PIDController(Constants.DriveStraightPID.kP, Constants.DriveStraightPID.kI, Constants.DriveStraightPID.kD),
+        // This should return the measurement
+        driveBase::getRate,
+        // This should return the setpoint (can also be a constant)
+        () -> 0,
+        // This uses the output
+        output -> driveBase.driveRobot(speed, output, false)
+        );
+    // Use addRequirements() here to declare subsystem dependencies.
+    // Configure additional PID options by calling `getController` here.
+    addRequirements(driveBase);
+    SmartDashboard.putNumber("DriveStraightPID/kP",Constants.TurnPID.kP);
+    SmartDashboard.putNumber("DriveStraightPID/kI",Constants.TurnPID.kI);
+    SmartDashboard.putNumber("DriveStraightPID/kD",Constants.TurnPID.kD);
+    this.getController().setTolerance(0.5);
+  }
+  
+
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {

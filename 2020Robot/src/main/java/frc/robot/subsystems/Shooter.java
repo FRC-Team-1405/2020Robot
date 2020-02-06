@@ -9,6 +9,12 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANEncoder;
+import com.revrobotics.CANPIDController;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -26,24 +32,20 @@ public class Shooter extends SubsystemBase {
       public double distance;
     } ; 
 
-  public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
-  public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
-  // public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
-  // public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
+  //public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
+  //public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
+   public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
+   public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
 
-  // public CANEncoder leftEncoder = new CANEncoder(left); 
-  // public CANEncoder rightEncoder = new CANEncoder(right); 
+  public CANEncoder leftEncoder = new CANEncoder(left); 
+  public CANEncoder rightEncoder = new CANEncoder(right); 
 
-  // CANPIDController leftPIDController = new CANPIDController(left);  
-  // CANPIDController rightPIDController = new CANPIDController(right); 
+  CANPIDController leftPIDController = new CANPIDController(left);  
+  CANPIDController rightPIDController = new CANPIDController(right); 
 
   public Shooter() { 
     SmartDashboard.putBoolean("Shooter/isReady", false);
     SmartDashboard.putString("Shooter/launch", ""); 
-
-
-
-    
   }
 
   @Override
@@ -56,11 +58,8 @@ public class Shooter extends SubsystemBase {
   public void launch(double leftDistance, double rightDistance){
     SmartDashboard.putString("Shooter/launch", "FIRE");
     SmartDashboard.putBoolean("Shooter/isReady", false); 
-
-    left.set(ControlMode.Velocity, leftDistance); 
-    right.set(ControlMode.Velocity, rightDistance);  
-    // leftPIDController.setReference(leftDistance, ControlType.kVelocity);
-    // rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
+    leftPIDController.setReference(leftDistance, ControlType.kVelocity);
+    rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
   }
 
   public void stop(){
