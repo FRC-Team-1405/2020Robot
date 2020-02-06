@@ -11,6 +11,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
@@ -30,6 +31,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -46,8 +48,8 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
   private final ControlPanel controlPanel = new ControlPanel();
-  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
-  private final LEDStrip ledStrip = new LEDStrip(9, 60);
+  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  // private final LEDStrip ledStrip = new LEDStrip(8, 150);
 
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor(); 
@@ -66,10 +68,19 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand(
-        new RunCommand(() -> driveBase.driveRobot(-driver.getY(GenericHID.Hand.kLeft),
-                                                  driver.getX(GenericHID.Hand.kRight), true),
+        new RunCommand(() -> driveBase.driveRobot( driveSpeed(), driveRotation(), true),
         driveBase));
 
+  }
+
+  SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
+  private double driveSpeed(){
+    return driveSpeedFilter.calculate( -driver.getY(Hand.kLeft) );
+  }
+
+  SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
+  private double driveRotation(){
+    return driveRotationFilter.calculate( driver.getX(Hand.kRight) );
   }
 
   /**
@@ -89,12 +100,12 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-    // new JoystickButton(driver, XboxController.Button.kY.value)
-    //   .whenPressed( new InstantCommand( ledStrip::display ));
+    new JoystickButton(driver, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( ledStrip::display ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
     // .whenPressed( new InstantCommand( ledStrip::testOn ));
-    new JoystickButton(driver, XboxController.Button.kY.value)
-    .whenPressed( new InstantCommand( ledStrip::testLEDs ));
+    // new JoystickButton(driver, XboxController.Button.kY.value)
+    // .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenHeld( new RunCommand( lidar::readDistance));
