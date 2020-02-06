@@ -7,11 +7,17 @@
 
 package frc.robot;
 
+import java.util.Map;
 import java.util.function.DoubleSupplier;
 
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
@@ -28,10 +34,13 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -43,20 +52,20 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private final Autonomous1 auto1 = new Autonomous1();
-  private final Autonomous2 auto2 = new Autonomous2();
   private final ArcadeDrive driveBase = new ArcadeDrive(); 
   private final Shooter launcher = new Shooter();
+  private Intake intake = new Intake();
   private final ControlPanel controlPanel = new ControlPanel();
-  private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
-  // private final LEDStrip ledStrip = new LEDStrip(8, 150);
-
+  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor(); 
 
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
-  private Intake intake = new Intake();
+
+  private final Autonomous1 auto1 = new Autonomous1(driveBase);
+  private final Autonomous2 auto2 = new Autonomous2();
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -64,6 +73,7 @@ public class RobotContainer {
   public RobotContainer() {
     // Configure the button bindings
     configureButtonBindings();
+    initShuffleBoard();
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -81,6 +91,21 @@ public class RobotContainer {
   SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
   private double driveRotation(){
     return driveRotationFilter.calculate( driver.getX(Hand.kRight) );
+  }
+
+  SendableChooser<Integer> autoSelector;
+  private void initShuffleBoard(){
+    autoSelector = new SendableChooser<Integer>() ;
+    autoSelector.addOption("Shoot then drive.", 1);
+    autoSelector.addOption("Auto 2", 2);
+    autoSelector.addOption("Auto 3", 3);
+
+    ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
+    autoTab.add(autoSelector)
+            .withWidget(BuiltInWidgets.kComboBoxChooser);
+
+    SmartDashboard.putNumber("Auto/Selected_Auto", 1);
+    SmartDashboard.putNumber("Auto/Initial_Delay", 0);
   }
 
   /**
@@ -110,7 +135,7 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenHeld( new RunCommand( lidar::readDistance));
 
-    // SmartDashboard.putNumber("Right/speed", 0); 
+        // SmartDashboard.putNumber("Right/speed", 0); 
     // SmartDashboard.putNumber("Left/speed", 0); 
     // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
     //   .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
@@ -137,7 +162,7 @@ public class RobotContainer {
       );
 
       new JoystickButton(operator, XboxController.Button.kX.value)
-        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_DISTANCE),
+        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
                                               () -> {},
                                               (interrupted) -> { controlPanel.stop(); }, 
                                               controlPanel::isRotationComplete,
@@ -172,10 +197,33 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable));
-                                                                   
+               
+
 
   };
 
+
+  // An example selector method for the selectcommand.  Returns the selector that will select
+  // which command to run.  Can base this choice on logical conditions evaluated at runtime.
+  
+  private int select() {
+    return (int) autoSelector.getSelected();
+  }
+
+  // An example selectcommand.  Will select from the three commands based on the value returned
+  // by the selector method at runtime.  Note that selectcommand works on Object(), so the
+  // selector does not have to be an enum; it could be any desired type (string, integer,
+  // boolean, double...)
+  private final Command selectCommand =
+      new SelectCommand(
+          // Maps selector values to commands
+          Map.ofEntries(
+              Map.entry(1, auto1),
+              Map.entry(2, auto2),
+              Map.entry(3, new PrintCommand("Command three was selected!"))
+          ),
+          this::select
+      );
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
@@ -183,7 +231,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return auto1;
+    // return autoCommand;
+    return selectCommand;
   }
 }

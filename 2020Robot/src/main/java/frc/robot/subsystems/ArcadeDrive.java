@@ -65,6 +65,15 @@ public class ArcadeDrive extends SubsystemBase {
     }
   }
 
+  public double getDistance(){
+    return (driveLeft.getSelectedSensorPosition() + driveRight.getSelectedSensorPosition())/2;
+  }
+
+  public void resetDistance(){
+    driveLeft.setSelectedSensorPosition(0);
+    driveRight.setSelectedSensorPosition(0);
+  }
+
   public double getVelocity(){
    return Math.sqrt(gyro.getVelocityX()*gyro.getVelocityX() + gyro.getVelocityY()*gyro.getVelocityY());
   }

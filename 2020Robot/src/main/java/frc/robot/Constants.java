@@ -47,6 +47,9 @@ public final class Constants {
 
     public final static int lidarBufferSize = 20;
 
+    public final static double auto1Speed = 0.5;
+    public final static double auto1Distance = 20000;
+
     public static class TurnPID {
         public static double kP = 0.0;
         public static double kI = 0.0;
@@ -62,7 +65,8 @@ public final class Constants {
     }
 
     public static class ControlPanelConstants {
-        public final static int ROTATION_DISTANCE = 10000; 
+        public final static int ROTATION_CONTROL_DISTANCE = 10000; 
+        public final static int ROTATION_SEGMENT_DISTANCE = 417;
         public final static double SPEED = .3;
         public final static int COLOR_ADJUST = 1000;
         public final static int POSITION_ADJUST = 50;
