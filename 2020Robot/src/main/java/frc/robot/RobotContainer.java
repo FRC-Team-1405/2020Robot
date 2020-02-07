@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -106,6 +107,9 @@ public class RobotContainer {
 
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
     SmartDashboard.putNumber("Auto/Initial_Delay", 0);
+
+
+    SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
