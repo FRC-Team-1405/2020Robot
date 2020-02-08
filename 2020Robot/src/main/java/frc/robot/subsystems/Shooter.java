@@ -15,9 +15,11 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.sensors.LidarLitePWM;
 
 public class Shooter extends SubsystemBase {
   /**
@@ -41,11 +43,11 @@ public class Shooter extends SubsystemBase {
   public CANEncoder rightEncoder = new CANEncoder(right); 
 
   CANPIDController leftPIDController = new CANPIDController(left);  
-  CANPIDController rightPIDController = new CANPIDController(right); 
+  CANPIDController rightPIDController = new CANPIDController(right);
+  
+  private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
   public Shooter() { 
-    SmartDashboard.putBoolean("Shooter/isReady", false);
-    SmartDashboard.putString("Shooter/launch", ""); 
   }
 
   @Override
@@ -53,11 +55,12 @@ public class Shooter extends SubsystemBase {
     // This method will be called once per scheduler run 
     //SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
     //SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
+    //For competitons comment out shuffleboard distance and uncomment variable
+    SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
+    //lidarLitePWM.getDistance();
   }
 
   public void launch(double leftDistance, double rightDistance){
-    SmartDashboard.putString("Shooter/launch", "FIRE");
-    SmartDashboard.putBoolean("Shooter/isReady", false); 
     leftPIDController.setReference(leftDistance, ControlType.kVelocity);
     rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
   }
@@ -77,43 +80,45 @@ public class Shooter extends SubsystemBase {
 
   private double CalculatePower(double distance, Setting low, Setting high){ 
     //From slope point formula (y-y_1) = m(x-x_1) -> y = m(x-x_1) + y_1
-    double power = ((high.power - low.power) / (high.distance - low.distance)) * ((distance - low.distance) + low.power);
+    double power = (((high.power - low.power) / (high.distance - low.distance)) * (distance - low.distance) + low.power);
     return power;
   }
 
   Setting settings[] = new Setting[] {
-                                        new Setting(19200, 10),
-                                        new Setting(17200, 20),
-                                        new Setting(15100, 30), 
-                                        new Setting(13100, 40),
-                                        new Setting(11100, 50) };
+                                        new Setting(2000, 200),
+                                        new Setting(3000, 300),
+                                        new Setting(4000, 400), 
+                                        new Setting(5000, 500),
+                                        new Setting(6000, 600) };
 
   public void fire(double distance){
-    SmartDashboard.putString("Shooter/fire", "FIRE");
-    SmartDashboard.putBoolean("Shooter/isReady", false);
     int lowIndex = 0;
     int highIndex = 0;
+    double power = 0.0;
 
     if(distance < settings[0].distance){
-      lowIndex = 0;
-      highIndex = 0;
+      power = settings[0].power;
     }
     else if(distance > settings[settings.length-1].distance){
-      lowIndex = settings.length-1;
-      highIndex = settings.length-1;
+      power = settings[settings.length-1].power;
     }
     else{
       for(int i = 1; i < settings.length-2; i++){
         if(distance < settings[i].distance){
           lowIndex = i-1;
           highIndex = i;
+          power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
           break;
         }
       }
     }
-    double power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
     left.set(power);
     right.set(power);
-    
+    SmartDashboard.putNumber("Shooter_Power", power);
+    SmartDashboard.putNumber("Shooter_Distance", distance);
+  }
+
+  public void fire(){
+    fire(lidarLitePWM.getDistance());
   }
 }

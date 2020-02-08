@@ -28,7 +28,6 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
-import frc.robot.sensors.LidarLitePWM;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -43,8 +42,6 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DigitalSource;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -65,8 +62,6 @@ public class RobotContainer {
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final ColorSensor colorSensor = new ColorSensor();
-
-  private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
@@ -92,12 +87,20 @@ public class RobotContainer {
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
   private double driveSpeed(){
-    return driveSpeedFilter.calculate( -driver.getY(Hand.kLeft) );
+    double speed = -driver.getY(Hand.kLeft);
+    if(Math.abs(speed) < Constants.deadBand)
+      speed = 0.0;
+    SmartDashboard.putNumber("Drive_Speed", speed);
+    return driveSpeedFilter.calculate(speed);
   }
 
   SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
   private double driveRotation(){
-    return driveRotationFilter.calculate( driver.getX(Hand.kRight) );
+    double rotation = driver.getX(Hand.kRight);
+    if(Math.abs(rotation) < Constants.deadBand)
+      rotation = 0.0;
+    SmartDashboard.putNumber("Drive_Rotation", rotation);
+    return driveRotationFilter.calculate(rotation);
   }
 
   SendableChooser<Integer> autoSelector;
@@ -115,7 +118,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Auto/Initial_Delay", 0);
 
 
-    SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
+    //SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
@@ -150,6 +153,10 @@ public class RobotContainer {
     // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
     //   .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
     //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+    new JoystickButton(driver, XboxController.Button.kBumperRight.value)
+      .whenHeld( new RunCommand( () -> { launcher.fire(); }) )
+      .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+      
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
       .toggleWhenPressed( new TestShooter(launcher, driver::getPOV ) );
 
@@ -208,8 +215,7 @@ public class RobotContainer {
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable)); 
 
-      new JoystickButton(operator, XboxController.Button.kY.value) 
-      .whenHeld(new RunCommand(() -> { SmartDashboard.putNumber("Distance", lidarLitePWM.getDistance());})); 
+
                
 
 
