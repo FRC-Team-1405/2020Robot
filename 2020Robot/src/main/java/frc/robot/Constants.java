@@ -78,4 +78,23 @@ public final class Constants {
         public final static int RETRACT_POSITION = 0;
         public static double SPEED = .8;
     }
+
+    public static class VelocityConversions{
+        public final static double SensorUnitsForMilliseconds = (1/100);
+        public final static int MillisecondsToSensorUnits = (100/1);
+        public final static double SecondsUnitsForMilliseconds = (1/1000);
+        public final static int MillisecondsToSeconds = (1000/1);
+        public final static double FRotationsToSensorUnits = (1/2048);
+        public final static int SensorUnitsToFRotations = (2048/1);
+        public final static double DriveShaftRotationsToFRotations = (1/8.68);
+        public final static double FRotationsToDriveShaftRotations = (8.68/1);
+        public final static double InchesToDriveShaftRotations = ((6*Math.PI)/1);
+        public final static double DriveShaftRotationsToInches = (1/(6*Math.PI));
+        public final static double MetersToInches = (1/39.37);
+        public final static double InchesToMeters = (39.37/1);
+        public final static double TimeAndFalconVToDriveV = (SensorUnitsForMilliseconds * MillisecondsToSeconds);
+        public final static double DriveVToTimeAndFalconV = (MillisecondsToSeconds * SensorUnitsForMilliseconds);
+        public final static double FalconVToDriveV = (SensorUnitsForMilliseconds * FRotationsToSensorUnits * DriveShaftRotationsToFRotations * InchesToDriveShaftRotations * MetersToInches);
+        public final static double DriveVToFalconV = (MetersToInches * InchesToDriveShaftRotations * DriveShaftRotationsToFRotations * FRotationsToSensorUnits * SensorUnitsForMilliseconds);
+    }
 }
