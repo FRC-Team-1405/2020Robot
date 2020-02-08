@@ -28,6 +28,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
+import frc.robot.sensors.LidarLitePWM;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -42,6 +43,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalSource;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -53,14 +56,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private final ArcadeDrive driveBase = new ArcadeDrive(); 
+  private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final ControlPanel controlPanel = new ControlPanel();
-  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
+  // Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
-  private final ColorSensor colorSensor = new ColorSensor(); 
+  private final ColorSensor colorSensor = new ColorSensor();
+
+  private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
@@ -200,7 +206,10 @@ public class RobotContainer {
                                             controlPanel));
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
-      .whenReleased(new InstantCommand(intake :: disable));
+      .whenReleased(new InstantCommand(intake :: disable)); 
+
+      new JoystickButton(operator, XboxController.Button.kY.value) 
+      .whenHeld(new RunCommand(() -> { SmartDashboard.putNumber("Distance", lidarLitePWM.getDistance());})); 
                
 
 
