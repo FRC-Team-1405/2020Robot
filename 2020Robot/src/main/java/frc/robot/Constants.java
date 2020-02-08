@@ -30,6 +30,8 @@ public final class Constants {
     public final static int shooterLeft = 10;
     public final static int shooterRight = 11; 
 
+    public final static double deadBand = 0.033;
+
     //All climb/buddy climb motors here 
     public final static int backClampMotorLeft = 12; 
     public final static int frontClampMotorLeft = 13; 
