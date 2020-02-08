@@ -92,4 +92,7 @@ public class ArcadeDrive extends SubsystemBase {
       SmartDashboard.putNumber("Velocity", getVelocity());
       SmartDashboard.putNumber("Heading", getHeading());
     }
+    
+    public void setVelocity(double leftSpeed, double rightSpeed){
+    }
 }
