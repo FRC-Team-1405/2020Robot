@@ -12,7 +12,9 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
@@ -26,6 +28,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
+import frc.robot.sensors.LidarLitePWM;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -38,7 +41,10 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DigitalSource;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -50,14 +56,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private final ArcadeDrive driveBase = new ArcadeDrive(); 
+  private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final ControlPanel controlPanel = new ControlPanel();
-  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0, Constants.ledLength);
+  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
+  // Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
-  private final ColorSensor colorSensor = new ColorSensor(); 
+  private final ColorSensor colorSensor = new ColorSensor();
+
+  private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
@@ -76,10 +85,19 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand(
-        new RunCommand(() -> driveBase.driveRobot(-driver.getY(GenericHID.Hand.kLeft),
-                                                  driver.getX(GenericHID.Hand.kRight), true),
+        new RunCommand(() -> driveBase.driveRobot( driveSpeed(), driveRotation(), true),
         driveBase));
 
+  }
+
+  SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
+  private double driveSpeed(){
+    return driveSpeedFilter.calculate( -driver.getY(Hand.kLeft) );
+  }
+
+  SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
+  private double driveRotation(){
+    return driveRotationFilter.calculate( driver.getX(Hand.kRight) );
   }
 
   SendableChooser<Integer> autoSelector;
@@ -95,6 +113,9 @@ public class RobotContainer {
 
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
     SmartDashboard.putNumber("Auto/Initial_Delay", 0);
+
+
+    SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
@@ -114,12 +135,12 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-    // new JoystickButton(driver, XboxController.Button.kY.value)
-    //   .whenPressed( new InstantCommand( ledStrip::display ));
+    new JoystickButton(driver, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( ledStrip::display ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
     // .whenPressed( new InstantCommand( ledStrip::testOn ));
-    new JoystickButton(driver, XboxController.Button.kY.value)
-    .whenPressed( new InstantCommand( ledStrip::testLEDs ));
+    // new JoystickButton(driver, XboxController.Button.kY.value)
+    // .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenHeld( new RunCommand( lidar::readDistance));
@@ -185,7 +206,10 @@ public class RobotContainer {
                                             controlPanel));
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
-      .whenReleased(new InstantCommand(intake :: disable));
+      .whenReleased(new InstantCommand(intake :: disable)); 
+
+      new JoystickButton(operator, XboxController.Button.kY.value) 
+      .whenHeld(new RunCommand(() -> { SmartDashboard.putNumber("Distance", lidarLitePWM.getDistance());})); 
                
 
 
