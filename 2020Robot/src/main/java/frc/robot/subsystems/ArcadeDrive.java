@@ -82,6 +82,10 @@ public class ArcadeDrive extends SubsystemBase {
     return Math.IEEEremainder(gyro.getAngle(), 360.0);
   }
 
+  public double getRoll(){
+    return gyro.getRoll();
+  }
+
   public double getRate(){
     return gyro.getRate();
   }

@@ -54,6 +54,26 @@ public class LEDStrip {
         }
     }
 
+    //colors for climbing
+    public void red1(){
+
+    }
+    public void blue1(){
+
+    }
+    public void green1(){
+
+    }
+    public void red2(){
+
+    }
+    public void blue2(){
+
+    }
+    public void green2(){
+
+    }
+
     public void setColor(Color8Bit color, int index){ 
         if(index >= ledCount)
             return; 

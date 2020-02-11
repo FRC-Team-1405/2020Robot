@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
@@ -22,13 +23,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
+import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
+import frc.robot.sensors.LidarLitePWM;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -56,11 +60,14 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
+  private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
   // Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
+  private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
+  private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
   private final ColorSensor colorSensor = new ColorSensor();
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -68,6 +75,8 @@ public class RobotContainer {
 
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2();
+
+  private final ClimbLEDs climbLEDs = new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -117,6 +126,14 @@ public class RobotContainer {
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
     SmartDashboard.putNumber("Auto/Initial_Delay", 0);
 
+    // SmartDashboard.putNumber("Left_Robot_Weight", 200);
+    // SmartDashboard.putNumber("Right_Robot_Weight", 200);
+
+    // For now use https://www.geogebra.org/m/aapcdzvf to find ideal distances and tolerances
+    SmartDashboard.putNumber("Left_Robot_Distance_Inches", 40);
+    SmartDashboard.putNumber("Right_Robot_Distance_Inches", 40);
+    SmartDashboard.putNumber("Left_Tolerance_Inches", 10);
+    SmartDashboard.putNumber("Right_Tolerance_Inches", 10);
 
     //SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
@@ -211,6 +228,10 @@ public class RobotContainer {
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
                                             controlPanel));
+
+      new JoystickButton(operator, XboxController.Button.kStart.value)
+      .whenPressed(climbLEDs);
+
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable)); 

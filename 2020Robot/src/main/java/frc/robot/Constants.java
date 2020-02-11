@@ -53,6 +53,9 @@ public final class Constants {
     public final static double auto1Speed = 0.5;
     public final static double auto1Distance = 20000;
 
+    // Centimeters
+    public final static double robotWidth = 69.342;
+
     public static class TurnPID {
         public static double kP = 0.0;
         public static double kI = 0.0;
@@ -61,6 +64,13 @@ public final class Constants {
     }
 
     public static class DriveStraightPID {
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+        public static double kF = 0.0;
+    }
+
+    public static class BalancePID {
         public static double kP = 0.0;
         public static double kI = 0.0;
         public static double kD = 0.0;
