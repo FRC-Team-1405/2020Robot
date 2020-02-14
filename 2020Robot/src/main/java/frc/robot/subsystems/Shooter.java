@@ -34,16 +34,16 @@ public class Shooter extends SubsystemBase {
       public double distance;
     } ; 
 
-  //public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
-  //public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
-   public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
-   public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
+  public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
+  public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
+  //  public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
+  //  public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
 
-  public CANEncoder leftEncoder = new CANEncoder(left); 
-  public CANEncoder rightEncoder = new CANEncoder(right); 
+  // public CANEncoder leftEncoder = new CANEncoder(left); 
+  // public CANEncoder rightEncoder = new CANEncoder(right); 
 
-  CANPIDController leftPIDController = new CANPIDController(left);  
-  CANPIDController rightPIDController = new CANPIDController(right);
+  // CANPIDController leftPIDController = new CANPIDController(left);  
+  // CANPIDController rightPIDController = new CANPIDController(right);
   
   private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
@@ -53,16 +53,18 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
-    //SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
-    //SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
+    SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
+    SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
     //For competitons comment out shuffleboard distance and uncomment variable
     SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     //lidarLitePWM.getDistance();
   }
 
   public void launch(double leftDistance, double rightDistance){
-    leftPIDController.setReference(leftDistance, ControlType.kVelocity);
-    rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
+    // leftPIDController.setReference(leftDistance, ControlType.kVelocity);
+    // rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
+    left.set(ControlMode.Velocity, leftDistance); 
+    right.set(ControlMode.Velocity, rightDistance); 
   }
 
   public void stop(){
