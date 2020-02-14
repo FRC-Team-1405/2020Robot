@@ -49,11 +49,28 @@ public class Climber extends SubsystemBase {
     // This method will be called once per scheduler run
   } 
 
+  public void moveLeft(double distance){
+    leftClimbMotor.set(ControlMode.Position, distance);
+  }
+
+  public void moveRight(double distance){
+    rightClimbMotor.set(ControlMode.Position, distance);
+  }
+
   public void reachUp(){  
     leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
   } 
 
   public void goHome(){ 
     rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+  }
+
+  // get lengths in centimeters
+  public double getLeftScissorLength(){
+    return 0.0;
+  }
+
+  public double getRightScissorLength(){
+    return 0.0;
   }
 }

@@ -7,13 +7,17 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.SerialPort;
+
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
- * constants.  This class should not be used for any other purpose.  All constants should be
- * declared globally (i.e. public static).  Do not put anything functional in this class.
+ * The Constants class provides a convenient place for teams to hold robot-wide
+ * numerical or boolean constants. This class should not be used for any other
+ * purpose. All constants should be declared globally (i.e. public static). Do
+ * not put anything functional in this class.
  *
- * <p>It is advised to statically import this class (or one of its inner classes) wherever the
- * constants are needed, to reduce verbosity.
+ * <p>
+ * It is advised to statically import this class (or one of its inner classes)
+ * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants { 
     public final static int PDP = 0;
@@ -43,7 +47,7 @@ public final class Constants {
     public final static int rightClimbMotor = 19;   
 
     //Led strip length 
-    public final static int ledLength =29; 
+    public final static int ledLength =20; 
 
     public final static int pilot = 0;
     public final static int operator = 1;
@@ -52,6 +56,9 @@ public final class Constants {
 
     public final static double auto1Speed = 0.5;
     public final static double auto1Distance = 20000;
+
+    // Centimeters
+    public final static double robotWidth = 69.342;
 
     public static class TurnPID {
         public static double kP = 0.0;
@@ -65,6 +72,22 @@ public final class Constants {
         public static double kI = 0.0;
         public static double kD = 0.0;
         public static double kF = 0.0;
+    }
+
+    public static class BalancePID {
+        public static double kP = 0.0;
+        public static double kI = 0.0;
+        public static double kD = 0.0;
+        public static double kF = 0.0;
+    }
+
+    public static class Lidar {
+        public final static int BAUD_RATE = 9600;
+        public static final SerialPort.Port PORT = SerialPort.Port.kUSB1;
+        public static final int DATA_BITS = 8;
+        public static final SerialPort.Parity PARITY = SerialPort.Parity.kNone;
+        public static final SerialPort.StopBits STOP_BITS = SerialPort.StopBits.kOne;
+        public static final String LIDAR_KEY = "LIDAR VALUES";
     }
 
     public static class ControlPanelConstants {

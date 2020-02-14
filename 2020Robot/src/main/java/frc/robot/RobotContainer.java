@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
@@ -24,13 +25,17 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
+import frc.robot.sensors.LidarLitePWM;
+import frc.robot.sensors.LidarReader;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
@@ -59,11 +64,15 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
+  private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
   // Constants.ledLength);
   private final LEDStrip ledStrip = new LEDStrip(9, 60);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
+  private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
+  private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
+  // private final LidarReader lidarReader = new LidarReader();
   private final ColorSensor colorSensor = new ColorSensor();
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -71,6 +80,8 @@ public class RobotContainer {
 
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2();
+
+  private final ClimbLEDs climbLEDs = new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -83,6 +94,8 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
+
+    // lidarReader.start();
   }
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
@@ -106,10 +119,12 @@ public class RobotContainer {
   SendableChooser<Integer> autoSelector; 
    
   private void initShuffleBoard(){
-    autoSelector = new SendableChooser<Integer>() ;
+    autoSelector = new SendableChooser<Integer>();
+    autoSelector.addOption("Drive forward", 0);
     autoSelector.addOption("Shoot then drive.", 1);
     autoSelector.addOption("Auto 2", 2);
     autoSelector.addOption("Auto 3", 3);
+    autoSelector.setDefaultOption("Drive forward", 0);
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
     autoTab.add(autoSelector)
@@ -124,6 +139,14 @@ public class RobotContainer {
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
     
 
+    // SmartDashboard.putNumber("Left_Robot_Weight", 200);
+    // SmartDashboard.putNumber("Right_Robot_Weight", 200);
+
+    // For now use https://www.geogebra.org/m/aapcdzvf to find ideal distances and tolerances
+    SmartDashboard.putNumber("Left_Robot_Distance_Inches", 40);
+    SmartDashboard.putNumber("Right_Robot_Distance_Inches", 40);
+    SmartDashboard.putNumber("Left_Tolerance_Inches", 10);
+    SmartDashboard.putNumber("Right_Tolerance_Inches", 10);
 
     //SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
@@ -145,10 +168,10 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-    new JoystickButton(driver, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand( ledStrip::display ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
-    // .whenPressed( new InstantCommand( ledStrip::testOn ));
+    //   .whenPressed( new InstantCommand( ledStrip::display ));
+    new JoystickButton(driver, XboxController.Button.kY.value)
+    .whenPressed( new InstantCommand( ledStrip::testOn ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
     // .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
@@ -218,14 +241,14 @@ public class RobotContainer {
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
                                             controlPanel));
+
+      new JoystickButton(operator, XboxController.Button.kStart.value)
+      .whenPressed(climbLEDs);
+
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable)); 
-
-
-               
-
-
+      
   };
 
 
@@ -244,6 +267,7 @@ public class RobotContainer {
       new SelectCommand(
           // Maps selector values to commands
           Map.ofEntries(
+              Map.entry(0, new PrintCommand("*************Driving forward************")),
               Map.entry(1, auto1),
               Map.entry(2, auto2),
               Map.entry(3, new PrintCommand("Command three was selected!"))
