@@ -19,10 +19,12 @@ import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
+import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
@@ -45,6 +47,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -90,9 +93,8 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    driveBase.setDefaultCommand(
-        new RunCommand(() -> driveBase.driveRobot( driveSpeed(), driveRotation(), true),
-        driveBase));
+    driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
+
     // lidarReader.start();
   }
 
@@ -114,7 +116,8 @@ public class RobotContainer {
     return driveRotationFilter.calculate(rotation);
   }
 
-  SendableChooser<Integer> autoSelector;
+  SendableChooser<Integer> autoSelector; 
+   
   private void initShuffleBoard(){
     autoSelector = new SendableChooser<Integer>();
     autoSelector.addOption("Drive forward", 0);
@@ -128,7 +131,13 @@ public class RobotContainer {
             .withWidget(BuiltInWidgets.kComboBoxChooser);
 
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
-    SmartDashboard.putNumber("Auto/Initial_Delay", 0);
+    SmartDashboard.putNumber("Auto/Initial_Delay", 0); 
+
+  
+
+    ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
+    testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
+    
 
     // SmartDashboard.putNumber("Left_Robot_Weight", 200);
     // SmartDashboard.putNumber("Right_Robot_Weight", 200);
@@ -169,17 +178,17 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kBack.value)
       .whenHeld( new RunCommand( lidar::readDistance));
 
-        // SmartDashboard.putNumber("Right/speed", 0); 
-    // SmartDashboard.putNumber("Left/speed", 0); 
-    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-    //   .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
-    //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+        SmartDashboard.putNumber("Right/speed", 0); 
+    SmartDashboard.putNumber("Left/speed", 0); 
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-      .whenHeld( new RunCommand( () -> { launcher.fire(); }) )
+      .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
       .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
+    //   .whenHeld( new RunCommand( () -> { launcher.fire(); }) )
+    //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
       
-    new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-      .toggleWhenPressed( new TestShooter(launcher, driver::getPOV ) );
+    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
+    //   .toggleWhenPressed( new TestShooter(launcher, driver::getPOV ) );
 
     DoubleSupplier setPoint = new DoubleSupplier(){
       public double getAsDouble() {

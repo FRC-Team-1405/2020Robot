@@ -19,6 +19,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj2.command.PIDCommand;
+
 public class ArcadeDrive extends SubsystemBase {
   /**
    * Creates a new ArcadeDrive.
@@ -65,10 +68,6 @@ public class ArcadeDrive extends SubsystemBase {
     }
   }
 
-  public double getDistance(){
-    return (driveLeft.getSelectedSensorPosition() + driveRight.getSelectedSensorPosition())/2;
-  }
-
   public void resetDistance(){
     driveLeft.setSelectedSensorPosition(0);
     driveRight.setSelectedSensorPosition(0);
@@ -98,5 +97,20 @@ public class ArcadeDrive extends SubsystemBase {
     }
     
     public void setVelocity(double leftSpeed, double rightSpeed){
+      driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
+      driveRight.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
+    }
+    public void resetEncoder(){
+      driveLeft.setSelectedSensorPosition(0);
+      driveRight.setSelectedSensorPosition(0);
+      SmartDashboard.putNumber("ArcadeDrive/Distance", 0);
+    }
+    public double getDistance(){
+      double distance = (((driveLeft.getSelectedSensorPosition()
+              +driveRight.getSelectedSensorPosition())/2.0)
+                  *Constants.VelocityConversions.FVelocityToMetersPerSecond);
+      SmartDashboard.putNumber("ArcadeDrive/Distance", distance);
+      return distance;
+
     }
 }
