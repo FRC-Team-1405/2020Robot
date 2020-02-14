@@ -2,12 +2,13 @@
    hacking away because I don't know if the
    Limelight stuff should be in another file */
 
-   package frc.robot.sensors;
+package frc.robot.sensors;
 
-   //import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-   import edu.wpi.first.networktables.NetworkTable;
-   import edu.wpi.first.networktables.NetworkTableEntry;
-   import edu.wpi.first.networktables.NetworkTableInstance;
+//import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
    
    public class Limelight {
        private NetworkTable table;
@@ -23,6 +24,7 @@
        private NetworkTableEntry tvert;
        private NetworkTableEntry getpipe;
        private NetworkTableEntry getCamMode;
+       private NetworkTableEntry tcornxy;
 
        //public byte pipeline;
        /* public enum pipe {
@@ -52,6 +54,7 @@
        tlong  = table.getEntry("tlong");
        thoriz = table.getEntry("thoriz");
        tvert  = table.getEntry("tvert");
+       tcornxy = table.getEntry("tcornxy");
        getpipe= table.getEntry("getpipe");
        getCamMode = table.getEntry("camMode");
        }
@@ -126,6 +129,19 @@
        public double getTVERT() {
            return tvert.getDouble(0.0);
        } 
+       public double[] getTCORNXY() {
+           return tcornxy.getDoubleArray(new double[] {0.0});
+       }
+       public double getTXPos() {
+           double x1 = getTCORNXY()[0];
+           double x2 = getTCORNXY()[2];
+           return (x1 + (x2-x1)/2.0);
+       }
+       public double getTYPos() {
+            double y1 = getTCORNXY()[1];
+            double y2 = getTCORNXY()[3];
+            return y1 + (y2-y1)/2;
+    }
        /* public double fixedAngleDist(double h1, double h2,
                     double a1) {
        
