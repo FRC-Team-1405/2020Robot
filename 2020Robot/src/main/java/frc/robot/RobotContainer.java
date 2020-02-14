@@ -31,6 +31,7 @@ import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.LIDARCanifier;
 import frc.robot.sensors.LidarLitePWM;
+import frc.robot.sensors.LidarReader;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
@@ -68,6 +69,7 @@ public class RobotContainer {
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
+  // private final LidarReader lidarReader = new LidarReader();
   private final ColorSensor colorSensor = new ColorSensor();
 
   private XboxController driver = new XboxController(Constants.pilot);
@@ -91,7 +93,7 @@ public class RobotContainer {
     driveBase.setDefaultCommand(
         new RunCommand(() -> driveBase.driveRobot( driveSpeed(), driveRotation(), true),
         driveBase));
-
+    // lidarReader.start();
   }
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
@@ -114,10 +116,12 @@ public class RobotContainer {
 
   SendableChooser<Integer> autoSelector;
   private void initShuffleBoard(){
-    autoSelector = new SendableChooser<Integer>() ;
+    autoSelector = new SendableChooser<Integer>();
+    autoSelector.addOption("Drive forward", 0);
     autoSelector.addOption("Shoot then drive.", 1);
     autoSelector.addOption("Auto 2", 2);
     autoSelector.addOption("Auto 3", 3);
+    autoSelector.setDefaultOption("Drive forward", 0);
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
     autoTab.add(autoSelector)
@@ -155,10 +159,10 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kStart.value)
       .whenPressed( new RunCommand( FMSData::getColor ));
 
-    new JoystickButton(driver, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand( ledStrip::display ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
-    // .whenPressed( new InstantCommand( ledStrip::testOn ));
+    //   .whenPressed( new InstantCommand( ledStrip::display ));
+    new JoystickButton(driver, XboxController.Button.kY.value)
+    .whenPressed( new InstantCommand( ledStrip::testOn ));
     // new JoystickButton(driver, XboxController.Button.kY.value)
     // .whenPressed( new InstantCommand( ledStrip::testLEDs ));
     
@@ -235,11 +239,7 @@ public class RobotContainer {
       new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
       .whenReleased(new InstantCommand(intake :: disable)); 
-
-
-               
-
-
+      
   };
 
 
@@ -258,6 +258,7 @@ public class RobotContainer {
       new SelectCommand(
           // Maps selector values to commands
           Map.ofEntries(
+              Map.entry(0, new PrintCommand("*************Driving forward************")),
               Map.entry(1, auto1),
               Map.entry(2, auto2),
               Map.entry(3, new PrintCommand("Command three was selected!"))
