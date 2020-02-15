@@ -107,8 +107,8 @@ public class ArcadeDrive extends SubsystemBase {
     }
     public double getDistance(){
       double distance = (((driveLeft.getSelectedSensorPosition()
-              +driveRight.getSelectedSensorPosition())/2.0)
-                  *Constants.VelocityConversions.FVelocityToMetersPerSecond);
+              -driveRight.getSelectedSensorPosition())/2.0)
+                  *Constants.VelocityConversions.SensorToMeters);
       SmartDashboard.putNumber("ArcadeDrive/Distance", distance);
       return distance;
 

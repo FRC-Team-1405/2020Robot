@@ -127,8 +127,10 @@ public final class Constants {
         public final static double SensorUnitsPerRotation = 2048;
         public final static double DriveBaseReduction = 8.68;
         public final static double InchesPerMeter = 39.37;
+        public final static double SensorToMeters = (1.0 / SensorUnitsPerRotation) * (1.0 / DriveBaseReduction) * WheelCircumference * (1.0 / InchesPerMeter);
+        public final static double MetersToSensor = (1.0 / SensorToMeters);
         public final static double FVelocityToMetersPerSecond = (SensorTimePerSec * WheelCircumference)/(SensorUnitsPerRotation * DriveBaseReduction * InchesPerMeter); 
-        public final static double MetersPerSecondToVelocity = 1/FVelocityToMetersPerSecond; 
+        public final static double MetersPerSecondToVelocity = 1.0/FVelocityToMetersPerSecond; 
 
 
     }
