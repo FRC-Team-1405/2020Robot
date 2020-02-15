@@ -46,6 +46,11 @@ public final class Constants {
     public final static int leftClimbMotor = 18; 
     public final static int rightClimbMotor = 19;   
 
+    public final static int leftFrontSwitchid = 0;
+    public final static int rightFrontSwitchid = 1;
+    public final static int leftBackSwitchid = 2;
+    public final static int rightBackSwitchid = 3;
+
     //Led strip length 
     public final static int ledLength =20; 
 
