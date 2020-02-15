@@ -47,11 +47,11 @@ public class TestShooter extends CommandBase {
     SmartDashboard.putNumber("Power", power); 
 
     if(spin < 0) 
-      shooter.launch(power + (power * Math.abs(spin)), power - (power * Math.abs(spin))); 
+      shooter.launch(-power + (power * Math.abs(spin)), power - (power * Math.abs(spin))); 
     else if(spin>0)
-      shooter.launch(power - (power * Math.abs(spin)), power + (power * Math.abs(spin))); 
+      shooter.launch(-power - (power * Math.abs(spin)), power + (power * Math.abs(spin))); 
     else
-      shooter.launch(power, power); 
+      shooter.launch(-power, power); 
 
     int currentPov = pov.getAsInt();
     if (currentPov == -1)
