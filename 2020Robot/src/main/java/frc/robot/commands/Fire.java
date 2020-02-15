@@ -26,12 +26,17 @@ public class Fire extends CommandBase {
   public void initialize() {
     shooter.limelight.setPipeline((byte) 2);
     shooter.limelight.setLED((byte) 3);
+    shooter.prepFlywheels(shooter.limelight.getTX());
+    shooter.turnTurret((int) shooter.limelight.getTX());
   }
-
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    shooter.fire();
+    if(shooter.turretReady() && shooter.flywheelReady()){
+      shooter.fire();
+    }else{
+      shooter.stopIndexer();
+    }
   }
 
   // Called once the command ends or is interrupted.
@@ -39,12 +44,13 @@ public class Fire extends CommandBase {
   public void end(boolean interrupted) {
     shooter.limelight.setPipeline((byte) 3);
     shooter.limelight.setPipeline((byte) 1);
-    shooter.stop();
+    shooter.stopIndexer();
+    shooter.stopFlywheels();
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return false; 
   }
 }

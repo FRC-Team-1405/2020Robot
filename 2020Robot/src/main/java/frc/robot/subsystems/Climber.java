@@ -27,12 +27,12 @@ public class Climber extends SubsystemBase {
    public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
    
   //Regular bois go here: 
-   public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
-   public WPI_TalonSRX buddyBarLiftMotorRight = new WPI_TalonSRX(Constants.buddyBarLiftMotorRight); 
-   public WPI_TalonSRX frontClampMotorLeft = new WPI_TalonSRX(Constants.frontClampMotorLeft); 
-   public WPI_TalonSRX backClampMotorLeft = new WPI_TalonSRX(Constants.backClampMotorLeft); 
-   public WPI_TalonSRX frontClampMotorRight = new WPI_TalonSRX(Constants.frontClampMotorRight); 
-   public WPI_TalonSRX backClampMotorRight = new WPI_TalonSRX(Constants.backClampMotorRight); 
+  //  public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
+  //  public WPI_TalonSRX buddyBarLiftMotorRight = new WPI_TalonSRX(Constants.buddyBarLiftMotorRight); 
+  //  public WPI_TalonSRX frontClampMotorLeft = new WPI_TalonSRX(Constants.frontClampMotorLeft); 
+  //  public WPI_TalonSRX backClampMotorLeft = new WPI_TalonSRX(Constants.backClampMotorLeft); 
+  //  public WPI_TalonSRX frontClampMotorRight = new WPI_TalonSRX(Constants.frontClampMotorRight); 
+  //  public WPI_TalonSRX backClampMotorRight = new WPI_TalonSRX(Constants.backClampMotorRight); 
 
   //Configurable values for the climb motor: 
   public double reachPosition = 0.0; 

@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import javax.swing.text.Position;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANEncoder;
@@ -19,6 +21,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.lib.MathTools;
 import frc.robot.sensors.LidarLitePWM;
 import frc.robot.sensors.Limelight;
 
@@ -37,6 +40,9 @@ public class Shooter extends SubsystemBase {
 
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
+  public WPI_TalonSRX turret = new WPI_TalonSRX(Constants.turretid);
+  public WPI_TalonSRX indexer = new WPI_TalonSRX(Constants.indexerid);
+  public WPI_TalonSRX trigger = new WPI_TalonSRX(Constants.triggerid);
   public Limelight limelight = new Limelight();
   //  public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
   //  public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
@@ -71,9 +77,9 @@ public class Shooter extends SubsystemBase {
     SmartDashboard.putNumber("Right Distance", rightDistance); 
   }
 
-  public void stop(){
+  public void stopFlywheels(){
     left.set(0.0); 
-    right.set(0.0);  
+    right.set(0.0); 
   }
 
   public boolean isReady(){
@@ -97,7 +103,7 @@ public class Shooter extends SubsystemBase {
                                         new Setting(5000, 500),
                                         new Setting(6000, 600) };
 
-  public void fire(double distance){
+  public void prepFlywheels(double distance){
     int lowIndex = 0;
     int highIndex = 0;
     double power = 0.0;
@@ -125,6 +131,32 @@ public class Shooter extends SubsystemBase {
   }
 
   public void fire(){
-    fire(lidarLitePWM.getDistance());
+    prepFlywheels(lidarLitePWM.getDistance());
+    indexer.set(ControlMode.Velocity, 0.5);
+    trigger.set(ControlMode.Velocity, 0.5);
+  }
+
+  public void stopIndexer(){
+    indexer.set(ControlMode.Velocity, 0);
+    trigger.set(ControlMode.Velocity, 0);
+  }
+
+  public boolean flywheelReady() {
+    return left.getClosedLoopError() <= Constants.maxFlywheelError && right.getClosedLoopError() <= Constants.maxFlywheelError ;
+  }
+  public void turnTurret(int angle){
+    int currentPos = turret.getSelectedSensorPosition();
+    angle = MathTools.map(angle, Constants.angleMin, Constants.angleMax, Constants.unitsMin, Constants.unitsMax);
+    if(currentPos+angle < Constants.unitsMin){
+      turret.set(ControlMode.Position, Constants.unitsMin);
+    } else if(currentPos+angle > Constants.unitsMax){
+      turret.set(ControlMode.Position, Constants.unitsMax);
+    } else{
+      turret.set(ControlMode.Position, currentPos+angle);
+    }
+  }
+
+  public boolean turretReady(){
+    return Math.abs(limelight.getTX()) <= 5;
   }
 }

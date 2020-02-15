@@ -33,16 +33,19 @@ public final class Constants {
 
     public final static int shooterLeft = 10;
     public final static int shooterRight = 11; 
+    public final static int turretid = 12;
+    public final static int indexerid = 13;
+    public final static int triggerid = 14;
 
     public final static double deadBand = 0.033;
 
     //All climb/buddy climb motors here 
-    public final static int backClampMotorLeft = 12; 
-    public final static int frontClampMotorLeft = 13; 
-    public final static int frontClampMotorRight = 14; 
-    public final static int backClampMotorRight = 15;
-    public final static int buddyBarLiftMotorLeft = 16; 
-    public final static int buddyBarLiftMotorRight = 17; 
+    // public final static int backClampMotorLeft = 12; 
+    // public final static int frontClampMotorLeft = 13; 
+    // public final static int frontClampMotorRight = 14; 
+    // public final static int backClampMotorRight = 15;
+    // public final static int buddyBarLiftMotorLeft = 16; 
+    // public final static int buddyBarLiftMotorRight = 17; 
     public final static int leftClimbMotor = 18; 
     public final static int rightClimbMotor = 19;   
 
@@ -60,10 +63,18 @@ public final class Constants {
     public final static int lidarBufferSize = 20;
 
     public final static double auto1Speed = 0.5;
-    public final static double auto1Distance = 20000;
+    public final static double auto1Distance = 2;//distance in meters
 
     // Centimeters
     public final static double robotWidth = 69.342;
+
+    //Turret constants
+    public final static int angleMin = -90;
+    public final static int angleMax = 90;
+    public final static int unitsMin = 12000;
+    public final static int unitsMax = 24000;
+
+    public static int maxFlywheelError = 60;
 
     public static class TurnPID {
         public static double kP = 0.0;

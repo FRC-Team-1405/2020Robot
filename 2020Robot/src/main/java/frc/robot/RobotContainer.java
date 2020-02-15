@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.DriveDistance;
 import frc.robot.commands.Fire;
 import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
@@ -79,7 +80,8 @@ public class RobotContainer {
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
 
-  private final Autonomous1 auto1 = new Autonomous1(driveBase);
+  private final DriveDistance auto0 = new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed);
+  private final Autonomous1 auto1 = new Autonomous1(driveBase, launcher);
   private final Autonomous2 auto2 = new Autonomous2();
 
   /**
@@ -183,7 +185,7 @@ public class RobotContainer {
     SmartDashboard.putNumber("Left/speed", 0); 
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
-      .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
+      .whenReleased( new InstantCommand( () -> { launcher.stopFlywheels(); })); 
     // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
     //   .whenHeld( new RunCommand( () -> { launcher.fire(); }) )
     //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
@@ -261,7 +263,7 @@ public class RobotContainer {
       new SelectCommand(
           // Maps selector values to commands
           Map.ofEntries(
-              Map.entry(0, new PrintCommand("*************Driving forward************")),
+              Map.entry(0, auto0),
               Map.entry(1, auto1),
               Map.entry(2, auto2),
               Map.entry(3, new PrintCommand("Command three was selected!"))
