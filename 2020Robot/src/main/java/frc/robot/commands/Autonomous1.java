@@ -13,6 +13,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.Shooter;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -21,11 +22,11 @@ public class Autonomous1 extends SequentialCommandGroup {
   /**
    * Creates a new Autonomous1.
    */
-  public Autonomous1(ArcadeDrive driveBase) {
+  public Autonomous1(ArcadeDrive driveBase, Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new PrintCommand("Shooting"), new DriveDistance(driveBase, Constants.auto1Distance));
-    super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new PrintCommand("*********************Shooting***********************"), new PrintCommand("~~~~~~~~~~~~~~~~~~~~~~~DriveDistance~~~~~~~~~~~~~~~~~~~~~~~~~"));
+    super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new Fire(shooter).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
+        new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
 
   }
 }

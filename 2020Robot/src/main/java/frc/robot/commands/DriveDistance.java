@@ -17,8 +17,8 @@ public class DriveDistance extends DriveStraight {
    */
   private ArcadeDrive driveBase;
   private double distance;
-  public DriveDistance(ArcadeDrive driveBase, double distance) {
-    super(driveBase, Constants.auto1Speed);
+  public DriveDistance(ArcadeDrive driveBase, double distance, double speed) {
+    super(driveBase, speed);
     // Use addRequirements() here to declare subsystem dependencies.
     this.driveBase = driveBase;
     this.distance = distance;
@@ -39,6 +39,6 @@ public class DriveDistance extends DriveStraight {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return driveBase.getDistance() >= distance;
+    return driveBase.getDistance() >= distance*Constants.VelocityConversions.MetersPerSecondToVelocity/Constants.VelocityConversions.SensorTimePerSec;
   }
 }
