@@ -10,6 +10,9 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.SparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -23,8 +26,10 @@ public class Climber extends SubsystemBase {
    */ 
   
    //This is a Falcon 500. Not sure if FX will work. 
-   public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
-   public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
+  //  public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
+  //  public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
+   public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
+   public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless);
    
   //Regular bois go here: 
    public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
@@ -47,7 +52,6 @@ public class Climber extends SubsystemBase {
 
     SmartDashboard.putNumber("Climb Position", reachPosition); 
     SmartDashboard.putNumber("Home Position", homePosition); 
-
   }
 
   @Override
@@ -56,20 +60,25 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
   } 
 
+  public void directControl(double left, double right){
+    leftClimbMotor.set(left);
+    rightClimbMoter.set(right);
+  }
+  
   public void moveLeft(double distance){
-    leftClimbMotor.set(ControlMode.Position, distance);
+    // leftClimbMotor.set(ControlMode.Position, distance);
   }
 
   public void moveRight(double distance){
-    rightClimbMotor.set(ControlMode.Position, distance);
+    // rightClimbMotor.set(ControlMode.Position, distance);
   }
 
   public void reachUp(){  
-    leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+    // leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
   } 
 
   public void goHome(){ 
-    rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+    // rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
   }
 
   boolean leftToggle = false;

@@ -94,6 +94,10 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
+    climber.setDefaultCommand( new RunCommand( () -> {
+      climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
+    }, climber));
+
     // lidarReader.start();
   }
 
@@ -242,7 +246,6 @@ public class RobotContainer {
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
                                             controlPanel));
-      
   };
 
 
