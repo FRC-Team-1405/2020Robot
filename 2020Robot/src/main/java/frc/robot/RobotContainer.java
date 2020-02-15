@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.Fire;
 import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
@@ -81,8 +82,6 @@ public class RobotContainer {
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2();
 
-  private final ClimbLEDs climbLEDs = new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance);
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -129,15 +128,30 @@ public class RobotContainer {
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
     autoTab.add(autoSelector)
             .withWidget(BuiltInWidgets.kComboBoxChooser);
-
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
-    SmartDashboard.putNumber("Auto/Initial_Delay", 0); 
+    autoTab.add("Auto/Initial_Delay", 0); 
 
   
 
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-    
+    testCommandsTab.add( new Fire(launcher));
+    testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
+    InstantCommand testLEDs = new InstantCommand(ledStrip::testOn);
+    testLEDs.setName("Test_LEDs");
+    testCommandsTab.add(testLEDs);
+    RunCommand getColor = new RunCommand( FMSData::getColor );
+    getColor.setName("Get_Color");
+    testCommandsTab.add(getColor);
+    InstantCommand displayLEDs = new InstantCommand(ledStrip::display);
+    displayLEDs.setName("Display_LEDs");
+    testCommandsTab.add(displayLEDs);
+    RunCommand readDistance = new RunCommand(lidar::readDistance);
+    readDistance.setName("Read_Distance");
+    testCommandsTab.add(readDistance);
+    RunCommand readColor = new RunCommand(colorSensor::readColor);
+    readColor.setName("Read_Color");
+    testCommandsTab.add(readColor);
 
     // SmartDashboard.putNumber("Left_Robot_Weight", 200);
     // SmartDashboard.putNumber("Right_Robot_Weight", 200);
@@ -161,24 +175,11 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
 
-    new JoystickButton(driver, XboxController.Button.kA.value) 
-      .whenHeld( new RunCommand( colorSensor::readColor )); 
+    new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
+      .whenHeld( new InstantCommand( intake :: enable))
+      .whenReleased(new InstantCommand(intake :: disable)); 
 
-    // Testing
-    new JoystickButton(driver, XboxController.Button.kStart.value)
-      .whenPressed( new RunCommand( FMSData::getColor ));
-
-    // new JoystickButton(driver, XboxController.Button.kY.value)
-    //   .whenPressed( new InstantCommand( ledStrip::display ));
-    new JoystickButton(driver, XboxController.Button.kY.value)
-    .whenPressed( new InstantCommand( ledStrip::testOn ));
-    // new JoystickButton(driver, XboxController.Button.kY.value)
-    // .whenPressed( new InstantCommand( ledStrip::testLEDs ));
-    
-    new JoystickButton(driver, XboxController.Button.kBack.value)
-      .whenHeld( new RunCommand( lidar::readDistance));
-
-        SmartDashboard.putNumber("Right/speed", 0); 
+    SmartDashboard.putNumber("Right/speed", 0); 
     SmartDashboard.putNumber("Left/speed", 0); 
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
       .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
@@ -241,13 +242,6 @@ public class RobotContainer {
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
                                             controlPanel));
-
-      new JoystickButton(operator, XboxController.Button.kStart.value)
-      .whenPressed(climbLEDs);
-
-      new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new InstantCommand( intake :: enable))
-      .whenReleased(new InstantCommand(intake :: disable)); 
       
   };
 

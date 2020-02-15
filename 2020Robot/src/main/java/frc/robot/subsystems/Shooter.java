@@ -20,6 +20,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.sensors.LidarLitePWM;
+import frc.robot.sensors.Limelight;
 
 public class Shooter extends SubsystemBase {
   /**
@@ -36,6 +37,7 @@ public class Shooter extends SubsystemBase {
 
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
+  public Limelight limelight = new Limelight();
   //  public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
   //  public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
 
