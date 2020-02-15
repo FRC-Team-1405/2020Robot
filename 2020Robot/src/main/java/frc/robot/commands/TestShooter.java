@@ -42,15 +42,16 @@ public class TestShooter extends CommandBase {
   public void execute() { 
     double high = SmartDashboard.getNumber("TestShooter/High", 0); 
     double low  = SmartDashboard.getNumber("TestShooter/Low", 0); 
-    double spin = SmartDashboard.getNumber("TestShooter/Spin", 0); 
+    double spin = SmartDashboard.getNumber("TestShooter/Spin", 0) / 2.0; 
     double power = (high + low) / 2.0; 
+    SmartDashboard.putNumber("Power", power); 
 
     if(spin < 0) 
-      shooter.launch(power + Math.abs(spin), power - Math.abs(spin)); 
+      shooter.launch(power + (power * Math.abs(spin)), power - (power * Math.abs(spin))); 
     else if(spin>0)
-      shooter.launch(power - Math.abs(spin), power + Math.abs(spin)); 
+      shooter.launch(power - (power * Math.abs(spin)), power + (power * Math.abs(spin))); 
     else
-      shooter.launch(power - Math.abs(spin), power + Math.abs(spin)); 
+      shooter.launch(power, power); 
 
     int currentPov = pov.getAsInt();
     if (currentPov == -1)
@@ -60,12 +61,12 @@ public class TestShooter extends CommandBase {
           SmartDashboard.putNumber("TestShooter/Low", power); 
           lastPovValue = currentPov; 
            break;
-        case 90: 
+        case 180: 
           SmartDashboard.putNumber("TestShooter/High", power); 
           lastPovValue = currentPov; 
           break;
       }
-    } else if (currentPov == 0 || currentPov == 90) {
+    } else if (currentPov == 0 || currentPov == 180) {
       lastPovValue = currentPov;
     }
   }
