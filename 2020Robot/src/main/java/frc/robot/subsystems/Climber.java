@@ -53,6 +53,7 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+    SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
   } 
 
   public void moveLeft(double distance){
