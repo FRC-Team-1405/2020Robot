@@ -65,6 +65,8 @@ public class Shooter extends SubsystemBase {
     // rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
     left.set(ControlMode.Velocity, leftDistance); 
     right.set(ControlMode.Velocity, rightDistance); 
+    SmartDashboard.putNumber("Left Distance", leftDistance); 
+    SmartDashboard.putNumber("Right Distance", rightDistance); 
   }
 
   public void stop(){
