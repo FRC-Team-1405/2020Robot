@@ -28,6 +28,7 @@ public class Fire extends CommandBase {
     shooter.limelight.setLED((byte) 3);
     shooter.prepFlywheels(shooter.limelight.getTX());
     shooter.turnTurret((int) shooter.limelight.getTX());
+    shooter.stopIndexer();
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
