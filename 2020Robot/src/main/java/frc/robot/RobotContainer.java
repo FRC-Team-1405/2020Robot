@@ -70,7 +70,7 @@ public class RobotContainer {
   private final ControlPanel controlPanel = new ControlPanel();
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
   // Constants.ledLength);
-  private final LEDStrip ledStrip = new LEDStrip(9, 60);
+  private final LEDStrip ledStrip = new LEDStrip(9, 300);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
@@ -143,13 +143,10 @@ public class RobotContainer {
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
     testCommandsTab.add( new Fire(launcher));
     testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
-    InstantCommand testLEDs = new InstantCommand(ledStrip::testOn);
-    testLEDs.setName("Test_LEDs");
-    testCommandsTab.add(testLEDs);
     RunCommand getColor = new RunCommand( FMSData::getColor );
     getColor.setName("Get_Color");
     testCommandsTab.add(getColor);
-    InstantCommand displayLEDs = new InstantCommand(ledStrip::display);
+    InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
     displayLEDs.setName("Display_LEDs");
     testCommandsTab.add(displayLEDs);
     RunCommand readDistance = new RunCommand(lidar::readDistance);

@@ -31,28 +31,7 @@ public class LEDStrip {
         led.start();
     }
     
-    public LEDStrip(SPI.Port portID, int ledCount){
-        port = new SPI(portID); 
-        this.ledCount = ledCount;  
-        data = new byte[ledCount * 4 + 8]; 
-        data[0] = (byte) 0x00; 
-        data[1] = (byte) 0x00; 
-        data[2] = (byte) 0x00;  
-        data[3] = (byte) 0x00;  
-        data[data.length-1] = (byte) 0xFF; 
-        data[data.length-2] = (byte) 0xFF; 
-        data[data.length-3] = (byte) 0xFF;  
-        data[data.length-4] = (byte) 0xFF;  
-
-        Color8Bit finneyGreen = new Color8Bit(0, 64, 0);
-        Color8Bit finneyGold = new Color8Bit(230, 185, 5);
-        for (int ledIndex = 0 ; ledIndex < ledCount ; ledIndex++){
-            if (ledIndex % 3 == 0)
-                setColor(finneyGold, ledIndex);
-            else
-                setColor(finneyGreen, ledIndex);
-        }
-    }
+   
 
     //colors for climbing
     public void red1(){
@@ -116,46 +95,12 @@ public class LEDStrip {
 
    public void testLEDs(){
     for (var i = 0; i < ledBuffer.getLength(); i++) {
-        ledBuffer.setRGB(i, 0, 255-i, i);
+        ledBuffer.setRGB(i, 0, Math.abs(255-i) % 100, i % 100);
      }
      led.setData(ledBuffer);
      led.start();
    }
 
-   public void testOn(){
-    byte[] data = new byte[] {(byte) 0x00, (byte) 0x00, (byte)0x00, (byte)0x00,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0x00, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0x00,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0x00, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0xFF, (byte)0xFF,
-                              (byte) 0xFE, (byte) 0xFF, (byte)0x00, (byte)0x00,
-                              (byte) 0xFF, (byte) 0xFF, (byte)0xFF, (byte)0xFF
-                             };
-    port.write(data, data.length);
-} 
+
 
 }
