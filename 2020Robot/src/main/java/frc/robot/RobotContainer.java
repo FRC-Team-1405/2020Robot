@@ -80,9 +80,8 @@ public class RobotContainer {
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
 
-  private final DriveDistance auto0 = new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed);
-  private final Autonomous1 auto1 = new Autonomous1(driveBase, launcher);
-  private final Autonomous2 auto2 = new Autonomous2();
+  private final Autonomous1 auto1 = new Autonomous1(driveBase);
+  private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -125,11 +124,11 @@ public class RobotContainer {
    
   private void initShuffleBoard(){
     autoSelector = new SendableChooser<Integer>();
-    autoSelector.addOption("Drive forward", 0);
-    autoSelector.addOption("Shoot then drive.", 1);
-    autoSelector.addOption("Auto 2", 2);
+    autoSelector.addOption("Do nothing", 0);
+    autoSelector.addOption("Drive forward.", 1);
+    autoSelector.addOption("Shoot then drive", 2);
     autoSelector.addOption("Auto 3", 3);
-    autoSelector.setDefaultOption("Drive forward", 0);
+    autoSelector.setDefaultOption("Do nothing", 0);
 
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
     autoTab.add(autoSelector)
@@ -159,6 +158,7 @@ public class RobotContainer {
     readColor.setName("Read_Color");
     testCommandsTab.add(readColor);
 
+
     // SmartDashboard.putNumber("Left_Robot_Weight", 200);
     // SmartDashboard.putNumber("Right_Robot_Weight", 200);
 
@@ -180,6 +180,10 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
+
+    new JoystickButton(driver, XboxController.Button.kA.value)
+      .whenPressed( new InstantCommand( () -> {driveBase.setVelocity(1.0, 1.0); }))
+      .whenReleased(new InstantCommand( driveBase::stop ));
 
     new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
@@ -266,7 +270,7 @@ public class RobotContainer {
       new SelectCommand(
           // Maps selector values to commands
           Map.ofEntries(
-              Map.entry(0, auto0),
+              Map.entry(0, new PrintCommand("Do nothing")),
               Map.entry(1, auto1),
               Map.entry(2, auto2),
               Map.entry(3, new PrintCommand("Command three was selected!"))

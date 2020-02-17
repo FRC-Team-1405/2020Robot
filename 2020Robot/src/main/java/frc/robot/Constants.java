@@ -62,8 +62,8 @@ public final class Constants {
 
     public final static int lidarBufferSize = 20;
 
-    public final static double auto1Speed = 0.5;
-    public final static double auto1Distance = 2;//distance in meters
+    public final static double auto1Speed = 0.25;
+    public final static double auto1Distance = 1;//distance in meters
 
     // Centimeters
     public final static double robotWidth = 69.342;

@@ -73,6 +73,11 @@ public class ArcadeDrive extends SubsystemBase {
     driveRight.setSelectedSensorPosition(0);
   }
 
+  public void stop(){
+    driveLeft.set(ControlMode.PercentOutput, 0);
+    driveRight.set(ControlMode.PercentOutput, 0);
+  }
+
   public double getVelocity(){
    return Math.sqrt(gyro.getVelocityX()*gyro.getVelocityX() + gyro.getVelocityY()*gyro.getVelocityY());
   }
@@ -95,7 +100,7 @@ public class ArcadeDrive extends SubsystemBase {
       SmartDashboard.putNumber("Velocity", getVelocity());
       SmartDashboard.putNumber("Heading", getHeading());
     }
-    
+     
     public void setVelocity(double leftSpeed, double rightSpeed){
       driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
       driveRight.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
