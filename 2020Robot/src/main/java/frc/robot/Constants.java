@@ -8,6 +8,8 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -65,14 +67,22 @@ public final class Constants {
     public final static double auto1Speed = 0.25;
     public final static double auto1Distance = 1;//distance in meters
 
-    // Centimeters
-    public final static double robotWidth = 69.342;
+    // meters
+    public final static double robotWidth = 6.9342;
 
     //Turret constants
     public final static int angleMin = -90;
     public final static int angleMax = 90;
     public final static int unitsMin = 12000;
     public final static int unitsMax = 24000;
+
+    //TrajectoryDrive constants
+    public static final double kTrackwidthMeters = 0.5461;
+    public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
+	public static final double maxVelocity = 1;
+	public static final double maxAcceleration = 0.5;
+    public static final double kRamseteB = 2;
+    public static final double kRamseteZeta = 0.7;
 
     public static int maxFlywheelError = 60;
 

@@ -10,11 +10,15 @@ package frc.robot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -34,6 +38,7 @@ public class ArcadeDrive extends SubsystemBase {
   DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
 
   private AHRS gyro = new AHRS(I2C.Port.kMXP);
+  private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
   boolean driveForward = true;
   
   public ArcadeDrive() {
@@ -46,6 +51,9 @@ public class ArcadeDrive extends SubsystemBase {
     driveRightSlave.set(ControlMode.Follower, Constants.driveRight);
 
     driveBase.setDeadband(0.0);
+
+    driveLeft.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
+    driveRight.configSelectedFeedbackSensor(FeedbackDevice.IntegratedSensor);
   }
 
   public void toggleDriveDirection(){
@@ -99,6 +107,17 @@ public class ArcadeDrive extends SubsystemBase {
       // This method will be called once per scheduler run
       SmartDashboard.putNumber("Velocity", getVelocity());
       SmartDashboard.putNumber("Heading", getHeading());
+      odometry.update(Rotation2d.fromDegrees(getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
+                      driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
+    }
+
+    public Pose2d getPose() {
+      return odometry.getPoseMeters();
+    }
+    public void resetOdometry(Pose2d pose) {
+      driveLeft.setSelectedSensorPosition(0);
+      driveRight.setSelectedSensorPosition(0);
+      odometry.resetPosition(pose, Rotation2d.fromDegrees(getHeading()));
     }
      
     public void setVelocity(double leftSpeed, double rightSpeed){
