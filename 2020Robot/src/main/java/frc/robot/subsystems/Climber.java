@@ -119,7 +119,7 @@ public class Climber extends SubsystemBase {
     return (rightToggle && leftToggle);
   }
 
-  // get lengths in centimeters
+  // get lengths in meters
   public double getLeftScissorLength(){
     return 0.0;
   }

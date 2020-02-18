@@ -107,6 +107,7 @@ public class LEDStrip {
      }
      led.setData(ledBuffer);
      led.start();
+     led.stop();
    }
 
 }

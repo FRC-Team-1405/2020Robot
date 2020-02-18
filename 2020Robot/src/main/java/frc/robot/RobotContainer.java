@@ -27,6 +27,7 @@ import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.BatteryLED;
 import frc.robot.commands.DefaultDrive;
+import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.Fire;
 import frc.robot.commands.ClimbLEDs;
@@ -71,9 +72,7 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
-  // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
-  // Constants.ledLength);
-  // private final LEDStrip ledStrip = new LEDStrip(9, 300);
+  private final LEDStrip ledStrip = new LEDStrip(9, 300);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
@@ -147,13 +146,14 @@ public class RobotContainer {
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
     testCommandsTab.add( new Fire(launcher));
-    // testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
+    testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
+    testCommandsTab.add( new DriveByVelocity(driveBase));
     RunCommand getColor = new RunCommand( FMSData::getColor );
     getColor.setName("Get_Color");
     testCommandsTab.add(getColor);
-    // InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
-    // displayLEDs.setName("Display_LEDs");
-    // testCommandsTab.add(displayLEDs);
+    InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
+    displayLEDs.setName("Display_LEDs");
+    testCommandsTab.add(displayLEDs);
     RunCommand readDistance = new RunCommand(lidar::readDistance);
     readDistance.setName("Read_Distance");
     testCommandsTab.add(readDistance);
@@ -182,10 +182,6 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(driver, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
-
-    new JoystickButton(driver, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand( () -> {driveBase.setVelocity(1.0, 1.0); }))
-      .whenReleased(new InstantCommand( driveBase::stop ));
 
     new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake :: enable))
