@@ -31,7 +31,15 @@ public class LEDStrip {
         led.start();
     }
     
-   
+    public AddressableLEDBuffer getLedBuffer(){
+        return ledBuffer;
+    }
+
+    public void displayLEDBuffer(AddressableLEDBuffer ledBuffer){
+        this.ledBuffer = ledBuffer;
+        led.setData(ledBuffer);
+    }
+
 
     //colors for climbing
     public void red1(){
@@ -100,7 +108,5 @@ public class LEDStrip {
      led.setData(ledBuffer);
      led.start();
    }
-
-
 
 }

@@ -22,8 +22,10 @@ import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.Constants.BatteryMonitor;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
+import frc.robot.commands.BatteryLED;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.Fire;
@@ -42,6 +44,7 @@ import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -70,7 +73,7 @@ public class RobotContainer {
   private final ControlPanel controlPanel = new ControlPanel();
   // private final LEDStrip ledStrip = new LEDStrip(SPI.Port.kOnboardCS0,
   // Constants.ledLength);
-  private final LEDStrip ledStrip = new LEDStrip(9, 300);
+  // private final LEDStrip ledStrip = new LEDStrip(9, 300);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
@@ -82,6 +85,9 @@ public class RobotContainer {
 
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
+
+  public final BatteryLED batteryMonitor = new BatteryLED( new LEDStrip(Constants.PWM_Port.batteryDisplay, Constants.BatteryMonitor.ledCount));
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -141,20 +147,19 @@ public class RobotContainer {
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
     testCommandsTab.add( new Fire(launcher));
-    testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
+    // testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
     RunCommand getColor = new RunCommand( FMSData::getColor );
     getColor.setName("Get_Color");
     testCommandsTab.add(getColor);
-    InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
-    displayLEDs.setName("Display_LEDs");
-    testCommandsTab.add(displayLEDs);
+    // InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
+    // displayLEDs.setName("Display_LEDs");
+    // testCommandsTab.add(displayLEDs);
     RunCommand readDistance = new RunCommand(lidar::readDistance);
     readDistance.setName("Read_Distance");
     testCommandsTab.add(readDistance);
     RunCommand readColor = new RunCommand(colorSensor::readColor);
     readColor.setName("Read_Color");
     testCommandsTab.add(readColor);
-
 
     // SmartDashboard.putNumber("Left_Robot_Weight", 200);
     // SmartDashboard.putNumber("Right_Robot_Weight", 200);

@@ -139,4 +139,15 @@ public final class Constants {
         public final static double VelocityI = 0;
         public final static double VelocityD = 0;
     }
+
+    public class BatteryMonitor{
+        public final static double maxVoltage = 13;
+        public final static double minVoltage = 7;
+        public final static int ledCount = 12;
+        public final static int brightness = 100;
+    }
+
+    public class PWM_Port{
+        public final static int batteryDisplay = 8;
+    }
 }

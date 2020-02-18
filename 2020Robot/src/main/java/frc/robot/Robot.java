@@ -54,10 +54,12 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void disabledInit() {
+    m_robotContainer.batteryMonitor.schedule();
   }
 
   @Override
   public void disabledPeriodic() {
+    CommandScheduler.getInstance().run();
   }
 
   /**
