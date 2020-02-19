@@ -128,6 +128,7 @@ public final class Constants {
     public static class IntakeConstants {
         public final static int DEPLOY_POSITION = 1000;
         public final static int RETRACT_POSITION = 0;
+        public final static int RENDEZVOUS_POSITION = 500; 
         public static double SPEED = -0.8;
     }
 
