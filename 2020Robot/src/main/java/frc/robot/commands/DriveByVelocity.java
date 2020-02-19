@@ -21,12 +21,12 @@ public class DriveByVelocity extends CommandBase {
   public DriveByVelocity(ArcadeDrive driveBase) {
     this.driveBase = driveBase;
     addRequirements(driveBase);
+    SmartDashboard.putNumber("DriveByVelocity/Velocity (m/s)", 0);
   }
 
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SmartDashboard.putNumber("DriveByVelocity/Velocity (m/s)", 0);
     velocity = SmartDashboard.getNumber("DriveByVelocity/Velocity (m/s)", 0);
   }
 

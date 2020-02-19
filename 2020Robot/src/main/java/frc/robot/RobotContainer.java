@@ -30,9 +30,11 @@ import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.Fire;
+import frc.robot.commands.FollowPath;
 import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
+import frc.robot.lib.PathGenerator;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
@@ -72,7 +74,6 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
-  //private final LEDStrip ledStrip = new LEDStrip(3, 300);
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
@@ -85,7 +86,6 @@ public class RobotContainer {
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
-  public final BatteryLED batteryMonitor = new BatteryLED( new LEDStrip(Constants.PWM_Port.batteryDisplay, Constants.BatteryMonitor.ledCount));
 
 
   /**
@@ -161,6 +161,10 @@ public class RobotContainer {
     RunCommand readColor = new RunCommand(colorSensor::readColor);
     readColor.setName("Read_Color");
     testCommandsTab.add(readColor);
+
+    InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
+    resetPosition.setName("Reset Position");
+    testCommandsTab.add(resetPosition);
 
     // SmartDashboard.putNumber("Left_Robot_Weight", 200);
     // SmartDashboard.putNumber("Right_Robot_Weight", 200);
@@ -250,7 +254,14 @@ public class RobotContainer {
                                             () -> {},
                                             (interrupted) -> { controlPanel.stop(); },
                                             controlPanel::isRotationComplete,
-                                            controlPanel));
+                                            controlPanel)); 
+
+      new JoystickButton(driver, XboxController.Button.kStart.value)
+        .whenHeld( new FollowPath( PathGenerator.driveCurveTest(), driveBase).andThen( () -> driveBase.stop() ) )
+        .whenReleased( () -> driveBase.stop() );
+
+      // new JoystickButton(driver, XboxController.Button.kA.value) 
+      // .whenHeld(new DriveByVelocity(driveBase));                         
   };
 
 

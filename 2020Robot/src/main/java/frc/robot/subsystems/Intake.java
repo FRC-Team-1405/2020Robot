@@ -33,11 +33,15 @@ public class Intake extends SubsystemBase {
 
   public void deploy(){
     intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.DEPLOY_POSITION);
+  } 
+
+  public void deployRendezvous(){ 
+    intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.RENDEZVOUS_POSITION); 
   }
 
   public void retract(){
     intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.RETRACT_POSITION);
-  }
+  } 
 
   public void enable(){
     intakeTalon.set(ControlMode.PercentOutput, Constants.IntakeConstants.SPEED);

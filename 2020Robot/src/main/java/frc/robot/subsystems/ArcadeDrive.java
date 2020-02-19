@@ -107,8 +107,13 @@ public class ArcadeDrive extends SubsystemBase {
       // This method will be called once per scheduler run
       SmartDashboard.putNumber("Velocity", getVelocity());
       SmartDashboard.putNumber("Heading", getHeading());
-      odometry.update(Rotation2d.fromDegrees(getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
-                      driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
+      odometry.update(Rotation2d.fromDegrees(-getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
+                      -driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
+    }
+
+    public void resetPosition(){
+      gyro.reset();
+      resetOdometry( new Pose2d() );
     }
 
     public Pose2d getPose() {
@@ -121,8 +126,10 @@ public class ArcadeDrive extends SubsystemBase {
     }
      
     public void setVelocity(double leftSpeed, double rightSpeed){
-      driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
-      driveRight.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
+      SmartDashboard.putNumber("ArcadeDrive/Speed Left", Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
+      SmartDashboard.putNumber("ArcadeDrive/Speed Right", Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
+      driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed); 
+      driveRight.set(ControlMode.Velocity, - Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed); 
     }
     public void resetEncoder(){
       driveLeft.setSelectedSensorPosition(0);
