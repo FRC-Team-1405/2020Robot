@@ -86,6 +86,7 @@ public class RobotContainer {
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
+  public final BatteryLED batteryMonitor = new BatteryLED( new LEDStrip(Constants.PWM_Port.batteryDisplay, Constants.BatteryMonitor.ledCount));
 
 
   /**
