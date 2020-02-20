@@ -40,39 +40,6 @@ public class LEDStrip {
         led.setData(ledBuffer);
     }
 
-
-    //colors for climbing
-    public void red1(){
-        for (int ledIndex = 0 ; ledIndex < ledCount/2 ; ledIndex++){
-            setColor(new Color8Bit(255, 0, 0), ledIndex);
-        }
-    }
-    public void blue1(){
-        for (int ledIndex = 0 ; ledIndex < ledCount/2 ; ledIndex++){
-            setColor(new Color8Bit(0, 0, 255), ledIndex);
-        }
-    }
-    public void green1(){
-        for (int ledIndex = 0 ; ledIndex < ledCount/2 ; ledIndex++){
-            setColor(new Color8Bit(0, 255, 0), ledIndex);
-        }
-    }
-    public void red2(){
-        for (int ledIndex = ledCount/2 ; ledIndex < ledCount ; ledIndex++){
-            setColor(new Color8Bit(255, 0, 0), ledIndex);
-        }
-    }
-    public void blue2(){
-        for (int ledIndex = ledCount/2 ; ledIndex < ledCount ; ledIndex++){
-            setColor(new Color8Bit(0, 0, 255), ledIndex);
-        }
-    }
-    public void green2(){
-        for (int ledIndex = ledCount/2 ; ledIndex < ledCount ; ledIndex++){
-            setColor(new Color8Bit(0, 255, 0), ledIndex);
-        }
-    }
-
     public void setColor(Color8Bit color, int index){ 
         if(index >= ledCount)
             return; 

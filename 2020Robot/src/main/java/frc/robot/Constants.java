@@ -38,6 +38,8 @@ public final class Constants {
     public final static int turretid = 12;
     public final static int indexerid = 13;
     public final static int triggerid = 14;
+    public final static int leftActuatorId = 1;
+    public final static int rightActuatorId = 2;
 
     public final static double deadBand = 0.033;
 
@@ -75,6 +77,8 @@ public final class Constants {
     public final static int angleMax = 90;
     public final static int unitsMin = 12000;
     public final static int unitsMax = 24000;
+    public final static double elevationMin = 0.2;
+    public final static double elevationMax = 0.8;
 
     //TrajectoryDrive constants
     public static final double kTrackwidthMeters = 0.5461;

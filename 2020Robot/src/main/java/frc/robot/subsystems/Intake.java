@@ -50,4 +50,8 @@ public class Intake extends SubsystemBase {
   public void disable(){
     intakeTalon.set(ControlMode.PercentOutput, 0);
   }
+
+  public void outtake(){
+    intakeTalon.set(ControlMode.PercentOutput, -Constants.IntakeConstants.SPEED);
+  }
 }
