@@ -15,25 +15,39 @@ public class Fire extends CommandBase {
    * Creates a new Fire.
    */
   private Shooter shooter;
+  private double distance=0;
   public Fire(Shooter shooter) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.shooter = shooter;
     addRequirements(this.shooter);
   }
 
+  public Fire(Shooter shooter, double distance) {
+    this.shooter = shooter;
+    this.distance = distance;
+    addRequirements(this.shooter);
+  }
+
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    shooter.limelight.setPipeline((byte) 2);
-    shooter.limelight.setLED((byte) 3);
-    shooter.prepFlywheels(shooter.limelight.getTX());
-    shooter.turnTurret((int) shooter.limelight.getTX());
-    shooter.stopIndexer();
+    if(distance==0){
+      shooter.limelight.setPipeline((byte) 2);
+      shooter.limelight.setLED((byte) 3);
+      shooter.prepFlywheels(shooter.lidarLitePWM.getDistance());
+      shooter.turnTurret((int) shooter.limelight.getTX());
+      shooter.stopIndexer();
+    }else{
+      shooter.prepFlywheels(distance);
+      shooter.stopIndexer();
+    }
   }
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    if(shooter.turretReady() && shooter.flywheelReady()){
+    if(shooter.turretReady() && shooter.flywheelReady() && distance==0){
+      shooter.fire();
+    }else if(distance!=0){
       shooter.fire();
     }else{
       shooter.stopIndexer();

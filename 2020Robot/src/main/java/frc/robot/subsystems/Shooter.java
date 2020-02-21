@@ -57,7 +57,7 @@ public class Shooter extends SubsystemBase {
   // CANPIDController leftPIDController = new CANPIDController(left);  
   // CANPIDController rightPIDController = new CANPIDController(right);
   
-  private final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
+  public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
 
   public Shooter() { 
   }
