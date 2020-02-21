@@ -110,10 +110,12 @@ public class ArcadeDrive extends SubsystemBase {
       odometry.update(Rotation2d.fromDegrees(-getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
                       -driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
     }
-
     public void resetPosition(){
-      gyro.reset();
-      resetOdometry( new Pose2d() );
+      resetPosition(0,0);
+    }
+    public void resetPosition(double xPos, double yPos){
+      gyro.reset();;
+      resetOdometry( new Pose2d(xPos,yPos, Rotation2d.fromDegrees(0.0)) );
     }
 
     public Pose2d getPose() {
