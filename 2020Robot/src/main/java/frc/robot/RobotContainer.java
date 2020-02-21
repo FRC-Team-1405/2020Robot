@@ -224,8 +224,8 @@ public class RobotContainer {
      * Operator:
      * +Right bumper: shoot
      * +Left bumper: toggle shooter elevation
-     * Y: manual shoot close
-     * A: manual shoot far
+     * +Y: manual shoot close
+     * +A: manual shoot far
      * +X: rotation control
      * +B: position control
      * +D-pad left: control panel left
@@ -237,7 +237,6 @@ public class RobotContainer {
      * +Start: scissors enable
      * +Left trigger: manual turret adjust left
      * +Right trigger: manual turret adjust right
-     * Back: cancel current command
      */
 
      //B: drive backwards
@@ -272,6 +271,14 @@ public class RobotContainer {
     //Left bumper: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
       .whenPressed( new InstantCommand( launcher::toggleElevation ));
+
+    //Y: manual fire close
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenHeld( new Fire(launcher, Constants.closeFire) );
+
+    //A: manual fire far
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenHeld( new Fire(launcher, Constants.farFire) );
 
     //X: rotation control
     new JoystickButton(operator, XboxController.Button.kX.value)

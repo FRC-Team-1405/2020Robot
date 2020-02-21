@@ -89,6 +89,8 @@ public final class Constants {
     public static final double kRamseteZeta = 0.7;
 
     public static int maxFlywheelError = 60;
+    public static int closeFire = 1000;
+    public static int farFire = 2000;
 
     public static class TurnPID {
         public static double kP = 0.0;
