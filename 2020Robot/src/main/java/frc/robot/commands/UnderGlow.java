@@ -40,6 +40,11 @@ public class UnderGlow extends CommandBase {
     ledStrip.displayLEDBuffer(addressableLEDBuffer);
   }
 
+  @Override
+  public boolean runsWhenDisabled(){
+    return true;
+  }
+
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {

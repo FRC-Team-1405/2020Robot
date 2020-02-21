@@ -158,7 +158,7 @@ public final class Constants {
     }
 
     public class BatteryMonitor{
-        public final static double maxVoltage = 12;
+        public final static double maxVoltage = 12.5;
         public final static double minVoltage = 7;
         //ledCount has to be a multiple of 3
         public final static int ledStart = 0;
