@@ -18,6 +18,7 @@ import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -43,6 +44,9 @@ public class Shooter extends SubsystemBase {
   public WPI_TalonSRX turret = new WPI_TalonSRX(Constants.turretid);
   public WPI_TalonSRX indexer = new WPI_TalonSRX(Constants.indexerid);
   public WPI_TalonSRX trigger = new WPI_TalonSRX(Constants.triggerid);
+  public Servo leftActuator = new Servo(Constants.leftActuatorId);
+  public Servo rightActuator = new Servo(Constants.rightActuatorId);
+  
   public Limelight limelight = new Limelight();
   //  public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
   //  public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
@@ -141,9 +145,37 @@ public class Shooter extends SubsystemBase {
     trigger.set(ControlMode.Velocity, 0);
   }
 
+  public void outtake(){
+    indexer.set(ControlMode.Velocity, -0.5);
+    trigger.set(ControlMode.Velocity, -0.5);
+  }
+
   public boolean flywheelReady() {
     return left.getClosedLoopError() <= Constants.maxFlywheelError && right.getClosedLoopError() <= Constants.maxFlywheelError ;
   }
+
+  public boolean setLow = false;
+
+  public void toggleElevation(){
+    setLow = !setLow;
+  }
+
+  public void setElevationManual(double elevation){
+    leftActuator.set(elevation);
+    rightActuator.set(elevation);
+  }
+
+  public void setElevationMin(){
+    if(setLow){
+      leftActuator.set(Constants.elevationMin);
+      rightActuator.set(Constants.elevationMin);
+    }else{
+      leftActuator.set(Constants.elevationMax); 
+      rightActuator.set(Constants.elevationMax);
+    }
+
+  }
+
   public void turnTurret(int angle){
     int currentPos = turret.getSelectedSensorPosition();
     angle = MathTools.map(angle, Constants.angleMin, Constants.angleMax, Constants.unitsMin, Constants.unitsMax);

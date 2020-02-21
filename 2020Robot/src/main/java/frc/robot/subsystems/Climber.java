@@ -41,7 +41,8 @@ public class Climber extends SubsystemBase {
 
   //Configurable values for the climb motor: 
   public double reachPosition = 0.0; 
-  public double homePosition = 0.0; 
+  public double homePosition = 0.0;
+  public boolean enabled = false; 
 
   DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
   DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
@@ -60,25 +61,37 @@ public class Climber extends SubsystemBase {
     SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
   } 
 
+  public void toggleEnable(){
+    enabled = !enabled;
+  }
+
   public void directControl(double left, double right){
     leftClimbMotor.set(left);
     rightClimbMoter.set(right);
   }
   
   public void moveLeft(double distance){
-    // leftClimbMotor.set(ControlMode.Position, distance);
+    if(enabled){
+      // leftClimbMotor.set(ControlMode.Position, distance);
+    }
   }
 
   public void moveRight(double distance){
-    // rightClimbMotor.set(ControlMode.Position, distance);
+    if(enabled){
+      // rightClimbMotor.set(ControlMode.Position, distance);
+    }
   }
 
   public void reachUp(){  
-    // leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+    if(enabled){
+      // leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+    }
   } 
 
   public void goHome(){ 
-    // rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+    if(enabled){
+      // rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+    }
   }
 
   boolean leftToggle = false;

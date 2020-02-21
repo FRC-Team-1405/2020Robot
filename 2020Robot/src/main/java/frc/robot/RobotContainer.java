@@ -8,6 +8,7 @@
 package frc.robot;
 
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
@@ -31,9 +32,9 @@ import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveDistance;
 import frc.robot.commands.Fire;
 import frc.robot.commands.FollowPath;
-import frc.robot.commands.ClimbLEDs;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
+import frc.robot.lib.MathTools;
 import frc.robot.lib.PathGenerator;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
@@ -54,6 +55,8 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
@@ -105,6 +108,10 @@ public class RobotContainer {
       climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
     }, climber));
 
+    // climber.setDefaultCommand( new RunCommand( () -> {
+    //   climber.positionControl( this::leftScissorPos, this::rightScissorPos );
+    // }, climber));
+
     // lidarReader.start();
   }
 
@@ -124,6 +131,20 @@ public class RobotContainer {
       rotation = 0.0;
     SmartDashboard.putNumber("Drive_Rotation", rotation);
     return driveRotationFilter.calculate(rotation);
+  }
+
+  private double leftScissorPos(){
+    double pos = -operator.getY(Hand.kLeft);
+    if(Math.abs(pos) < Constants.deadBand)
+      pos = 0.0;
+    return MathTools.map(pos, 0.0, 1.0, -10.0, 10.0);
+  }
+
+  private double rightScissorPos(){
+    double pos = -operator.getY(Hand.kLeft);
+    if(Math.abs(pos) < Constants.deadBand)
+    pos = 0.0;
+    return MathTools.map(pos, 0.0, 1.0, -10.0, 10.0);
   }
 
   SendableChooser<Integer> autoSelector; 
@@ -147,11 +168,12 @@ public class RobotContainer {
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
     testCommandsTab.add( new Fire(launcher));
-    //testCommandsTab.add(new ClimbLEDs(ledStrip, driveBase, leftLidar::getDistance, rightLidar::getDistance));
+
     testCommandsTab.add( new DriveByVelocity(driveBase));
     RunCommand getColor = new RunCommand( FMSData::getColor );
     getColor.setName("Get_Color");
     testCommandsTab.add(getColor);
+
     testCommandsTab.add( batteryMonitor );
     //InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
     //displayLEDs.setName("Display_LEDs");
@@ -159,6 +181,7 @@ public class RobotContainer {
     RunCommand readDistance = new RunCommand(lidar::readDistance);
     readDistance.setName("Read_Distance");
     testCommandsTab.add(readDistance);
+
     RunCommand readColor = new RunCommand(colorSensor::readColor);
     readColor.setName("Read_Color");
     testCommandsTab.add(readColor);
@@ -167,14 +190,16 @@ public class RobotContainer {
     resetPosition.setName("Reset Position");
     testCommandsTab.add(resetPosition);
 
-    // SmartDashboard.putNumber("Left_Robot_Weight", 200);
-    // SmartDashboard.putNumber("Right_Robot_Weight", 200);
+    SmartDashboard.putNumber("Shooter/Elevation", 0);
+    InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
+    setElevation.setName("Set Elevation");
+    testCommandsTab.add(setElevation);
 
-    // For now use https://www.geogebra.org/m/aapcdzvf to find ideal distances and tolerances
-    SmartDashboard.putNumber("Left_Robot_Distance_Inches", 40);
-    SmartDashboard.putNumber("Right_Robot_Distance_Inches", 40);
-    SmartDashboard.putNumber("Left_Tolerance_Inches", 10);
-    SmartDashboard.putNumber("Right_Tolerance_Inches", 10);
+    SmartDashboard.putNumber("Right/speed", 0); 
+    SmartDashboard.putNumber("Left/speed", 0); 
+    RunCommand testLauncher = new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); });
+    testLauncher.setName("Test Launcher");
+    testCommandsTab.add(testLauncher);
 
     //SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
@@ -186,25 +211,127 @@ public class RobotContainer {
    * {@link edu.wpi.first.wpilibj2.command.button.JoystickButton}.
    */
   private void configureButtonBindings() {
+    /**
+     * Driver:
+     * +Left joystick: drive 
+     * +Right joystick: turn
+     * +B: drive backwards
+     * +Right bumper: intake
+     * +Left bumper: outtake
+     * +Left trigger: intake down to floor
+     * +Right trigger: intake down to 1 in.
+     * 
+     * Operator:
+     * +Right bumper: shoot
+     * +Left bumper: toggle shooter elevation
+     * Y: manual shoot close
+     * A: manual shoot far
+     * +X: rotation control
+     * +B: position control
+     * +D-pad left: control panel left
+     * +D-pad right control panel right
+     * +D-pad up: scissors up
+     * +D-pad down: scissors down
+     * Left joystick: left scissor
+     * Right joystick: right scissor
+     * +Start: scissors enable
+     * +Left trigger: manual turret adjust left
+     * +Right trigger: manual turret adjust right
+     * Back: cancel current command
+     */
+
+     //B: drive backwards
     new JoystickButton(driver, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
 
-    new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new InstantCommand( intake :: enable))
-      .whenReleased(new InstantCommand(intake :: disable)); 
-
-    SmartDashboard.putNumber("Right/speed", 0); 
-    SmartDashboard.putNumber("Left/speed", 0); 
+    //Right bumper: intake
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-      .whenHeld( new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); }) )
-      .whenReleased( new InstantCommand( () -> { launcher.stopFlywheels(); })); 
-    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-    //   .whenHeld( new RunCommand( () -> { launcher.fire(); }) )
-    //   .whenReleased( new InstantCommand( () -> { launcher.stop(); })); 
-      
-    // new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-    //   .toggleWhenPressed( new TestShooter(launcher, driver::getPOV ) );
+      .whenHeld( new InstantCommand( intake :: enable))
+      .whenReleased( new InstantCommand(intake :: disable)); 
+    
+    //Left bumper: outtake 
+    new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
+      .whenHeld( new InstantCommand( intake::outtake))
+      .whenHeld( new InstantCommand( launcher::outtake))
+      .whenReleased( new InstantCommand(intake::disable));
 
+    //Left trigger: intake to floor
+    new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.5 )
+      .whileActiveOnce( new InstantCommand( intake::deploy, intake) )
+      .whenInactive( new InstantCommand( intake::retract, intake) );
+
+    //Right trigger: intake to 1 in.
+    new Trigger(() -> driver.getTriggerAxis(Hand.kRight) > 0.5 )
+      .whileActiveOnce( new InstantCommand( intake::deployRendezvous, intake) )
+      .whenInactive( new InstantCommand( intake::retract, intake) );
+
+    //Right bumper: fire
+    new JoystickButton(operator, XboxController.Button.kBumperRight.value)
+      .whenHeld( new Fire(launcher) );
+
+    //Left bumper: toggle shooter elevation
+    new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
+      .whenPressed( new InstantCommand( launcher::toggleElevation ));
+
+    //X: rotation control
+    new JoystickButton(operator, XboxController.Button.kX.value)
+      .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
+                                            () -> {},
+                                            (interrupted) -> { controlPanel.stop(); }, 
+                                            controlPanel::isRotationComplete,
+                                            controlPanel ) );
+
+    //B: position control
+    new JoystickButton(operator, XboxController.Button.kB.value)
+    .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
+                                          () -> {},
+                                          (interrupted) -> { controlPanel.stop(); },
+                                          controlPanel::checkColor,
+                                          controlPanel
+                                          )
+                    .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
+                                          () -> {},
+                                          (interrupted) -> { controlPanel.stop(); },
+                                          controlPanel::isRotationComplete,
+                                          controlPanel) ));
+
+    //D-pad left: control panel left
+    new POVButton(operator, 270)
+    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
+                                        () -> {},
+                                        (interrupted) -> { controlPanel.stop(); },
+                                        controlPanel::isRotationComplete,
+                                        controlPanel));   
+
+    //D-pad right: control panel right
+    new POVButton(operator, 90)
+    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
+                                          () -> {},
+                                          (interrupted) -> { controlPanel.stop(); },
+                                          controlPanel::isRotationComplete,
+                                          controlPanel)); 
+
+    //D-pad up: scissors up
+    new POVButton(operator, 0)
+      .whenPressed( new InstantCommand( climber::reachUp ));
+
+    //D-pad down: scissors down
+    new POVButton(operator, 180)
+      .whenPressed( new InstantCommand( climber::goHome ));
+
+    //Start: enable scissors
+    new JoystickButton(operator, XboxController.Button.kStart.value)
+      .whenPressed( new InstantCommand( climber::toggleEnable));
+
+    //Left trigger: manual turret adjust left
+    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
+      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));}) );
+      
+    //Right trigger: manual turret adjust right
+    new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
+      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));}) );
+
+                                          
     DoubleSupplier setPoint = new DoubleSupplier(){
       public double getAsDouble() {
         return SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading();
@@ -222,40 +349,6 @@ public class RobotContainer {
                                   Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
                                 })
       );
-
-      new JoystickButton(operator, XboxController.Button.kX.value)
-        .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
-                                              () -> {},
-                                              (interrupted) -> { controlPanel.stop(); }, 
-                                              controlPanel::isRotationComplete,
-                                              controlPanel ) );
-
-      new JoystickButton(operator, XboxController.Button.kB.value)
-        .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
-                                              () -> {},
-                                              (interrupted) -> { controlPanel.stop(); },
-                                              controlPanel::checkColor,
-                                              controlPanel
-                                              )
-                        .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
-                                              () -> {},
-                                              (interrupted) -> { controlPanel.stop(); },
-                                              controlPanel::isRotationComplete,
-                                              controlPanel) ));
-
-      new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-        .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
-                                              () -> {},
-                                              (interrupted) -> { controlPanel.stop(); },
-                                              controlPanel::isRotationComplete,
-                                              controlPanel));
-
-      new JoystickButton(operator, XboxController.Button.kBumperRight.value)
-      .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
-                                            () -> {},
-                                            (interrupted) -> { controlPanel.stop(); },
-                                            controlPanel::isRotationComplete,
-                                            controlPanel)); 
 
       new JoystickButton(driver, XboxController.Button.kStart.value)
         .whenHeld( new FollowPath( PathGenerator.driveCurveTest(), driveBase).andThen( () -> driveBase.stop() ) )
