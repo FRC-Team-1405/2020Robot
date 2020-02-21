@@ -156,14 +156,25 @@ public final class Constants {
     }
 
     public class BatteryMonitor{
-        public final static double maxVoltage = 13;
+        public final static double maxVoltage = 12;
         public final static double minVoltage = 7;
         //ledCount has to be a multiple of 3
-        public final static int ledCount = 42;
+        public final static int ledStart = 0;
+        public final static int ledStop = 15;
+        public final static int ledCount = ledStop - ledStart;
+        public final static int brightness = 100;
+    }
+
+    public class UnderGlow{
+        //The under glow has 43 leds
+        public final static int ledStart = 15;
+        public final static int ledStop = 59;
+        public final static int ledCount = ledStop - ledStart;
         public final static int brightness = 100;
     }
 
     public class PWM_Port{
-        public final static int batteryDisplay = 8;
+        public final static int leds = 8;
+        public final static int totalLEDCount = UnderGlow.ledCount + BatteryMonitor.ledCount;
     }
 }

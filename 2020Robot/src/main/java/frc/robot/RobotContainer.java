@@ -34,6 +34,7 @@ import frc.robot.commands.Fire;
 import frc.robot.commands.FollowPath;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
+import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.PathGenerator;
 import frc.robot.sensors.ColorSensor;
@@ -48,7 +49,6 @@ import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -57,7 +57,6 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -89,7 +88,9 @@ public class RobotContainer {
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
   private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
-  public final BatteryLED batteryMonitor = new BatteryLED( new LEDStrip(Constants.PWM_Port.batteryDisplay, Constants.BatteryMonitor.ledCount));
+  private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
+  public final UnderGlow underGlow = new  UnderGlow(ledStrip);
+  public final BatteryLED batteryMonitor = new BatteryLED(ledStrip);
 
 
   /**
@@ -175,6 +176,7 @@ public class RobotContainer {
     testCommandsTab.add(getColor);
 
     testCommandsTab.add( batteryMonitor );
+    testCommandsTab.add( underGlow );
     //InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
     //displayLEDs.setName("Display_LEDs");
     //testCommandsTab.add(displayLEDs);
