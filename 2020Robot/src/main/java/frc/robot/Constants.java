@@ -71,14 +71,19 @@ public final class Constants {
 
     // meters
     public final static double robotWidth = 6.9342;
+    public final static double goalX = 2.404364;
 
+    public class ShooterConstants {
+        public final static int angleMin = -90;
+        public final static int angleMax = 90;
+        public final static int unitsMin = 12000;
+        public final static int unitsMax = 24000;
+        public final static double elevationMin = 0.2;
+        public final static double elevationMax = 0.8;
+        public final static double limelightError = 2.0;
+        public final static int turretError = 100;
+    }
     //Turret constants
-    public final static int angleMin = -90;
-    public final static int angleMax = 90;
-    public final static int unitsMin = 12000;
-    public final static int unitsMax = 24000;
-    public final static double elevationMin = 0.2;
-    public final static double elevationMax = 0.8;
 
     //TrajectoryDrive constants
     public static final double kTrackwidthMeters = 0.5461;

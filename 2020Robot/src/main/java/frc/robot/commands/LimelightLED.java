@@ -37,14 +37,18 @@ public class LimelightLED extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double offset = shooter.limelight.getTX();
-    double numberOfLeds = MathTools.map(offset, -29.8, 29.8, -Constants.UnderGlow.ledCount/2, Constants.UnderGlow.ledCount/2);
-    if(numberOfLeds < 0){
-      for(int i = 0; i < -numberOfLeds; i++){
-        addressableLEDBuffer.setLED(Constants.UnderGlow.ledStart-i, Color.kGreen);
+    double offset = Math.abs(shooter.limelight.getTX());
+    int numberOfLeds = MathTools.map((int) offset, 0, 29, 0, Constants.UnderGlow.ledCount);
+    if(offset <= Constants.ShooterConstants.limelightError){
+      for(int i = 0; i < numberOfLeds; i++){
+        if(i%3==0){
+          addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, Color.kYellow);
+        }else{
+          addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, Color.kGreen);
+        }
       }
     }else{
-      for(int i = 0; i < Constants.UnderGlow.ledCount; i++){
+      for(int i = 0; i < Constants.UnderGlow.ledCount-numberOfLeds; i++){
         addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, Color.kGreen);
       }
     }

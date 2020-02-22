@@ -29,8 +29,8 @@ public class SetStartPos extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    SmartDashboard.getNumber("StartingPos/xPos", xPos);
-    SmartDashboard.getNumber("StartingPos/yPos", yPos);
+    xPos = SmartDashboard.getNumber("StartingPos/xPos", xPos);
+    yPos = SmartDashboard.getNumber("StartingPos/yPos", yPos);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -30,7 +30,7 @@ import frc.robot.commands.BatteryLED;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveDistance;
-import frc.robot.commands.Fire;
+import frc.robot.commands.FireOnce;
 import frc.robot.commands.FollowPath;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
@@ -122,7 +122,8 @@ public class RobotContainer {
     if(Math.abs(speed) < Constants.deadBand)
       speed = 0.0;
     SmartDashboard.putNumber("Drive_Speed", speed);
-    return driveSpeedFilter.calculate(speed);
+    // return driveSpeedFilter.calculate(speed);
+    return speed;
   }
 
   SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
@@ -131,21 +132,22 @@ public class RobotContainer {
     if(Math.abs(rotation) < Constants.deadBand)
       rotation = 0.0;
     SmartDashboard.putNumber("Drive_Rotation", rotation);
-    return driveRotationFilter.calculate(rotation);
+    // return driveRotationFilter.calculate(rotation);
+    return rotation;
   }
 
   private double leftScissorPos(){
     double pos = -operator.getY(Hand.kLeft);
     if(Math.abs(pos) < Constants.deadBand)
       pos = 0.0;
-    return MathTools.map(pos, 0.0, 1.0, -10.0, 10.0);
+    return MathTools.map(pos, -1.0, 1.0, -10.0, 10.0);
   }
 
   private double rightScissorPos(){
     double pos = -operator.getY(Hand.kLeft);
     if(Math.abs(pos) < Constants.deadBand)
     pos = 0.0;
-    return MathTools.map(pos, 0.0, 1.0, -10.0, 10.0);
+    return MathTools.map(pos, -1.0, 1.0, -10.0, 10.0);
   }
 
   SendableChooser<Integer> autoSelector; 
@@ -168,7 +170,7 @@ public class RobotContainer {
 
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-    testCommandsTab.add( new Fire(launcher));
+    testCommandsTab.add( new FireOnce(launcher, driveBase));
 
     testCommandsTab.add( new DriveByVelocity(driveBase));
     RunCommand getColor = new RunCommand( FMSData::getColor );
@@ -268,7 +270,7 @@ public class RobotContainer {
 
     //Right bumper: fire
     new JoystickButton(operator, XboxController.Button.kBumperRight.value)
-      .whenHeld( new Fire(launcher) );
+      .whenHeld( new FireOnce(launcher, driveBase) );
 
     //Left bumper: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
@@ -276,11 +278,11 @@ public class RobotContainer {
 
     //Y: manual fire close
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new Fire(launcher, Constants.closeFire) );
+      .whenHeld( new FireOnce(launcher, Constants.closeFire) );
 
     //A: manual fire far
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new Fire(launcher, Constants.farFire) );
+      .whenHeld( new FireOnce(launcher, Constants.farFire) );
 
     //X: rotation control
     new JoystickButton(operator, XboxController.Button.kX.value)

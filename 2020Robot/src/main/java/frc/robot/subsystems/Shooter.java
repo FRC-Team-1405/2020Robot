@@ -19,6 +19,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -107,6 +108,10 @@ public class Shooter extends SubsystemBase {
                                         new Setting(5000, 500),
                                         new Setting(6000, 600) };
 
+  public void prepFlywheels(){
+    prepFlywheels(lidarLitePWM.getDistance());
+  }
+
   public void prepFlywheels(double distance){
     int lowIndex = 0;
     int highIndex = 0;
@@ -167,28 +172,48 @@ public class Shooter extends SubsystemBase {
 
   public void setElevationMin(){
     if(setLow){
-      leftActuator.set(Constants.elevationMin);
-      rightActuator.set(Constants.elevationMin);
+      leftActuator.set(Constants.ShooterConstants.elevationMin);
+      rightActuator.set(Constants.ShooterConstants.elevationMin);
     }else{
-      leftActuator.set(Constants.elevationMax); 
-      rightActuator.set(Constants.elevationMax);
+      leftActuator.set(Constants.ShooterConstants.elevationMax); 
+      rightActuator.set(Constants.ShooterConstants.elevationMax);
     }
 
   }
 
+  public boolean hasTarget(){
+    return limelight.hasTarget();
+  }
+
+  public void turnToGoal(ArcadeDrive driveBase){
+    Pose2d pose = driveBase.getPose();
+    double currentX = pose.getTranslation().getX();
+    double currentY = pose.getTranslation().getY();
+    double heading = pose.getRotation().getDegrees();
+    double angle = 90.0 - Math.atan((-currentY)/(Constants.goalX - currentX)) - heading;
+    this.turnTurret((int) angle);
+  }
+
+  public boolean turretTurnIsComplete(){
+    return turret.getClosedLoopError() < Constants.ShooterConstants.turretError;
+  }
+  public void turnTurret(){
+    turnTurret((int) limelight.getTX());
+  };
+
   public void turnTurret(int angle){
     int currentPos = turret.getSelectedSensorPosition();
-    angle = MathTools.map(angle, Constants.angleMin, Constants.angleMax, Constants.unitsMin, Constants.unitsMax);
-    if(currentPos+angle < Constants.unitsMin){
-      turret.set(ControlMode.Position, Constants.unitsMin);
-    } else if(currentPos+angle > Constants.unitsMax){
-      turret.set(ControlMode.Position, Constants.unitsMax);
+    angle = MathTools.map(angle, Constants.ShooterConstants.angleMin, Constants.ShooterConstants.angleMax, Constants.ShooterConstants.unitsMin, Constants.ShooterConstants.unitsMax);
+    if(currentPos+angle < Constants.ShooterConstants.unitsMin){
+      turret.set(ControlMode.Position, Constants.ShooterConstants.unitsMin);
+    } else if(currentPos+angle > Constants.ShooterConstants.unitsMax){
+      turret.set(ControlMode.Position, Constants.ShooterConstants.unitsMax);
     } else{
       turret.set(ControlMode.Position, currentPos+angle);
     }
   }
 
   public boolean turretReady(){
-    return Math.abs(limelight.getTX()) <= 5;
+    return Math.abs(limelight.getTX()) <= Constants.ShooterConstants.limelightError;
   }
 }
