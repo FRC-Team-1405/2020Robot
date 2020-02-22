@@ -55,6 +55,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.batteryMonitor.schedule();
+    m_robotContainer.underGlow.schedule();
   }
 
   @Override
@@ -92,6 +93,7 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     m_robotContainer.batteryMonitor.schedule();
+    m_robotContainer.underGlow.schedule();
   }
 
   /**
