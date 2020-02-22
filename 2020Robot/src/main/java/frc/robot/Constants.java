@@ -30,14 +30,17 @@ public final class Constants {
 
     public final static int intakeTalon = 5;
     public final static int intakeDeploy = 6;
+    public final static int indexerid = 7;
+    public final static int triggerid = 8;
+    public final static int shooterLeft = 9;
+    public final static int shooterRight = 10; 
+    public final static int turretid = 11;
 
-    public final static int controlPanel = 7;
+    public final static int controlPanel = 12;
 
-    public final static int shooterLeft = 10;
-    public final static int shooterRight = 11; 
-    public final static int turretid = 12;
-    public final static int indexerid = 13;
-    public final static int triggerid = 14;
+    public final static int leftScissor = 13;
+    public final static int rightScissor = 14;
+
     public final static int leftActuatorId = 1;
     public final static int rightActuatorId = 2;
 
@@ -96,6 +99,8 @@ public final class Constants {
     public static int maxFlywheelError = 60;
     public static int closeFire = 1000;
     public static int farFire = 2000;
+    public static int closeFire2 = 1300;
+    public static int farFire2 = 1600;
 
     public static class TurnPID {
         public static double kP = 0.0;

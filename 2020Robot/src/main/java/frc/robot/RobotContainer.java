@@ -170,7 +170,8 @@ public class RobotContainer {
 
     ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
     testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-    testCommandsTab.add( new FireOnce(launcher, driveBase));
+    testCommandsTab.add( new FireOnce(launcher, driveBase)
+                    .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
 
     testCommandsTab.add( new DriveByVelocity(driveBase));
     RunCommand getColor = new RunCommand( FMSData::getColor );
@@ -270,7 +271,8 @@ public class RobotContainer {
 
     //Right bumper: fire
     new JoystickButton(operator, XboxController.Button.kBumperRight.value)
-      .whenHeld( new FireOnce(launcher, driveBase) );
+      .whenHeld( new FireOnce(launcher, driveBase) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
     //Left bumper: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
@@ -278,33 +280,45 @@ public class RobotContainer {
 
     //Y: manual fire close
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.closeFire) );
+      .whenHeld( new FireOnce(launcher, Constants.closeFire) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );
 
     //A: manual fire far
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.farFire) );
+      .whenHeld( new FireOnce(launcher, Constants.farFire) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
-    //X: rotation control
-    new JoystickButton(operator, XboxController.Button.kX.value)
-      .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
-                                            () -> {},
-                                            (interrupted) -> { controlPanel.stop(); }, 
-                                            controlPanel::isRotationComplete,
-                                            controlPanel ) );
+    //X: manual fire second close
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenHeld( new FireOnce(launcher, Constants.closeFire2) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
-    //B: position control
-    new JoystickButton(operator, XboxController.Button.kB.value)
-    .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::checkColor,
-                                          controlPanel
-                                          )
-                    .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::isRotationComplete,
-                                          controlPanel) ));
+    //B: manual fire second far
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenHeld( new FireOnce(launcher, Constants.farFire2) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+
+    // //X: rotation control
+    // new JoystickButton(operator, XboxController.Button.kX.value)
+    //   .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
+    //                                         () -> {},
+    //                                         (interrupted) -> { controlPanel.stop(); }, 
+    //                                         controlPanel::isRotationComplete,
+    //                                         controlPanel ) );
+
+    // //B: position control
+    // new JoystickButton(operator, XboxController.Button.kB.value)
+    // .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::checkColor,
+    //                                       controlPanel
+    //                                       )
+    //                 .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::isRotationComplete,
+    //                                       controlPanel) ));
 
     //D-pad left: control panel left
     new POVButton(operator, 270)

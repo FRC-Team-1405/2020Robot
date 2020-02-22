@@ -11,7 +11,7 @@ import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.FeedbackDevice;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.I2C;
@@ -31,10 +31,10 @@ public class ArcadeDrive extends SubsystemBase {
    * Creates a new ArcadeDrive.
    */
   
-  WPI_TalonSRX driveLeft = new WPI_TalonSRX(Constants.driveLeft);
-  WPI_TalonSRX driveRight = new WPI_TalonSRX(Constants.driveRight);
-  WPI_TalonSRX driveLeftSlave = new WPI_TalonSRX(Constants.driveLeftSlave);
-  WPI_TalonSRX driveRightSlave = new WPI_TalonSRX(Constants.driveRightSlave);
+  WPI_TalonFX driveLeft = new WPI_TalonFX(Constants.driveLeft);
+  WPI_TalonFX driveRight = new WPI_TalonFX(Constants.driveRight);
+  WPI_TalonFX driveLeftSlave = new WPI_TalonFX(Constants.driveLeftSlave);
+  WPI_TalonFX driveRightSlave = new WPI_TalonFX(Constants.driveRightSlave);
   DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
 
   private AHRS gyro = new AHRS(I2C.Port.kMXP);
