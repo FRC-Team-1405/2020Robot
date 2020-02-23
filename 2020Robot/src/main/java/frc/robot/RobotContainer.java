@@ -121,7 +121,7 @@ public class RobotContainer {
     double speed = -driver.getY(Hand.kLeft);
     if(Math.abs(speed) < Constants.deadBand)
       speed = 0.0;
-    SmartDashboard.putNumber("Drive_Speed", speed);
+    // SmartDashboard.putNumber("Drive_Speed", speed);
     // return driveSpeedFilter.calculate(speed);
     return speed;
   }
@@ -131,7 +131,7 @@ public class RobotContainer {
     double rotation = driver.getX(Hand.kRight);
     if(Math.abs(rotation) < Constants.deadBand)
       rotation = 0.0;
-    SmartDashboard.putNumber("Drive_Rotation", rotation);
+    // SmartDashboard.putNumber("Drive_Rotation", rotation);
     // return driveRotationFilter.calculate(rotation);
     return rotation;
   }
@@ -195,6 +195,10 @@ public class RobotContainer {
     resetPosition.setName("Reset Position");
     testCommandsTab.add(resetPosition);
 
+    InstantCommand stopFlywheels = new InstantCommand( launcher::stopFlywheels );
+    stopFlywheels.setName("Stop Flywheels");
+    testCommandsTab.add(stopFlywheels);
+
     SmartDashboard.putNumber("Shooter/Elevation", 0);
     InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
     setElevation.setName("Set Elevation");
@@ -206,7 +210,7 @@ public class RobotContainer {
     testLauncher.setName("Test Launcher");
     testCommandsTab.add(testLauncher);
 
-    //SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
+    // SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
@@ -224,7 +228,6 @@ public class RobotContainer {
      * +Right bumper: intake
      * +Left bumper: outtake
      * +Left trigger: intake down to floor
-     * +Right trigger: intake down to 1 in.
      * 
      * Operator:
      * +Right bumper: shoot
@@ -257,46 +260,61 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
       .whenHeld( new InstantCommand( intake::outtake))
       .whenHeld( new InstantCommand( launcher::outtake))
-      .whenReleased( new InstantCommand(intake::disable));
+      .whenReleased( new InstantCommand(intake::disable))
+      .whenReleased( new InstantCommand(launcher::stopIndexer));
 
     //Left trigger: intake to floor
     new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.5 )
-      .whileActiveOnce( new InstantCommand( intake::deploy, intake) )
-      .whenInactive( new InstantCommand( intake::retract, intake) );
+      .whileActiveOnce( new InstantCommand( intake::deploy, intake) );
 
-    //Right trigger: intake to 1 in.
-    new Trigger(() -> driver.getTriggerAxis(Hand.kRight) > 0.5 )
-      .whileActiveOnce( new InstantCommand( intake::deployRendezvous, intake) )
-      .whenInactive( new InstantCommand( intake::retract, intake) );
+    //Right trigger: intake up
+    new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.5 )
+      .whileActiveOnce( new InstantCommand( intake::retract, intake) );
 
-    //Right bumper: fire
+    // //Right bumper: fire
+    // new JoystickButton(operator, XboxController.Button.kBumperRight.value)
+    //   .whenHeld( new FireOnce(launcher, driveBase) )
+    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+
     new JoystickButton(operator, XboxController.Button.kBumperRight.value)
-      .whenHeld( new FireOnce(launcher, driveBase) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+      .whenPressed(launcher::fire)
+      .whenReleased(launcher::stopIndexer);
 
     //Left bumper: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
       .whenPressed( new InstantCommand( launcher::toggleElevation ));
 
-    //Y: manual fire close
-    new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.closeFire) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );
+    // //Y: manual fire close
+    // new JoystickButton(operator, XboxController.Button.kY.value)
+    //   .whenHeld( new FireOnce(launcher, Constants.closeFire) )
+    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );
 
-    //A: manual fire far
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.farFire) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(12000); }));
 
-    //X: manual fire second close
-    new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.closeFire2) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+    new JoystickButton(operator, XboxController.Button.kB.value)
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(16000); }));
+
+    new JoystickButton(operator, XboxController.Button.kA.value)
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(24000); }));
+
+    new JoystickButton(operator, XboxController.Button.kX.value)
+      .whenPressed( new InstantCommand(launcher::stopFlywheels));
+
+    // //A: manual fire far
+    // new JoystickButton(operator, XboxController.Button.kA.value)
+    //   .whenHeld( new FireOnce(launcher, Constants.farFire) )
+    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+
+    // //X: manual fire second close
+    // new JoystickButton(operator, XboxController.Button.kB.value)
+    //   .whenHeld( new FireOnce(launcher, Constants.closeFire2) )
+    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
     //B: manual fire second far
-    new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenHeld( new FireOnce(launcher, Constants.farFire2) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+    // new JoystickButton(operator, XboxController.Button.kB.value)
+    //   .whenHeld( new FireOnce(launcher, Constants.farFire2) )
+    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
     // //X: rotation control
     // new JoystickButton(operator, XboxController.Button.kX.value)

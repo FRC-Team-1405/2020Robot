@@ -9,6 +9,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -19,11 +21,11 @@ public class Intake extends SubsystemBase {
    */
 
   WPI_TalonSRX intakeTalon = new WPI_TalonSRX(Constants.intakeTalon);
-  WPI_TalonSRX intakeDeploy = new WPI_TalonSRX(Constants.intakeDeploy);
+  CANSparkMax intakeDeploy = new CANSparkMax(Constants.intakeDeploy, MotorType.kBrushless);
 
   public Intake() {
     intakeTalon.set(ControlMode.PercentOutput, 0);
-    intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.RETRACT_POSITION);
+    intakeDeploy.set(0);
   }
 
   @Override
@@ -32,15 +34,19 @@ public class Intake extends SubsystemBase {
   }
 
   public void deploy(){
-    intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.DEPLOY_POSITION);
+    if(intakeDeploy.getEncoder().getPosition() <= Constants.IntakeConstants.DEPLOY_POSITION){
+      intakeDeploy.set(0.15);
+    }else{
+      intakeDeploy.set(0);
+    }
   } 
 
-  public void deployRendezvous(){ 
-    intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.RENDEZVOUS_POSITION); 
-  }
-
   public void retract(){
-    intakeDeploy.set(ControlMode.Position, Constants.IntakeConstants.RETRACT_POSITION);
+    if(intakeDeploy.getEncoder().getPosition() <= Constants.IntakeConstants.RETRACT_POSITION){
+      intakeDeploy.set(-0.15);
+    }else{
+      intakeDeploy.set(0);
+    }
   } 
 
   public void enable(){

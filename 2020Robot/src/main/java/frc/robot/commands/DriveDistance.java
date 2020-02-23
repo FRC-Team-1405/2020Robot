@@ -39,6 +39,6 @@ public class DriveDistance extends DriveStraight {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return driveBase.getDistance() >= distance;
+    return Math.abs(driveBase.getDistance()) >= Math.abs(distance);
   }
 }

@@ -83,8 +83,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stopFlywheels(){
-    left.set(0.0); 
-    right.set(0.0); 
+    left.set(ControlMode.PercentOutput, 0.0); 
+    right.set(ControlMode.PercentOutput, 0.0); 
   }
 
   public boolean isReady(){
@@ -102,57 +102,58 @@ public class Shooter extends SubsystemBase {
   }
 
   Setting settings[] = new Setting[] {
-                                        new Setting(2000, 200),
-                                        new Setting(3000, 300),
-                                        new Setting(4000, 400), 
-                                        new Setting(5000, 500),
-                                        new Setting(6000, 600) };
+                                        new Setting(16000, 1),
+                                        new Setting(18000, 2),
+                                        new Setting(20000, 3), 
+                                        new Setting(22000, 4) };
 
   public void prepFlywheels(){
     prepFlywheels(lidarLitePWM.getDistance());
   }
 
-  public void prepFlywheels(double distance){
-    int lowIndex = 0;
-    int highIndex = 0;
-    double power = 0.0;
 
-    if(distance < settings[0].distance){
-      power = settings[0].power;
-    }
-    else if(distance > settings[settings.length-1].distance){
-      power = settings[settings.length-1].power;
-    }
-    else{
-      for(int i = 1; i < settings.length-2; i++){
-        if(distance < settings[i].distance){
-          lowIndex = i-1;
-          highIndex = i;
-          power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
-          break;
-        }
-      }
-    }
-    left.set(power);
-    right.set(power);
-    SmartDashboard.putNumber("Shooter_Power", power);
-    SmartDashboard.putNumber("Shooter_Distance", distance);
+  public void prepFlywheels(double distance){
+    // int lowIndex = 0;
+    // int highIndex = 0;
+    // double power = 0.0;
+
+    // if(distance < settings[0].distance){
+    //   power = settings[0].power;
+    // }
+    // else if(distance > settings[settings.length-1].distance){
+    //   power = settings[settings.length-1].power;
+    // }
+    // else{
+    //   for(int i = 1; i < settings.length-2; i++){
+    //     if(distance < settings[i].distance){
+    //       lowIndex = i-1;
+    //       highIndex = i;
+    //       power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
+    //       break;
+    //     }
+    //   }
+    // }
+    // left.set(-power);
+    // right.set(power);
+    left.set(ControlMode.Velocity, -distance);
+    right.set(ControlMode.Velocity, distance);
+    // SmartDashboard.putNumber("Shooter_Power", power);
+    // SmartDashboard.putNumber("Shooter_Distance", distance);
   }
 
   public void fire(){
-    prepFlywheels(lidarLitePWM.getDistance());
-    indexer.set(ControlMode.Velocity, 0.5);
-    trigger.set(ControlMode.Velocity, 0.5);
+    indexer.set(ControlMode.PercentOutput, 0.6);
+    trigger.set(ControlMode.PercentOutput, -0.3);
   }
 
   public void stopIndexer(){
-    indexer.set(ControlMode.Velocity, 0);
-    trigger.set(ControlMode.Velocity, 0);
+    indexer.set(ControlMode.PercentOutput, 0);
+    trigger.set(ControlMode.PercentOutput, 0);
   }
 
   public void outtake(){
-    indexer.set(ControlMode.Velocity, -0.5);
-    trigger.set(ControlMode.Velocity, -0.5);
+    indexer.set(ControlMode.PercentOutput, -0.5);
+    trigger.set(ControlMode.PercentOutput, 0.3);
   }
 
   public boolean flywheelReady() {

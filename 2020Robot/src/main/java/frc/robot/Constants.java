@@ -69,8 +69,8 @@ public final class Constants {
 
     public final static int lidarBufferSize = 20;
 
-    public final static double auto1Speed = 0.25;
-    public final static double auto1Distance = 1;//distance in meters
+    public final static double auto1Speed = -0.25;
+    public final static double auto1Distance = 0.75;//distance in meters
 
     // meters
     public final static double robotWidth = 6.9342;
@@ -97,10 +97,10 @@ public final class Constants {
     public static final double kRamseteZeta = 0.7;
 
     public static int maxFlywheelError = 60;
-    public static int closeFire = 1000;
-    public static int farFire = 2000;
-    public static int closeFire2 = 1300;
-    public static int farFire2 = 1600;
+    public static int closeFire = 1;
+    public static int farFire = 4;
+    public static int closeFire2 = 2;
+    public static int farFire2 = 3;
 
     public static class TurnPID {
         public static double kP = 0.0;
