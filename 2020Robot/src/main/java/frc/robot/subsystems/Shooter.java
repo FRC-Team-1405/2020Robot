@@ -18,11 +18,13 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 // import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.lib.MathTools;
 import frc.robot.sensors.LidarLitePWM;
 import frc.robot.sensors.Limelight;
@@ -68,11 +70,13 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
-    SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
-    SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
-    //For competitons comment out shuffleboard distance and uncomment variable
-    SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
-    //lidarLitePWM.getDistance();
+    if(!Robot.fmsAttached){
+      SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
+      SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
+      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
+    }else{
+      lidarLitePWM.getDistance();
+    }
   }
 
   public void launch(double leftDistance, double rightDistance){
@@ -80,8 +84,10 @@ public class Shooter extends SubsystemBase {
     // rightPIDController.setReference(rightDistance, ControlType.kVelocity); 
     left.set(ControlMode.Velocity, leftDistance); 
     right.set(ControlMode.Velocity, rightDistance); 
-    SmartDashboard.putNumber("Left Distance", leftDistance); 
-    SmartDashboard.putNumber("Right Distance", rightDistance); 
+    if(!Robot.fmsAttached){
+      SmartDashboard.putNumber("Left Distance", leftDistance); 
+      SmartDashboard.putNumber("Right Distance", rightDistance); 
+    }
   }
 
   public void stopFlywheels(){

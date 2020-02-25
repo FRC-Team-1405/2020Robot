@@ -15,7 +15,9 @@ import com.revrobotics.SparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants;
+import frc.robot.Robot;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -50,9 +52,10 @@ public class Climber extends SubsystemBase {
   DigitalInput rightBackSwitch = new DigitalInput(Constants.rightBackSwitchid);
 
   public Climber() { 
-
-    SmartDashboard.putNumber("Climb Position", reachPosition); 
-    SmartDashboard.putNumber("Home Position", homePosition); 
+    if(!Robot.fmsAttached){
+      SmartDashboard.putNumber("Climb Position", reachPosition); 
+      SmartDashboard.putNumber("Home Position", homePosition); 
+    }
   }
 
   @Override
