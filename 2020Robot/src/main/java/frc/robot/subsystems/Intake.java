@@ -9,8 +9,8 @@ package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+// import com.revrobotics.CANSparkMax;
+// import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -21,7 +21,7 @@ public class Intake extends SubsystemBase {
    */
 
   WPI_TalonSRX intakeTalon = new WPI_TalonSRX(Constants.intakeTalon);
-  CANSparkMax intakeDeploy = new CANSparkMax(Constants.intakeDeploy, MotorType.kBrushless);
+  WPI_TalonSRX intakeDeploy = new WPI_TalonSRX(Constants.intakeDeploy);
 
   public Intake() {
     intakeTalon.set(ControlMode.PercentOutput, 0);
@@ -34,7 +34,7 @@ public class Intake extends SubsystemBase {
   }
 
   public void deploy(){
-    if(intakeDeploy.getEncoder().getPosition() <= Constants.IntakeConstants.DEPLOY_POSITION){
+    if(intakeDeploy.getSelectedSensorPosition() <= Constants.IntakeConstants.DEPLOY_POSITION){
       intakeDeploy.set(0.15);
     }else{
       intakeDeploy.set(0);
@@ -42,7 +42,7 @@ public class Intake extends SubsystemBase {
   } 
 
   public void retract(){
-    if(intakeDeploy.getEncoder().getPosition() <= Constants.IntakeConstants.RETRACT_POSITION){
+    if(intakeDeploy.getSelectedSensorPosition() <= Constants.IntakeConstants.RETRACT_POSITION){
       intakeDeploy.set(-0.15);
     }else{
       intakeDeploy.set(0);

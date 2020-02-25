@@ -74,7 +74,7 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
-  private final Climber climber = new Climber();
+  // private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
@@ -105,9 +105,9 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
-    climber.setDefaultCommand( new RunCommand( () -> {
-      climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
-    }, climber));
+    // climber.setDefaultCommand( new RunCommand( () -> {
+    //   climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
+    // }, climber));
 
     // climber.setDefaultCommand( new RunCommand( () -> {
     //   climber.positionControl( this::leftScissorPos, this::rightScissorPos );
@@ -292,8 +292,8 @@ public class RobotContainer {
     new JoystickButton(operator, XboxController.Button.kY.value)
       .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(12000); }));
 
-    new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(16000); }));
+    // new JoystickButton(operator, XboxController.Button.kB.value)
+    //   .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(16000); }));
 
     new JoystickButton(operator, XboxController.Button.kA.value)
       .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(24000); }));
@@ -306,10 +306,10 @@ public class RobotContainer {
     //   .whenHeld( new FireOnce(launcher, Constants.farFire) )
     //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
-    // //X: manual fire second close
-    // new JoystickButton(operator, XboxController.Button.kB.value)
-    //   .whenHeld( new FireOnce(launcher, Constants.closeFire2) )
-    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+    //X: manual fire second close
+    new JoystickButton(operator, XboxController.Button.kB.value)
+      .whenHeld( new FireOnce(launcher, 16000) )
+      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
 
     //B: manual fire second far
     // new JoystickButton(operator, XboxController.Button.kB.value)
@@ -354,17 +354,17 @@ public class RobotContainer {
                                           controlPanel::isRotationComplete,
                                           controlPanel)); 
 
-    //D-pad up: scissors up
-    new POVButton(operator, 0)
-      .whenPressed( new InstantCommand( climber::reachUp ));
+    // //D-pad up: scissors up
+    // new POVButton(operator, 0)
+    //   .whenPressed( new InstantCommand( climber::reachUp ));
 
-    //D-pad down: scissors down
-    new POVButton(operator, 180)
-      .whenPressed( new InstantCommand( climber::goHome ));
+    // //D-pad down: scissors down
+    // new POVButton(operator, 180)
+    //   .whenPressed( new InstantCommand( climber::goHome ));
 
-    //Start: enable scissors
-    new JoystickButton(operator, XboxController.Button.kStart.value)
-      .whenPressed( new InstantCommand( climber::toggleEnable));
+    // //Start: enable scissors
+    // new JoystickButton(operator, XboxController.Button.kStart.value)
+    //   .whenPressed( new InstantCommand( climber::toggleEnable));
 
     //Left trigger: manual turret adjust left
     new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )

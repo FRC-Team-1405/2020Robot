@@ -84,7 +84,8 @@ public final class Constants {
         public final static double elevationMin = 0.2;
         public final static double elevationMax = 0.8;
         public final static double limelightError = 2.0;
-        public final static int turretError = 100;
+        public final static int turretError = 100; 
+        public final static double triggerSpeed = .8; 
     }
     //Turret constants
 
@@ -135,7 +136,7 @@ public final class Constants {
     public static class ControlPanelConstants {
         public final static int ROTATION_CONTROL_DISTANCE = 10000; 
         public final static int ROTATION_SEGMENT_DISTANCE = 417;
-        public final static double SPEED = .3;
+        public final static double SPEED = .3; 
         public final static int COLOR_ADJUST = 1000;
         public final static int POSITION_ADJUST = 50;
         // TODO At some point, define a value that will set a motor rotation equivalent to turning one segment on the control panel (1'9/16")

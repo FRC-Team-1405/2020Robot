@@ -11,11 +11,11 @@ import javax.swing.text.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANPIDController;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+// import com.revrobotics.CANEncoder;
+// import com.revrobotics.CANPIDController;
+// import com.revrobotics.CANSparkMax;
+// import com.revrobotics.ControlType;
+// import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.Servo;
@@ -58,9 +58,11 @@ public class Shooter extends SubsystemBase {
   // CANPIDController leftPIDController = new CANPIDController(left);  
   // CANPIDController rightPIDController = new CANPIDController(right);
   
-  public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9));
+  public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9)); 
+  public double triggerSpeed = 0.5; 
 
   public Shooter() { 
+    SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
   }
 
   @Override
@@ -85,6 +87,7 @@ public class Shooter extends SubsystemBase {
   public void stopFlywheels(){
     left.set(ControlMode.PercentOutput, 0.0); 
     right.set(ControlMode.PercentOutput, 0.0); 
+    trigger.set(ControlMode.PercentOutput, 0);
   }
 
   public boolean isReady(){
@@ -109,6 +112,8 @@ public class Shooter extends SubsystemBase {
 
   public void prepFlywheels(){
     prepFlywheels(lidarLitePWM.getDistance());
+    //trigger.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Trigger Speed", triggerSpeed));  
+    trigger.set(ControlMode.PercentOutput, -0.5);
   }
 
 
@@ -137,18 +142,18 @@ public class Shooter extends SubsystemBase {
     // right.set(power);
     left.set(ControlMode.Velocity, -distance);
     right.set(ControlMode.Velocity, distance);
+    trigger.set(ControlMode.PercentOutput, -0.5);
     // SmartDashboard.putNumber("Shooter_Power", power);
     // SmartDashboard.putNumber("Shooter_Distance", distance);
   }
 
   public void fire(){
     indexer.set(ControlMode.PercentOutput, 0.6);
-    trigger.set(ControlMode.PercentOutput, -0.3);
+
   }
 
   public void stopIndexer(){
     indexer.set(ControlMode.PercentOutput, 0);
-    trigger.set(ControlMode.PercentOutput, 0);
   }
 
   public void outtake(){
