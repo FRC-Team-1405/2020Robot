@@ -14,6 +14,8 @@ import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import com.kauailabs.navx.frc.AHRS;
+
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -22,7 +24,7 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveOdometry;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-
+import frc.robot.Robot;
 import edu.wpi.first.wpilibj.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.PIDCommand;
 
@@ -105,8 +107,10 @@ public class ArcadeDrive extends SubsystemBase {
     @Override
     public void periodic() {
       // This method will be called once per scheduler run
-      SmartDashboard.putNumber("Velocity", getVelocity());
-      SmartDashboard.putNumber("Heading", getHeading());
+      if(!Robot.fmsAttached){
+        SmartDashboard.putNumber("Velocity", getVelocity());
+        SmartDashboard.putNumber("Heading", getHeading());
+      }
       odometry.update(Rotation2d.fromDegrees(-getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
                       -driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
     }
@@ -128,21 +132,27 @@ public class ArcadeDrive extends SubsystemBase {
     }
      
     public void setVelocity(double leftSpeed, double rightSpeed){
-      SmartDashboard.putNumber("ArcadeDrive/Speed Left", Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
-      SmartDashboard.putNumber("ArcadeDrive/Speed Right", Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
-      driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed); 
+      if(!Robot.fmsAttached){
+        SmartDashboard.putNumber("ArcadeDrive/Speed Left", Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed);
+        SmartDashboard.putNumber("ArcadeDrive/Speed Right", Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed);
+      }
+        driveLeft.set(ControlMode.Velocity, Constants.VelocityConversions.MetersPerSecondToVelocity*leftSpeed); 
       driveRight.set(ControlMode.Velocity, - Constants.VelocityConversions.MetersPerSecondToVelocity*rightSpeed); 
     }
     public void resetEncoder(){
       driveLeft.setSelectedSensorPosition(0);
       driveRight.setSelectedSensorPosition(0);
-      SmartDashboard.putNumber("ArcadeDrive/Distance", 0);
+      if(!Robot.fmsAttached){
+        SmartDashboard.putNumber("ArcadeDrive/Distance", 0);
+      }
     }
     public double getDistance(){
       double distance = (((driveLeft.getSelectedSensorPosition()
               -driveRight.getSelectedSensorPosition())/2.0)
                   *Constants.VelocityConversions.SensorToMeters);
-      SmartDashboard.putNumber("ArcadeDrive/Distance", distance);
+      if(!Robot.fmsAttached){
+        SmartDashboard.putNumber("ArcadeDrive/Distance", distance);
+      }
       return distance;
 
     }

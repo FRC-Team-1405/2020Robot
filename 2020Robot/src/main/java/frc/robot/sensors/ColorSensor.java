@@ -9,7 +9,7 @@ package frc.robot.sensors;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
-
+import frc.robot.Robot;
 import com.revrobotics.ColorMatch;
 import com.revrobotics.ColorMatchResult;
 import com.revrobotics.ColorSensorV3;
@@ -42,13 +42,15 @@ public class ColorSensor {
         }
     }
 
-    // Shuffelboard
+    // Shuffleboard
     private static final String keyDetectedColor = "ColorSensor/Color";
     private static final String keyConfidence = "ColorSensor/Confidence";
  
     public ColorSensor(){
-        SmartDashboard.putString(keyDetectedColor, "");
-        SmartDashboard.putNumber(keyConfidence, 0);
+        if(Robot.fmsAttached){
+            SmartDashboard.putString(keyDetectedColor, "");
+            SmartDashboard.putNumber(keyConfidence, 0);
+        }
 
         colorMatcher.addColorMatch(Target.BLUE);
         colorMatcher.addColorMatch(Target.GREEN);
@@ -60,13 +62,19 @@ public class ColorSensor {
     public Color readColor(){
         ColorMatchResult match = colorMatcher.matchClosestColor( colorSensor.getColor() );
 
-        SmartDashboard.putNumber(keyConfidence, match.confidence);
+        if(Robot.fmsAttached){
+            SmartDashboard.putNumber(keyConfidence, match.confidence);
+        }
 
         if (match.confidence < CONFIDENCE) {
-            SmartDashboard.putString(keyDetectedColor, "UNKNOWN");
+            if(Robot.fmsAttached){
+                SmartDashboard.putString(keyDetectedColor, "UNKNOWN");
+            }
             return null;
         } else {
-            SmartDashboard.putString(keyDetectedColor, Target.toFMSData(match.color));
+            if(Robot.fmsAttached){
+                SmartDashboard.putString(keyDetectedColor, Target.toFMSData(match.color));
+            }
             return match.color;
         }
     }

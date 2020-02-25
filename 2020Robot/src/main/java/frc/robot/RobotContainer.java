@@ -13,6 +13,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
@@ -167,48 +168,47 @@ public class RobotContainer {
     autoTab.add("Auto/Initial_Delay", 0); 
 
   
+    if(!Robot.fmsAttached){
+      ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
+      testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
+      testCommandsTab.add( new FireOnce(launcher, 16000)
+                      .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
+      testCommandsTab.add( new DriveByVelocity(driveBase));
 
-    ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
-    testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-    testCommandsTab.add( new FireOnce(launcher, driveBase)
-                    .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
-
-    testCommandsTab.add( new DriveByVelocity(driveBase));
-    RunCommand getColor = new RunCommand( FMSData::getColor );
-    getColor.setName("Get_Color");
-    testCommandsTab.add(getColor);
-
-    testCommandsTab.add( batteryMonitor );
-    testCommandsTab.add( underGlow );
-    //InstantCommand displayLEDs = new InstantCommand(ledStrip::testLEDs);
-    //displayLEDs.setName("Display_LEDs");
-    //testCommandsTab.add(displayLEDs);
-    RunCommand readDistance = new RunCommand(lidar::readDistance);
-    readDistance.setName("Read_Distance");
-    testCommandsTab.add(readDistance);
-
-    RunCommand readColor = new RunCommand(colorSensor::readColor);
-    readColor.setName("Read_Color");
-    testCommandsTab.add(readColor);
-
-    InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
-    resetPosition.setName("Reset Position");
-    testCommandsTab.add(resetPosition);
-
-    InstantCommand stopFlywheels = new InstantCommand( launcher::stopFlywheels );
-    stopFlywheels.setName("Stop Flywheels");
-    testCommandsTab.add(stopFlywheels);
-
-    SmartDashboard.putNumber("Shooter/Elevation", 0);
-    InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
-    setElevation.setName("Set Elevation");
-    testCommandsTab.add(setElevation);
-
-    SmartDashboard.putNumber("Right/speed", 0); 
-    SmartDashboard.putNumber("Left/speed", 0); 
-    RunCommand testLauncher = new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); });
-    testLauncher.setName("Test Launcher");
-    testCommandsTab.add(testLauncher);
+      RunCommand getColor = new RunCommand( FMSData::getColor );
+      getColor.setName("Get_Color");
+      testCommandsTab.add(getColor);
+  
+      testCommandsTab.add( batteryMonitor );
+      testCommandsTab.add( underGlow );
+     
+      RunCommand readDistance = new RunCommand(lidar::readDistance);
+      readDistance.setName("Read_Distance");
+      testCommandsTab.add(readDistance);
+  
+      RunCommand readColor = new RunCommand(colorSensor::readColor);
+      readColor.setName("Read_Color");
+      testCommandsTab.add(readColor);
+  
+      InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
+      resetPosition.setName("Reset Position");
+      testCommandsTab.add(resetPosition);
+  
+      InstantCommand stopFlywheels = new InstantCommand( launcher::stopFlywheels );
+      stopFlywheels.setName("Stop Flywheels");
+      testCommandsTab.add(stopFlywheels);
+  
+      SmartDashboard.putNumber("Shooter/Elevation", 0);
+      InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
+      setElevation.setName("Set Elevation");
+      testCommandsTab.add(setElevation);
+  
+      SmartDashboard.putNumber("Right/speed", 0); 
+      SmartDashboard.putNumber("Left/speed", 0); 
+      RunCommand testLauncher = new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); });
+      testLauncher.setName("Test Launcher");
+      testCommandsTab.add(testLauncher);
+    }
 
     // SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
@@ -375,30 +375,30 @@ public class RobotContainer {
       .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));}) );
 
                                           
-    DoubleSupplier setPoint = new DoubleSupplier(){
-      public double getAsDouble() {
-        return SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading();
-      }
-    };
+    // DoubleSupplier setPoint = new DoubleSupplier(){
+    //   public double getAsDouble() {
+    //     return SmartDashboard.getNumber("TurnPID/setPoint", 0.0)+driveBase.getHeading();
+    //   }
+    // };
 
-    SmartDashboard.putNumber("TurnPID/offset", 15);
-    new JoystickButton(driver, XboxController.Button.kX.value)
-      .whenPressed( new InstantCommand( () -> {
-        SmartDashboard.putNumber("TurnPID/setPoint", driveBase.getHeading()+SmartDashboard.getNumber("turnPID/offset", 15));
-      }) )
-      .whenHeld( new TurnToAngle(driveBase, () -> SmartDashboard.getNumber("TurnPID/setPoint", 0.0) ).beforeStarting( () -> {
-                                  Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
-                                  Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
-                                  Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
-                                })
-      );
+    // SmartDashboard.putNumber("TurnPID/offset", 15);
+    // new JoystickButton(driver, XboxController.Button.kX.value)
+    //   .whenPressed( new InstantCommand( () -> {
+    //     SmartDashboard.putNumber("TurnPID/setPoint", driveBase.getHeading()+SmartDashboard.getNumber("turnPID/offset", 15));
+    //   }) )
+    //   .whenHeld( new TurnToAngle(driveBase, () -> SmartDashboard.getNumber("TurnPID/setPoint", 0.0) ).beforeStarting( () -> {
+    //                               Constants.TurnPID.kP = SmartDashboard.getNumber("TurnPID/kP",Constants.TurnPID.kP) ;
+    //                               Constants.TurnPID.kI = SmartDashboard.getNumber("TurnPID/kI",Constants.TurnPID.kI) ;
+    //                               Constants.TurnPID.kD = SmartDashboard.getNumber("TurnPID/kD",Constants.TurnPID.kD) ;
+    //                             })
+    //   );
 
-      new JoystickButton(driver, XboxController.Button.kStart.value)
-        .whenHeld( new FollowPath( PathGenerator.driveCurveTest(), driveBase).andThen( () -> driveBase.stop() ) )
-        .whenReleased( () -> driveBase.stop() );
+    //   new JoystickButton(driver, XboxController.Button.kStart.value)
+    //     .whenHeld( new FollowPath( PathGenerator.driveCurveTest(), driveBase).andThen( () -> driveBase.stop() ) )
+    //     .whenReleased( () -> driveBase.stop() );
 
-      // new JoystickButton(driver, XboxController.Button.kA.value) 
-      // .whenHeld(new DriveByVelocity(driveBase));                         
+    //   new JoystickButton(driver, XboxController.Button.kA.value) 
+    //   .whenHeld(new DriveByVelocity(driveBase));                         
   };
 
 
