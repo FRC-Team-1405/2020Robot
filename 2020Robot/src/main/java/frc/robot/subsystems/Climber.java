@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -28,10 +30,10 @@ public class Climber extends SubsystemBase {
    */ 
   
    //This is a Falcon 500. Not sure if FX will work. 
-  //  public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
-  //  public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
-   public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
-   public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless);
+   public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
+   public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
+  //  public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
+  //  public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless);
    
   //Regular bois go here: 
   //  public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
@@ -68,32 +70,36 @@ public class Climber extends SubsystemBase {
     enabled = !enabled;
   }
 
-  public void directControl(double left, double right){
-    leftClimbMotor.set(left);
-    rightClimbMoter.set(right);
+  public void directControl(DoubleSupplier left, DoubleSupplier right){
+    double leftPos = leftClimbMotor.getSelectedSensorPosition() + left.getAsDouble();
+    double rightPos = rightClimbMotor.getSelectedSensorPosition() + right.getAsDouble();
+    leftClimbMotor.set(ControlMode.Position, leftPos);
+    rightClimbMotor.set(ControlMode.Position, rightPos);
   }
   
   public void moveLeft(double distance){
     if(enabled){
-      // leftClimbMotor.set(ControlMode.Position, distance);
+      leftClimbMotor.set(ControlMode.Position, distance);
     }
   }
 
   public void moveRight(double distance){
     if(enabled){
-      // rightClimbMotor.set(ControlMode.Position, distance);
+      rightClimbMotor.set(ControlMode.Position, distance);
     }
   }
 
   public void reachUp(){  
     if(enabled){
-      // leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
     }
   } 
 
   public void goHome(){ 
-    if(enabled){
-      // rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+    if(enabled){  
+      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
+      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
     }
   }
 

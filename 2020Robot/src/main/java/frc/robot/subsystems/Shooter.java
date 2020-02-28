@@ -168,7 +168,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean flywheelReady() {
-    return left.getClosedLoopError() <= Constants.maxFlywheelError && right.getClosedLoopError() <= Constants.maxFlywheelError ;
+    return (Math.abs(left.getClosedLoopError()) <= Constants.maxFlywheelError && Math.abs(right.getClosedLoopError()) <= Constants.maxFlywheelError);
   }
 
   public boolean setLow = false;

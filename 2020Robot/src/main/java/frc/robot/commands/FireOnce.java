@@ -24,35 +24,26 @@ public class FireOnce extends SequentialCommandGroup {
   public FireOnce(Shooter shooter, ArcadeDrive driveBase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new ParallelCommandGroup(new FunctionalCommand( () -> { shooter.prepFlywheels(); shooter.stopIndexer(); },
-                                                          () -> {},
-                                                          (interrupted) -> { if (interrupted) 
-                                                                                shooter.stopFlywheels(); }, 
-                                                          () -> { return shooter.flywheelReady(); }),
-                                   new TurnToTarget(shooter, driveBase) ),
-          new FunctionalCommand(shooter::fire,
-                                () -> {},
-                                (interrupted) -> { shooter.stopIndexer(); 
-                                                   if (interrupted) 
-                                                    shooter.stopFlywheels();},
+    super(new TurnToTarget(shooter, driveBase),
+          new FunctionalCommand(() -> {},
+                                () -> { if(shooter.flywheelReady())
+                                          shooter.fire();},
+                                (interrupted) -> { shooter.stopIndexer();},
                                 () -> {return !shooter.flywheelReady();} )  
           );
   }
 
-  public FireOnce(Shooter shooter, double distance) {
+  public FireOnce(Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new FunctionalCommand( () -> { shooter.prepFlywheels(distance); shooter.stopIndexer(); },
-                                                          () -> {},
-                                                          (interrupted) -> { if (interrupted) 
-                                                                                shooter.stopFlywheels(); }, 
-                                                          () -> { return shooter.flywheelReady(); }),
-          new FunctionalCommand(shooter::fire,
-                                () -> {},
-                                (interrupted) -> { shooter.stopIndexer(); 
-                                                   if (interrupted) 
-                                                    shooter.stopFlywheels();},
-                                () -> {return !shooter.flywheelReady();} )  
+    super(new FunctionalCommand(() -> {},
+                                () -> { if(shooter.flywheelReady()){
+                                          shooter.fire();
+                                      }else{
+                                        shooter.stopIndexer();
+                                      }},
+                                (interrupted) -> { shooter.stopIndexer();},
+                                () -> {return false;} )  
           );
   }
 }

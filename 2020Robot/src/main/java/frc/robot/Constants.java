@@ -97,7 +97,7 @@ public final class Constants {
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
 
-    public static int maxFlywheelError = 500;
+    public static int maxFlywheelError = 50;
     public static int closeFire = 1;
     public static int farFire = 4;
     public static int closeFire2 = 2;
@@ -143,9 +143,8 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public final static int DEPLOY_POSITION = 1000;
+        public final static int DEPLOY_POSITION = -1390;
         public final static int RETRACT_POSITION = 0;
-        public final static int RENDEZVOUS_POSITION = 500; 
         public static double SPEED = -0.8;
     }
 

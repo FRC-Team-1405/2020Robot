@@ -20,8 +20,13 @@ public class Intake extends SubsystemBase {
    * Creates a new Intake.
    */
 
-  WPI_TalonSRX intakeTalon = new WPI_TalonSRX(Constants.intakeTalon);
-  WPI_TalonSRX intakeDeploy = new WPI_TalonSRX(Constants.intakeDeploy);
+  private WPI_TalonSRX intakeTalon = new WPI_TalonSRX(Constants.intakeTalon);
+  private WPI_TalonSRX intakeDeploy = new WPI_TalonSRX(Constants.intakeDeploy);
+  private int errorThreshold = 50;
+  private int loopsToSettle = 10;
+  private int withinThresholdLoops = 0;
+  private int targetPosition = Constants.IntakeConstants.RETRACT_POSITION;
+  private boolean movingArm = false;
 
   public Intake() {
     intakeTalon.set(ControlMode.PercentOutput, 0);
@@ -30,23 +35,48 @@ public class Intake extends SubsystemBase {
 
   @Override
   public void periodic() {
+    if (movingArm) {
+      if (intakeDeploy.getActiveTrajectoryPosition() == targetPosition && Math.abs(intakeDeploy.getClosedLoopError()) < errorThreshold){
+        withinThresholdLoops++;
+      }else{
+        withinThresholdLoops = 0;
+      }
+    }
     // This method will be called once per scheduler run
   }
 
-  public void deploy(){
-    if(intakeDeploy.getSelectedSensorPosition() <= Constants.IntakeConstants.DEPLOY_POSITION){
-      intakeDeploy.set(0.15);
+  private boolean intakeUp = true;
+  public void toggleElevation(){
+    intakeUp = !intakeUp;
+    if(intakeUp){
+      retract();
     }else{
-      intakeDeploy.set(0);
+      deploy();
     }
+  }
+
+  public boolean armInPosition() {
+    return (withinThresholdLoops > loopsToSettle);
+  }
+
+  public void stop(){
+    if(!intakeUp){
+      intakeDeploy.set(ControlMode.PercentOutput, 0);
+    }
+  }
+
+  public void deploy(){
+    movingArm = true;
+    withinThresholdLoops = 0;
+    targetPosition = Constants.IntakeConstants.DEPLOY_POSITION;
+    intakeDeploy.set(ControlMode.MotionMagic, Constants.IntakeConstants.DEPLOY_POSITION);
   } 
 
   public void retract(){
-    if(intakeDeploy.getSelectedSensorPosition() <= Constants.IntakeConstants.RETRACT_POSITION){
-      intakeDeploy.set(-0.15);
-    }else{
-      intakeDeploy.set(0);
-    }
+    movingArm = true;
+    withinThresholdLoops = 0;
+    targetPosition = Constants.IntakeConstants.RETRACT_POSITION;
+    intakeDeploy.set(ControlMode.MotionMagic, Constants.IntakeConstants.RETRACT_POSITION);
   } 
 
   public void enable(){
