@@ -38,6 +38,7 @@ import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.PathGenerator;
+import frc.robot.lib.SmartSupplier;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
@@ -93,6 +94,13 @@ public class RobotContainer {
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
   public final UnderGlow underGlow = new  UnderGlow(ledStrip);
   public final BatteryLED batteryMonitor = new BatteryLED(ledStrip);
+
+  private SmartSupplier lowLeft = new SmartSupplier("Shooter/Low/Left", 10000);
+  private SmartSupplier lowRight = new SmartSupplier("Shooter/Low/Right", 10000);
+  private SmartSupplier midLeft = new SmartSupplier("Shooter/Mid/Left", 20000);
+  private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 20000);
+  private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 25000);
+  private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 25000);
 
 
   /**
@@ -295,15 +303,15 @@ public class RobotContainer {
 
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(10000); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
 
     //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(20000); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(midLeft, midRight); }));
 
     //A: prep flywheels far
     new JoystickButton(operator, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(25000); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(highLeft, highRight); }));
 
     //X: stop flywheels
     new JoystickButton(operator, XboxController.Button.kX.value)

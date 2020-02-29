@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import javax.swing.text.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -122,6 +124,11 @@ public class Shooter extends SubsystemBase {
     trigger.set(ControlMode.PercentOutput, -0.5);
   }
 
+  public void prepFlywheels(DoubleSupplier leftV, DoubleSupplier rightV){
+    left.set(ControlMode.Velocity, -leftV.getAsDouble());
+    right.set(ControlMode.Velocity, rightV.getAsDouble());
+    trigger.set(ControlMode.PercentOutput, -0.5);
+  } 
 
   public void prepFlywheels(double distance){
     // int lowIndex = 0;
