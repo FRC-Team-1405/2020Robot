@@ -31,11 +31,11 @@ public class TurnToTarget extends SequentialCommandGroup {
                                   (interrupted) -> {},
                                   ()-> { return shooter.turretTurnIsComplete(); } ),
 
-          new FunctionalCommand( ()-> {shooter.limelight.setPipeline((byte) 2);
+          new FunctionalCommand( ()-> {shooter.limelight.setPipeline((byte) 7);
                                       shooter.limelight.setLED((byte) 3);
                                       shooter.turnTurret(); },
                                  ()-> { },
-                                 (interrupted) -> {},
+                                 (interrupted) -> {shooter.limelight.setLED((byte) 1);},
                                  ()-> { return shooter.turretTurnIsComplete(); } )
     );
   };

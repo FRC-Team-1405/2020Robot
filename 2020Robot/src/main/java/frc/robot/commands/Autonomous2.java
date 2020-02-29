@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.DoubleSupplier;
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
@@ -29,9 +31,10 @@ public class Autonomous2 extends SequentialCommandGroup {
     // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new FireOnce(shooter, driveBase).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
     // new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
 
-    super( new InstantCommand(() -> {shooter.prepFlywheels(12000);}),
+    super( new InstantCommand(() -> {shooter.prepFlywheels(10000, 10000);}),
           new WaitCommand(2),
-          new InstantCommand(shooter::fire),
+          new FireOnce(shooter),
+          // new InstantCommand(shooter::fire),
           new WaitCommand(3),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
           new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));

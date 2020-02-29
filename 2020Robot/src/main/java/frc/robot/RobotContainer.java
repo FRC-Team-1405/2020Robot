@@ -97,10 +97,9 @@ public class RobotContainer {
 
   private SmartSupplier lowLeft = new SmartSupplier("Shooter/Low/Left", 10000);
   private SmartSupplier lowRight = new SmartSupplier("Shooter/Low/Right", 10000);
-  private SmartSupplier midLeft = new SmartSupplier("Shooter/Mid/Left", 20000);
-  private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 20000);
-  private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 25000);
-  private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 25000);
+  private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 16000);
+  private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000);
+  public static double increase = 0;
 
 
   /**
@@ -110,13 +109,16 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     initShuffleBoard();
+    launcher.limelight.setPipeline((byte) 0);
+    launcher.limelight.setLED((byte) 1);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
     climber.setDefaultCommand( new RunCommand( () -> {
-      climber.directControl( this::leftScissorPos, this::rightScissorPos );
+      // climber.directControl( this::leftScissorPos, this::rightScissorPos );
+      climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight));
     }, climber));
 
     // lidarReader.start();
@@ -141,6 +143,7 @@ public class RobotContainer {
     // return driveRotationFilter.calculate(rotation);
     return rotation;
   }
+
 
   private double leftScissorPos(){
     double pos = -operator.getY(Hand.kLeft);
@@ -190,6 +193,10 @@ public class RobotContainer {
       RunCommand readDistance = new RunCommand(lidar::readDistance);
       readDistance.setName("Read_Distance");
       testCommandsTab.add(readDistance);
+
+      RunCommand turnTurret = new RunCommand(launcher::turnTurret);
+      turnTurret.setName("Turn_Turret");
+      testCommandsTab.add(turnTurret);
   
       RunCommand readColor = new RunCommand(colorSensor::readColor);
       readColor.setName("Read_Color");
@@ -208,11 +215,6 @@ public class RobotContainer {
       setElevation.setName("Set Elevation");
       testCommandsTab.add(setElevation);
   
-      SmartDashboard.putNumber("Right/speed", 0); 
-      SmartDashboard.putNumber("Left/speed", 0); 
-      RunCommand testLauncher = new RunCommand( () -> { launcher.prepFlywheels( SmartDashboard.getNumber("Shooter/speed", 0)); });
-      testLauncher.setName("Test Launcher");
-      testCommandsTab.add(testLauncher);
     }
 
     // SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
@@ -236,6 +238,9 @@ public class RobotContainer {
      * +Right trigger: manual turret adjust right
      * +Y: toggle shooter elevation
      * +X: toggle intake elevation
+     * +A: toggle limelight pipeline
+     * +D-pad up: increase shooter power
+     * +D-pad down: decrease shooter power
      * 
      * Operator:
      * +Right bumper: run indexer
@@ -291,9 +296,22 @@ public class RobotContainer {
                                           intake::armInPosition,
                                           intake ) );
 
+    //A: toggle limelight pipeline
+    new JoystickButton(driver, XboxController.Button.kA.value)
+      .whenPressed( new InstantCommand(launcher::togglePipeline));
+
+    //D-pad up: increase power
+    new POVButton(driver, 0)
+      .whenPressed( new InstantCommand( () -> {increase += 250;} ));
+
+    //D-pad down: decrease power
+    new POVButton(driver, 0)
+      .whenPressed( new InstantCommand( () -> {increase -= 250;} ));
+
+
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new FireOnce(launcher) )
+      .whenHeld( new FireOnce(launcher, driveBase) )
       .whenReleased(launcher::stopIndexer);
 
     //Right bumper: run indexer
@@ -303,11 +321,11 @@ public class RobotContainer {
 
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(); }));
 
     //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(midLeft, midRight); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
 
     //A: prep flywheels far
     new JoystickButton(operator, XboxController.Button.kA.value)

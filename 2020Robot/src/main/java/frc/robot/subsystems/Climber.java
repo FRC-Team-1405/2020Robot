@@ -46,7 +46,7 @@ public class Climber extends SubsystemBase {
   //Configurable values for the climb motor: 
   public double reachPosition = 0.0; 
   public double homePosition = 0.0;
-  public boolean enabled = false; 
+  public boolean enabled = true; 
 
   DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
   DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
@@ -70,12 +70,17 @@ public class Climber extends SubsystemBase {
     enabled = !enabled;
   }
 
-  public void directControl(DoubleSupplier left, DoubleSupplier right){
-    double leftPos = leftClimbMotor.getSelectedSensorPosition() + left.getAsDouble();
-    double rightPos = rightClimbMotor.getSelectedSensorPosition() + right.getAsDouble();
-    leftClimbMotor.set(ControlMode.Position, leftPos);
-    rightClimbMotor.set(ControlMode.Position, rightPos);
+  public void directControl(double left, double right){
+    leftClimbMotor.set(left);
+    rightClimbMotor.set(right);
   }
+
+  // public void directControl(DoubleSupplier left, DoubleSupplier right){
+  //   double leftPos = leftClimbMotor.getSelectedSensorPosition() + left.getAsDouble();
+  //   double rightPos = rightClimbMotor.getSelectedSensorPosition() + right.getAsDouble();
+  //   leftClimbMotor.set(ControlMode.Position, leftPos);
+  //   rightClimbMotor.set(ControlMode.Position, rightPos);
+  // }
   
   public void moveLeft(double distance){
     if(enabled){

@@ -62,6 +62,7 @@ public class Intake extends SubsystemBase {
   public void stop(){
     if(!intakeUp){
       intakeDeploy.set(ControlMode.PercentOutput, 0);
+      movingArm = false;
     }
   }
 

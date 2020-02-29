@@ -59,10 +59,22 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
        getCamMode = table.getEntry("camMode");
        }
 
-
+       byte currentPipeline = 0;
        public void setPipeline(byte id) {
+       currentPipeline = id;
        //pipeline = id;
        table.getEntry("pipeline").setNumber(id);
+       }
+
+       public void togglePipeline() {
+        if(currentPipeline == 0){
+            setPipeline((byte) 7);
+            currentPipeline = (byte) 7;
+        }else{
+            setPipeline((byte) 0);
+            currentPipeline = (byte) 0;
+            setLED((byte) 1);
+        }
        }
        public void setLED(byte mode) {
        /* 0: Pipeline default (probably should just use this)

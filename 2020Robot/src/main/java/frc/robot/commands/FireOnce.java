@@ -7,6 +7,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -38,8 +39,10 @@ public class FireOnce extends SequentialCommandGroup {
     // super(new FooCommand(), new BarCommand());
     super(new FunctionalCommand(() -> {},
                                 () -> { if(shooter.flywheelReady()){
+                                          SmartDashboard.putBoolean("Shooter/FireActive", true);
                                           shooter.fire();
                                       }else{
+                                        SmartDashboard.putBoolean("Shooter/FireActive", false);
                                         shooter.stopIndexer();
                                       }},
                                 (interrupted) -> { shooter.stopIndexer();},
