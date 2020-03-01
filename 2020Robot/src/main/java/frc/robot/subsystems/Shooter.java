@@ -64,7 +64,7 @@ public class Shooter extends SubsystemBase {
   // CANPIDController rightPIDController = new CANPIDController(right);
   
   public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9)); 
-  public double triggerSpeed = 0.5; 
+  public double triggerSpeed = 0.6; 
   private int errorThreshold = 50;
   private int loopsToSettle = 10;
   private int withinThresholdLoops = 0;
@@ -154,7 +154,7 @@ public class Shooter extends SubsystemBase {
     }
     left.set(ControlMode.Velocity, -power - RobotContainer.increase);
     right.set(ControlMode.Velocity, power + RobotContainer.increase);
-    trigger.set(ControlMode.PercentOutput, -0.5);
+    trigger.set(ControlMode.PercentOutput, -0.6);
     //trigger.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Trigger Speed", triggerSpeed));
   }
 
@@ -165,7 +165,7 @@ public class Shooter extends SubsystemBase {
   public void prepFlywheels(double leftV, double rightV){
     left.set(ControlMode.Velocity, -leftV - RobotContainer.increase);
     right.set(ControlMode.Velocity, rightV + RobotContainer.increase);
-    trigger.set(ControlMode.PercentOutput, -0.5);
+    trigger.set(ControlMode.PercentOutput, -0.6);
   }
 
   public void fire(){
@@ -175,11 +175,12 @@ public class Shooter extends SubsystemBase {
 
   public void stopIndexer(){
     indexer.set(ControlMode.PercentOutput, 0);
+    //trigger.set(0);
   }
 
   public void outtake(){
     indexer.set(ControlMode.PercentOutput, -0.5);
-    trigger.set(ControlMode.PercentOutput, 0.3);
+    //trigger.set(ControlMode.PercentOutput, 0.3);
   }
 
   public boolean flywheelReady() {

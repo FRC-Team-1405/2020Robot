@@ -97,6 +97,8 @@ public class RobotContainer {
 
   private SmartSupplier lowLeft = new SmartSupplier("Shooter/Low/Left", 10000);
   private SmartSupplier lowRight = new SmartSupplier("Shooter/Low/Right", 10000);
+  private SmartSupplier midLeft = new SmartSupplier("Shooter/Mid/Left", 11000);
+  private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 11000);
   private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 16000);
   private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000);
   public static double increase = 0;
@@ -311,7 +313,7 @@ public class RobotContainer {
 
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new FireOnce(launcher, driveBase) )
+      .whenHeld( new FireOnce(launcher) )
       .whenReleased(launcher::stopIndexer);
 
     //Right bumper: run indexer
@@ -321,11 +323,11 @@ public class RobotContainer {
 
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
 
     //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(midLeft, midRight); }));
 
     //A: prep flywheels far
     new JoystickButton(operator, XboxController.Button.kA.value)
