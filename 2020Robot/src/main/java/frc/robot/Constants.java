@@ -77,14 +77,14 @@ public final class Constants {
     public final static double goalX = 2.404364;
 
     public class ShooterConstants {
-        public final static int angleMin = -20;
-        public final static int angleMax = 25;
-        public final static int unitsMin = 500;
+        public final static int angleMin = 0;
+        public final static int angleMax = 70;
+        public final static int unitsMin = 100;
         public final static int unitsMax = 3500;
+        public final static int turretCenter = 1700;
         public final static double elevationMin = 0.2;
         public final static double elevationMax = 0.8;
-        public final static double limelightError = 2.0;
-        public final static int turretError = 100; 
+        public final static double limelightError = 10.0;
         public final static double triggerSpeed = .8; 
     }
 

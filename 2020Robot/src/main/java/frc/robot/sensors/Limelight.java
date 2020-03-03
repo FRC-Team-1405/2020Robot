@@ -69,6 +69,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
        public void togglePipeline() {
         if(currentPipeline == 0){
             setPipeline((byte) 7);
+            setLED((byte) 3);
             currentPipeline = (byte) 7;
         }else{
             setPipeline((byte) 0);

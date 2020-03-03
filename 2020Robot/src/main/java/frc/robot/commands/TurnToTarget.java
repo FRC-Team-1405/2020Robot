@@ -24,19 +24,22 @@ public class TurnToTarget extends SequentialCommandGroup {
   public TurnToTarget(Shooter shooter, ArcadeDrive drivebase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super( new FunctionalCommand( ()-> { if(!shooter.hasTarget()){
-                                          shooter.turnToGoal(drivebase);
-                                        }},
-                                  ()-> { },
-                                  (interrupted) -> {},
-                                  ()-> { return shooter.turretTurnIsComplete(); } ),
+    super( 
+      // new FunctionalCommand( ()-> { if(!shooter.hasTarget() && shooter.tracking){
+      //                                     shooter.turnToGoal(drivebase);
+      //                                   }},
+      //                             ()-> { },
+      //                             (interrupted) -> {},
+      //                             ()-> { return (shooter.turretTurnIsComplete() || !shooter.tracking); } ),
 
-          new FunctionalCommand( ()-> {shooter.limelight.setPipeline((byte) 7);
-                                      shooter.limelight.setLED((byte) 3);
-                                      shooter.turnTurret(); },
+          new FunctionalCommand( ()-> {if(shooter.tracking){
+                                        shooter.limelight.setPipeline((byte) 7);
+                                        shooter.limelight.setLED((byte) 3);
+                                        shooter.turnTurret();
+                                      }},
                                  ()-> { },
                                  (interrupted) -> {shooter.limelight.setLED((byte) 1);},
-                                 ()-> { return shooter.turretTurnIsComplete(); } )
+                                 ()-> { return (shooter.turretTurnIsComplete() || !shooter.tracking); } )
     );
   };
 }

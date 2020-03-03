@@ -30,7 +30,7 @@ public class FireOnce extends SequentialCommandGroup {
                                 () -> { if(shooter.flywheelReady())
                                           shooter.fire();},
                                 (interrupted) -> { shooter.stopIndexer();},
-                                () -> {return !shooter.flywheelReady();} )  
+                                () -> {return false;} )  
           );
   }
 

@@ -70,6 +70,7 @@ public class Shooter extends SubsystemBase {
   private int withinThresholdLoops = 0;
   private int targetPosition = Constants.ShooterConstants.unitsMin;
   private boolean movingTurret = false;
+  public boolean tracking = false;
 
   public Shooter() { 
     SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
@@ -131,6 +132,8 @@ public class Shooter extends SubsystemBase {
                                         new Setting(11000, 0.625), };
 
   public void prepFlywheels(){
+    tracking = true;
+    turnTurret();
     int lowIndex = 0;
     int highIndex = 0;
     double power = 0.0;
@@ -159,10 +162,14 @@ public class Shooter extends SubsystemBase {
   }
 
   public void prepFlywheels(DoubleSupplier leftV, DoubleSupplier rightV){
+    tracking = true;
+    turnTurret();
     prepFlywheels(leftV.getAsDouble() - RobotContainer.increase, rightV.getAsDouble() + RobotContainer.increase);
   } 
 
   public void prepFlywheels(double leftV, double rightV){
+    tracking = true;
+    turnTurret();
     left.set(ControlMode.Velocity, -leftV - RobotContainer.increase);
     right.set(ControlMode.Velocity, rightV + RobotContainer.increase);
     trigger.set(ControlMode.PercentOutput, -0.6);
@@ -233,8 +240,12 @@ public class Shooter extends SubsystemBase {
   }
   public void turnTurret(){
     withinThresholdLoops = 0;
-    turnTurret((int) limelight.getTX());
+    turnTurret(-(int) limelight.getTX());
   };
+
+  public void goHome(){
+    turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.turretCenter);
+  }
 
   public void turnTurret(int angle){
     int currentPos = turret.getSelectedSensorPosition();

@@ -236,11 +236,7 @@ public class RobotContainer {
      * +B: drive backwards
      * +Right bumper: intake
      * +Left bumper: outtake
-     * +Left trigger: manual turret adjust left
-     * +Right trigger: manual turret adjust right
-     * +Y: toggle shooter elevation
      * +X: toggle intake elevation
-     * +A: toggle limelight pipeline
      * +D-pad up: increase shooter power
      * +D-pad down: decrease shooter power
      * 
@@ -251,10 +247,10 @@ public class RobotContainer {
      * +B: prep flywheels close
      * +A: prep flywheels far
      * +X: stop flywheels
-     * +Left trigger: rotation control
-     * +Right trigger: position control
-     * +D-pad left: control panel left
-     * +D-pad right control panel right
+     * +Left trigger: manual turret adjust left
+     * +Right trigger: manual turret adjust right
+     * +D-pad left: toggle limelight pipeline
+     * +D-pad right toggle shooter elevation
      * +D-pad up: scissors up
      * +D-pad down: scissors down
      * +Left joystick: left scissor
@@ -278,18 +274,6 @@ public class RobotContainer {
       .whenReleased( new InstantCommand(intake::disable))
       .whenReleased( new InstantCommand(launcher::stopIndexer));
 
-    //Left trigger: manual turret adjust left
-    new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.1 )
-      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));}) );
-      
-    //Right trigger: manual turret adjust right
-    new Trigger(() -> driver.getTriggerAxis(Hand.kRight) > 0.1 )
-      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));}) );
-
-    //Y: toggle shooter elevation
-    new JoystickButton(driver, XboxController.Button.kY.value)
-      .whenPressed(new InstantCommand( launcher::toggleElevation, launcher));
-
     //X toggle intake elevation
     new JoystickButton(driver, XboxController.Button.kX.value)
       .whenPressed( new FunctionalCommand(intake::toggleElevation,
@@ -297,10 +281,6 @@ public class RobotContainer {
                                           (interrupted) -> {intake.stop();}, 
                                           intake::armInPosition,
                                           intake ) );
-
-    //A: toggle limelight pipeline
-    new JoystickButton(driver, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand(launcher::togglePipeline));
 
     //D-pad up: increase power
     new POVButton(driver, 0)
@@ -311,9 +291,11 @@ public class RobotContainer {
       .whenPressed( new InstantCommand( () -> {increase -= 250;} ));
 
 
+
+
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new FireOnce(launcher) )
+      .whenHeld( new FireOnce(launcher, driveBase) )
       .whenReleased(launcher::stopIndexer);
 
     //Right bumper: run indexer
@@ -335,45 +317,68 @@ public class RobotContainer {
 
     //X: stop flywheels
     new JoystickButton(operator, XboxController.Button.kX.value)
-      .whenPressed( new InstantCommand(launcher::stopFlywheels));
+      .whenPressed( new InstantCommand(launcher::stopFlywheels))
+      .whenPressed( new InstantCommand(launcher::goHome));
 
-    //Left trigger: rotation control
-    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
-      .whileActiveOnce( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
-                                            () -> {},
-                                            (interrupted) -> { controlPanel.stop(); }, 
-                                            controlPanel::isRotationComplete,
-                                            controlPanel ) );
+    //Left trigger: manual turret adjust left
+    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.2 )
+    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
+                                            if(launcher.turretTurnIsComplete())
+                                              launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.2, 1, 1, 10));
+                                            }) );
+    
+  //Right trigger: manual turret adjust right
+  new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.2 )
+    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
+                                              if(launcher.turretTurnIsComplete())
+                                              launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.2, 1, 1, 10));
+                                            }) );
 
-    //Right trigger: position control
-    new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
-      .whileActiveOnce(  new FunctionalCommand(controlPanel::positionControl,
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::checkColor,
-                                          controlPanel
-                                          )
-                    .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::isRotationComplete,
-                                          controlPanel) ));
+    // //Left trigger: rotation control
+    // new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
+    //   .whileActiveOnce( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
+    //                                         () -> {},
+    //                                         (interrupted) -> { controlPanel.stop(); }, 
+    //                                         controlPanel::isRotationComplete,
+    //                                         controlPanel ) );
 
-    //D-pad left: control panel left
+    // //Right trigger: position control
+    // new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
+    //   .whileActiveOnce(  new FunctionalCommand(controlPanel::positionControl,
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::checkColor,
+    //                                       controlPanel
+    //                                       )
+    //                 .andThen( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.COLOR_ADJUST),
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::isRotationComplete,
+    //                                       controlPanel) ));
+
+    // //D-pad left: control panel left
+    // new POVButton(operator, 270)
+    // .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
+    //                                     () -> {},
+    //                                     (interrupted) -> { controlPanel.stop(); },
+    //                                     controlPanel::isRotationComplete,
+    //                                     controlPanel));   
+
+    // //D-pad right: control panel right
+    // new POVButton(operator, 90)
+    // .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::isRotationComplete,
+    //                                       controlPanel)); 
+
+    //D-Pad left: toggle limelight pipeline
     new POVButton(operator, 270)
-    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
-                                        () -> {},
-                                        (interrupted) -> { controlPanel.stop(); },
-                                        controlPanel::isRotationComplete,
-                                        controlPanel));   
+    .whenPressed( new InstantCommand(launcher::togglePipeline));
 
-    //D-pad right: control panel right
+    //D-pad right: toggle shooter elevation
     new POVButton(operator, 90)
-    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::isRotationComplete,
-                                          controlPanel)); 
+    .whenPressed(new InstantCommand( launcher::toggleElevation, launcher));
 
     //D-pad up: scissors up
     new POVButton(operator, 0)
