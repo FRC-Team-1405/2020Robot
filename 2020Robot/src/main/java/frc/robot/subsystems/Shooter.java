@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import javax.swing.text.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
@@ -25,6 +27,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
+import frc.robot.RobotContainer;
 import frc.robot.lib.MathTools;
 import frc.robot.sensors.LidarLitePWM;
 import frc.robot.sensors.Limelight;
@@ -61,7 +64,13 @@ public class Shooter extends SubsystemBase {
   // CANPIDController rightPIDController = new CANPIDController(right);
   
   public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9)); 
-  public double triggerSpeed = 0.5; 
+  public double triggerSpeed = 0.6; 
+  private int errorThreshold = 50;
+  private int loopsToSettle = 10;
+  private int withinThresholdLoops = 0;
+  private int targetPosition = Constants.ShooterConstants.unitsMin;
+  private boolean movingTurret = false;
+  public boolean tracking = false;
 
   public Shooter() { 
     SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
@@ -70,6 +79,13 @@ public class Shooter extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
+    if (movingTurret) {
+      if (turret.getActiveTrajectoryPosition() == targetPosition && Math.abs(turret.getClosedLoopError()) < errorThreshold){
+        withinThresholdLoops++;
+      }else{
+        withinThresholdLoops = 0;
+      }
+    }
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
       SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
@@ -111,46 +127,52 @@ public class Shooter extends SubsystemBase {
   }
 
   Setting settings[] = new Setting[] {
-                                        new Setting(16000, 1),
-                                        new Setting(18000, 2),
-                                        new Setting(20000, 3), 
-                                        new Setting(22000, 4) };
+                                        new Setting(10000, 1.82),
+                                        new Setting(10500, 0.97),
+                                        new Setting(11000, 0.625), };
 
   public void prepFlywheels(){
-    prepFlywheels(lidarLitePWM.getDistance());
-    //trigger.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Trigger Speed", triggerSpeed));  
-    trigger.set(ControlMode.PercentOutput, -0.5);
+    tracking = true;
+    turnTurret();
+    int lowIndex = 0;
+    int highIndex = 0;
+    double power = 0.0;
+    double distance = limelight.getTA();
+
+    if(distance <= settings[0].distance){
+      power = settings[0].power;
+    }
+    else if(distance >= settings[settings.length-1].distance){
+      power = settings[settings.length-1].power;
+    }
+    else{
+      for(int i = 1; i < settings.length; i++){
+        if(distance <= settings[i].distance){
+          lowIndex = i-1;
+          highIndex = i;
+          power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
+          break;
+        }
+      }
+    }
+    left.set(ControlMode.Velocity, -power - RobotContainer.increase);
+    right.set(ControlMode.Velocity, power + RobotContainer.increase);
+    trigger.set(ControlMode.PercentOutput, -0.6);
+    //trigger.set(ControlMode.PercentOutput, SmartDashboard.getNumber("Trigger Speed", triggerSpeed));
   }
 
+  public void prepFlywheels(DoubleSupplier leftV, DoubleSupplier rightV){
+    tracking = true;
+    turnTurret();
+    prepFlywheels(leftV.getAsDouble() - RobotContainer.increase, rightV.getAsDouble() + RobotContainer.increase);
+  } 
 
-  public void prepFlywheels(double distance){
-    // int lowIndex = 0;
-    // int highIndex = 0;
-    // double power = 0.0;
-
-    // if(distance < settings[0].distance){
-    //   power = settings[0].power;
-    // }
-    // else if(distance > settings[settings.length-1].distance){
-    //   power = settings[settings.length-1].power;
-    // }
-    // else{
-    //   for(int i = 1; i < settings.length-2; i++){
-    //     if(distance < settings[i].distance){
-    //       lowIndex = i-1;
-    //       highIndex = i;
-    //       power = CalculatePower(distance, settings[lowIndex], settings[highIndex]);
-    //       break;
-    //     }
-    //   }
-    // }
-    // left.set(-power);
-    // right.set(power);
-    left.set(ControlMode.Velocity, -distance);
-    right.set(ControlMode.Velocity, distance);
-    trigger.set(ControlMode.PercentOutput, -0.5);
-    // SmartDashboard.putNumber("Shooter_Power", power);
-    // SmartDashboard.putNumber("Shooter_Distance", distance);
+  public void prepFlywheels(double leftV, double rightV){
+    tracking = true;
+    turnTurret();
+    left.set(ControlMode.Velocity, -leftV - RobotContainer.increase);
+    right.set(ControlMode.Velocity, rightV + RobotContainer.increase);
+    trigger.set(ControlMode.PercentOutput, -0.6);
   }
 
   public void fire(){
@@ -160,15 +182,16 @@ public class Shooter extends SubsystemBase {
 
   public void stopIndexer(){
     indexer.set(ControlMode.PercentOutput, 0);
+    //trigger.set(0);
   }
 
   public void outtake(){
     indexer.set(ControlMode.PercentOutput, -0.5);
-    trigger.set(ControlMode.PercentOutput, 0.3);
+    //trigger.set(ControlMode.PercentOutput, 0.3);
   }
 
   public boolean flywheelReady() {
-    return left.getClosedLoopError() <= Constants.maxFlywheelError && right.getClosedLoopError() <= Constants.maxFlywheelError ;
+    return (Math.abs(left.getClosedLoopError()) <= Constants.maxFlywheelError && Math.abs(right.getClosedLoopError()) <= Constants.maxFlywheelError);
   }
 
   public boolean setLow = false;
@@ -197,7 +220,12 @@ public class Shooter extends SubsystemBase {
     return limelight.hasTarget();
   }
 
+  public void togglePipeline(){
+    limelight.togglePipeline();
+  }
+
   public void turnToGoal(ArcadeDrive driveBase){
+    withinThresholdLoops = 0;
     Pose2d pose = driveBase.getPose();
     double currentX = pose.getTranslation().getX();
     double currentY = pose.getTranslation().getY();
@@ -207,21 +235,27 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretTurnIsComplete(){
-    return turret.getClosedLoopError() < Constants.ShooterConstants.turretError;
+    return (withinThresholdLoops > loopsToSettle);
+    //return turret.getClosedLoopError() < Constants.ShooterConstants.turretError;
   }
   public void turnTurret(){
-    turnTurret((int) limelight.getTX());
+    withinThresholdLoops = 0;
+    turnTurret(-(int) limelight.getTX());
   };
+
+  public void goHome(){
+    turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.turretCenter);
+  }
 
   public void turnTurret(int angle){
     int currentPos = turret.getSelectedSensorPosition();
     angle = MathTools.map(angle, Constants.ShooterConstants.angleMin, Constants.ShooterConstants.angleMax, Constants.ShooterConstants.unitsMin, Constants.ShooterConstants.unitsMax);
     if(currentPos+angle < Constants.ShooterConstants.unitsMin){
-      turret.set(ControlMode.Position, Constants.ShooterConstants.unitsMin);
+      turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.unitsMin);
     } else if(currentPos+angle > Constants.ShooterConstants.unitsMax){
-      turret.set(ControlMode.Position, Constants.ShooterConstants.unitsMax);
+      turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.unitsMax);
     } else{
-      turret.set(ControlMode.Position, currentPos+angle);
+      turret.set(ControlMode.MotionMagic, currentPos+angle);
     }
   }
 

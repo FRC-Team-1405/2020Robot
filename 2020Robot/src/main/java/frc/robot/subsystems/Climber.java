@@ -7,6 +7,8 @@
 
 package frc.robot.subsystems;
 
+import java.util.function.DoubleSupplier;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
@@ -52,7 +54,7 @@ public class Climber extends SubsystemBase {
   public double reachPosition = 0.0; 
   public double lowPosition = 0.0; 
   public double homePosition = 0.0;
-  public boolean enabled = false; 
+  public boolean enabled = true; 
 
   DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
   DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
@@ -81,32 +83,56 @@ public class Climber extends SubsystemBase {
     leftClimbMotor.set(left);
     rightClimbMotor.set(right);
   }
+
+  // public void directControl(DoubleSupplier left, DoubleSupplier right){
+  //   double leftPos = leftClimbMotor.getSelectedSensorPosition() + left.getAsDouble();
+  //   double rightPos = rightClimbMotor.getSelectedSensorPosition() + right.getAsDouble();
+  //   leftClimbMotor.set(ControlMode.Position, leftPos);
+  //   rightClimbMotor.set(ControlMode.Position, rightPos);
+  // }
   
   public void moveLeft(double distance){
     if(enabled){
-      // leftClimbMotor.set(ControlMode.Position, distance);
+      leftClimbMotor.set(ControlMode.Position, distance);
     }
   }
 
   public void moveRight(double distance){
     if(enabled){
-      // rightClimbMotor.set(ControlMode.Position, distance);
+      rightClimbMotor.set(ControlMode.Position, distance);
     }
   }
   //highest position
   public void reachUp(){  
     if(enabled){
-       leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition)); 
-      
+      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
     }
   } 
   //lowest postition
   public void goHome(){ 
-    if(enabled){
-       rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
-      
+    if(enabled){  
+      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
+      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
     }
-  } 
+  }
+
+  boolean leftToggle = false;
+  boolean rightToggle = false;
+  boolean leftFrontOff = true;
+  boolean leftBackOff = true;
+  boolean rightFrontOff = true;
+  boolean rightBackOff = true;
+  // public boolean isAligned(){
+  //   if(leftFrontOff && !leftFrontSwitch.get()){
+  //     leftToggle = !leftToggle;
+  //     leftFrontOff = false;
+  //   }
+  //   if(leftBackOff && !leftBackSwitch.get()){
+  //     leftToggle = !leftToggle;
+  //     leftBackOff = false;
+  //   }
+  // } 
   //Position just under bar  
   public void reachLow(){ 
     if(enabled){ 

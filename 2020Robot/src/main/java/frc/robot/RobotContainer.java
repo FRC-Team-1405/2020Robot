@@ -38,6 +38,7 @@ import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.PathGenerator;
+import frc.robot.lib.SmartSupplier;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
@@ -93,6 +94,14 @@ public class RobotContainer {
   public final UnderGlow underGlow = new  UnderGlow(ledStrip);
   public final BatteryLED batteryMonitor = new BatteryLED(ledStrip);
 
+  private SmartSupplier lowLeft = new SmartSupplier("Shooter/Low/Left", 10000);
+  private SmartSupplier lowRight = new SmartSupplier("Shooter/Low/Right", 10000);
+  private SmartSupplier midLeft = new SmartSupplier("Shooter/Mid/Left", 11000);
+  private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 11000);
+  private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 16000);
+  private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000);
+  public static double increase = 0;
+
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -101,6 +110,8 @@ public class RobotContainer {
     // Configure the button bindings
     configureButtonBindings();
     initShuffleBoard();
+    launcher.limelight.setPipeline((byte) 0);
+    launcher.limelight.setLED((byte) 1);
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
@@ -137,6 +148,7 @@ public class RobotContainer {
     return rotation;
   }
 
+
   private double leftScissorPos(){
     double pos = -operator.getY(Hand.kLeft);
     if(Math.abs(pos) < Constants.deadBand)
@@ -145,7 +157,7 @@ public class RobotContainer {
   }
 
   private double rightScissorPos(){
-    double pos = -operator.getY(Hand.kLeft);
+    double pos = -operator.getY(Hand.kRight);
     if(Math.abs(pos) < Constants.deadBand)
     pos = 0.0;
     return MathTools.map(pos, -1.0, 1.0, -10.0, 10.0);
@@ -171,7 +183,7 @@ public class RobotContainer {
     if(!Robot.fmsAttached){
       ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
       testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-      testCommandsTab.add( new FireOnce(launcher, 16000)
+      testCommandsTab.add( new FireOnce(launcher)
                       .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
       testCommandsTab.add( new DriveByVelocity(driveBase));
 
@@ -185,6 +197,10 @@ public class RobotContainer {
       RunCommand readDistance = new RunCommand(lidar::readDistance);
       readDistance.setName("Read_Distance");
       testCommandsTab.add(readDistance);
+
+      RunCommand turnTurret = new RunCommand(launcher::turnTurret);
+      turnTurret.setName("Turn_Turret");
+      testCommandsTab.add(turnTurret);
   
       RunCommand readColor = new RunCommand(colorSensor::readColor);
       readColor.setName("Read_Color");
@@ -203,11 +219,6 @@ public class RobotContainer {
       setElevation.setName("Set Elevation");
       testCommandsTab.add(setElevation);
   
-      SmartDashboard.putNumber("Right/speed", 0); 
-      SmartDashboard.putNumber("Left/speed", 0); 
-      RunCommand testLauncher = new RunCommand( () -> { launcher.launch( SmartDashboard.getNumber("Left/speed", 0), SmartDashboard.getNumber("Right/speed", 0)); });
-      testLauncher.setName("Test Launcher");
-      testCommandsTab.add(testLauncher);
     }
 
      SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
@@ -227,24 +238,26 @@ public class RobotContainer {
      * +B: drive backwards
      * +Right bumper: intake
      * +Left bumper: outtake
-     * +Left trigger: intake down to floor
+     * +X: toggle intake elevation
+     * +D-pad up: increase shooter power
+     * +D-pad down: decrease shooter power
      * 
      * Operator:
-     * +Right bumper: shoot
-     * +Left bumper: toggle shooter elevation
-     * +Y: manual shoot close
-     * +A: manual shoot far
-     * +X: rotation control
-     * +B: position control
-     * +D-pad left: control panel left
-     * +D-pad right control panel right
-     * +D-pad up: scissors up
-     * +D-pad down: scissors down
-     * Left joystick: left scissor
-     * Right joystick: right scissor
-     * +Start: scissors enable
+     * +Right bumper: run indexer
+     * +Left bumper: shoot
+     * +Y: prep flywheels auto
+     * +B: prep flywheels close
+     * +A: prep flywheels far
+     * +X: stop flywheels
      * +Left trigger: manual turret adjust left
      * +Right trigger: manual turret adjust right
+     * +D-pad left: toggle limelight pipeline
+     * +D-pad right toggle shooter elevation
+     * +D-pad up: scissors up
+     * +D-pad down: scissors down
+     * +Left joystick: left scissor
+     * +Right joystick: right scissor
+     * +Start: scissors enable
      */
 
      //B: drive backwards
@@ -263,70 +276,77 @@ public class RobotContainer {
       .whenReleased( new InstantCommand(intake::disable))
       .whenReleased( new InstantCommand(launcher::stopIndexer));
 
-    //Left trigger: intake to floor
-    new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.5 )
-      .whileActiveOnce( new InstantCommand( intake::deploy, intake) );
+    //X toggle intake elevation
+    new JoystickButton(driver, XboxController.Button.kX.value)
+      .whenPressed( new FunctionalCommand(intake::toggleElevation,
+                                          () -> {},
+                                          (interrupted) -> {intake.stop();}, 
+                                          intake::armInPosition,
+                                          intake ) );
 
-    //Right trigger: intake up
-    new Trigger(() -> driver.getTriggerAxis(Hand.kLeft) > 0.5 )
-      .whileActiveOnce( new InstantCommand( intake::retract, intake) );
+    //D-pad up: increase power
+    new POVButton(driver, 0)
+      .whenPressed( new InstantCommand( () -> {increase += 250;} ));
 
-    // //Right bumper: fire
-    // new JoystickButton(operator, XboxController.Button.kBumperRight.value)
-    //   .whenHeld( new FireOnce(launcher, driveBase) )
-    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+    //D-pad down: decrease power
+    new POVButton(driver, 0)
+      .whenPressed( new InstantCommand( () -> {increase -= 250;} ));
 
+
+
+
+    //Left bumper: fire auto
+    new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
+      .whenHeld( new FireOnce(launcher, driveBase) )
+      .whenReleased(launcher::stopIndexer);
+
+    //Right bumper: run indexer
     new JoystickButton(operator, XboxController.Button.kBumperRight.value)
       .whenPressed(launcher::fire)
       .whenReleased(launcher::stopIndexer);
 
-    //Left bumper: toggle shooter elevation
-    new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-      .whenPressed( new InstantCommand( launcher::toggleElevation ));
-
-    // //Y: manual fire close
-    // new JoystickButton(operator, XboxController.Button.kY.value)
-    //   .whenHeld( new FireOnce(launcher, Constants.closeFire) )
-    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );
-
+    //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(12000); }));
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
 
-    // new JoystickButton(operator, XboxController.Button.kB.value)
-    //   .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(16000); }));
-
-    new JoystickButton(operator, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(24000); }));
-
-    new JoystickButton(operator, XboxController.Button.kX.value)
-      .whenPressed( new InstantCommand(launcher::stopFlywheels));
-
-    // //A: manual fire far
-    // new JoystickButton(operator, XboxController.Button.kA.value)
-    //   .whenHeld( new FireOnce(launcher, Constants.farFire) )
-    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
-
-    //X: manual fire second close
+    //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenHeld( new FireOnce(launcher, 16000) )
-      .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(midLeft, midRight); }));
 
-    //B: manual fire second far
-    // new JoystickButton(operator, XboxController.Button.kB.value)
-    //   .whenHeld( new FireOnce(launcher, Constants.farFire2) )
-    //   .whenReleased(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) );;
+    //A: prep flywheels far
+    new JoystickButton(operator, XboxController.Button.kA.value)
+      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(highLeft, highRight); }));
 
-    // //X: rotation control
-    // new JoystickButton(operator, XboxController.Button.kX.value)
-    //   .whenPressed( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
+    //X: stop flywheels
+    new JoystickButton(operator, XboxController.Button.kX.value)
+      .whenPressed( new InstantCommand(launcher::stopFlywheels))
+      .whenPressed( new InstantCommand(launcher::goHome));
+
+    //Left trigger: manual turret adjust left
+    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.2 )
+    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
+                                            if(launcher.turretTurnIsComplete())
+                                              launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.2, 1, 1, 10));
+                                            }) );
+    
+  //Right trigger: manual turret adjust right
+  new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.2 )
+    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
+                                              if(launcher.turretTurnIsComplete())
+                                              launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.2, 1, 1, 10));
+                                            }) );
+
+    // //Left trigger: rotation control
+    // new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
+    //   .whileActiveOnce( new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.ROTATION_CONTROL_DISTANCE),
     //                                         () -> {},
     //                                         (interrupted) -> { controlPanel.stop(); }, 
     //                                         controlPanel::isRotationComplete,
     //                                         controlPanel ) );
 
-    // //B: position control
-    // new JoystickButton(operator, XboxController.Button.kB.value)
-    // .whenPressed(  new FunctionalCommand(controlPanel::positionControl,
+    // //Right trigger: position control
+    // new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
+    //   .whileActiveOnce(  new FunctionalCommand(controlPanel::positionControl,
     //                                       () -> {},
     //                                       (interrupted) -> { controlPanel.stop(); },
     //                                       controlPanel::checkColor,
@@ -338,41 +358,41 @@ public class RobotContainer {
     //                                       controlPanel::isRotationComplete,
     //                                       controlPanel) ));
 
-    //D-pad left: control panel left
+    // //D-pad left: control panel left
+    // new POVButton(operator, 270)
+    // .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
+    //                                     () -> {},
+    //                                     (interrupted) -> { controlPanel.stop(); },
+    //                                     controlPanel::isRotationComplete,
+    //                                     controlPanel));   
+
+    // //D-pad right: control panel right
+    // new POVButton(operator, 90)
+    // .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
+    //                                       () -> {},
+    //                                       (interrupted) -> { controlPanel.stop(); },
+    //                                       controlPanel::isRotationComplete,
+    //                                       controlPanel)); 
+
+    //D-Pad left: toggle limelight pipeline
     new POVButton(operator, 270)
-    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(-Constants.ControlPanelConstants.POSITION_ADJUST),
-                                        () -> {},
-                                        (interrupted) -> { controlPanel.stop(); },
-                                        controlPanel::isRotationComplete,
-                                        controlPanel));   
+    .whenPressed( new InstantCommand(launcher::togglePipeline));
 
-    //D-pad right: control panel right
+    //D-pad right: toggle shooter elevation
     new POVButton(operator, 90)
-    .whenPressed(  new FunctionalCommand( () -> controlPanel.rotationControl(Constants.ControlPanelConstants.POSITION_ADJUST),
-                                          () -> {},
-                                          (interrupted) -> { controlPanel.stop(); },
-                                          controlPanel::isRotationComplete,
-                                          controlPanel)); 
+    .whenPressed(new InstantCommand( launcher::toggleElevation, launcher));
 
-    // //D-pad up: scissors up
-    // new POVButton(operator, 0)
-    //   .whenPressed( new InstantCommand( climber::reachUp ));
+    //D-pad up: scissors up
+    new POVButton(operator, 0)
+      .whenPressed( new InstantCommand( climber::reachUp ));
 
-    // //D-pad down: scissors down
-    // new POVButton(operator, 180)
-    //   .whenPressed( new InstantCommand( climber::goHome ));
+    //D-pad down: scissors down
+    new POVButton(operator, 180)
+      .whenPressed( new InstantCommand( climber::goHome ));
 
-    // //Start: enable scissors
-    // new JoystickButton(operator, XboxController.Button.kStart.value)
-    //   .whenPressed( new InstantCommand( climber::toggleEnable));
-
-    //Left trigger: manual turret adjust left
-    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
-      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));}) );
-      
-    //Right trigger: manual turret adjust right
-    new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
-      .whileActiveOnce( new InstantCommand( () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));}) );
+    //Start: enable scissors
+    new JoystickButton(operator, XboxController.Button.kStart.value)
+      .whenPressed( new InstantCommand( climber::toggleEnable));
 
                                           
     // DoubleSupplier setPoint = new DoubleSupplier(){
@@ -405,7 +425,7 @@ public class RobotContainer {
   // An example selector method for the selectcommand.  Returns the selector that will select
   // which command to run.  Can base this choice on logical conditions evaluated at runtime.
   
-  private int select() {
+  private int select() { 
     return (int) autoSelector.getSelected();
   }
 

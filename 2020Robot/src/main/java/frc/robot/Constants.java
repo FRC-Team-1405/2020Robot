@@ -77,17 +77,16 @@ public final class Constants {
     public final static double goalX = 2.404364;
 
     public class ShooterConstants {
-        public final static int angleMin = -90;
-        public final static int angleMax = 90;
-        public final static int unitsMin = 12000;
-        public final static int unitsMax = 24000;
+        public final static int angleMin = 0;
+        public final static int angleMax = 70;
+        public final static int unitsMin = 100;
+        public final static int unitsMax = 3500;
+        public final static int turretCenter = 1700;
         public final static double elevationMin = 0.2;
         public final static double elevationMax = 0.8;
-        public final static double limelightError = 2.0;
-        public final static int turretError = 100; 
+        public final static double limelightError = 10.0;
         public final static double triggerSpeed = .8; 
     }
-    //Turret constants
 
     //TrajectoryDrive constants
     public static final double kTrackwidthMeters = 0.5461;
@@ -97,7 +96,7 @@ public final class Constants {
     public static final double kRamseteB = 2;
     public static final double kRamseteZeta = 0.7;
 
-    public static int maxFlywheelError = 500;
+    public static int maxFlywheelError = 250;
     public static int closeFire = 1;
     public static int farFire = 4;
     public static int closeFire2 = 2;
@@ -143,9 +142,8 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public final static int DEPLOY_POSITION = 1000;
+        public final static int DEPLOY_POSITION = -1390;
         public final static int RETRACT_POSITION = 0;
-        public final static int RENDEZVOUS_POSITION = 500; 
         public static double SPEED = -0.8;
     }
 

@@ -7,6 +7,7 @@
 
 package frc.robot.commands;
 
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
@@ -24,35 +25,28 @@ public class FireOnce extends SequentialCommandGroup {
   public FireOnce(Shooter shooter, ArcadeDrive driveBase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new ParallelCommandGroup(new FunctionalCommand( () -> { shooter.prepFlywheels(); shooter.stopIndexer(); },
-                                                          () -> {},
-                                                          (interrupted) -> { if (interrupted) 
-                                                                                shooter.stopFlywheels(); }, 
-                                                          () -> { return shooter.flywheelReady(); }),
-                                   new TurnToTarget(shooter, driveBase) ),
-          new FunctionalCommand(shooter::fire,
-                                () -> {},
-                                (interrupted) -> { shooter.stopIndexer(); 
-                                                   if (interrupted) 
-                                                    shooter.stopFlywheels();},
-                                () -> {return !shooter.flywheelReady();} )  
+    super(new TurnToTarget(shooter, driveBase),
+          new FunctionalCommand(() -> {},
+                                () -> { if(shooter.flywheelReady())
+                                          shooter.fire();},
+                                (interrupted) -> { shooter.stopIndexer();},
+                                () -> {return false;} )  
           );
   }
 
-  public FireOnce(Shooter shooter, double distance) {
+  public FireOnce(Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new FunctionalCommand( () -> { shooter.prepFlywheels(distance); shooter.stopIndexer(); },
-                                                          () -> {},
-                                                          (interrupted) -> { if (interrupted) 
-                                                                                shooter.stopFlywheels(); }, 
-                                                          () -> { return shooter.flywheelReady(); }),
-          new FunctionalCommand(shooter::fire,
-                                () -> {},
-                                (interrupted) -> { shooter.stopIndexer(); 
-                                                   if (interrupted) 
-                                                    shooter.stopFlywheels();},
-                                () -> {return !shooter.flywheelReady();} )  
+    super(new FunctionalCommand(() -> {},
+                                () -> { if(shooter.flywheelReady()){
+                                          SmartDashboard.putBoolean("Shooter/FireActive", true);
+                                          shooter.fire();
+                                      }else{
+                                        SmartDashboard.putBoolean("Shooter/FireActive", false);
+                                        shooter.stopIndexer();
+                                      }},
+                                (interrupted) -> { shooter.stopIndexer();},
+                                () -> {return false;} )  
           );
   }
 }
