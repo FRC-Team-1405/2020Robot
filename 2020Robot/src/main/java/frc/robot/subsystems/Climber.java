@@ -11,6 +11,8 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.ControlType;
+import com.revrobotics.CANPIDController; 
 import com.revrobotics.SparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -30,8 +32,13 @@ public class Climber extends SubsystemBase {
    //This is a Falcon 500. Not sure if FX will work. 
   //  public WPI_TalonFX leftClimbMotor = new WPI_TalonFX(Constants.leftClimbMotor); 
   //  public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
-   public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
-   public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless);
+  //  public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
+  //  public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless); 
+  public WPI_TalonSRX leftClimbMotor = new WPI_TalonSRX(Constants.leftClimbMotor); 
+  public WPI_TalonSRX rightClimbMotor = new WPI_TalonSRX(Constants.rightClimbMotor); 
+
+   
+   //public CANPIDController rightPIDController = new CANPIDController(rightClimbmotor); 
    
   //Regular bois go here: 
   //  public WPI_TalonSRX buddyBarLiftMotorLeft = new WPI_TalonSRX(Constants.buddyBarLiftMotorLeft); 
@@ -43,6 +50,7 @@ public class Climber extends SubsystemBase {
 
   //Configurable values for the climb motor: 
   public double reachPosition = 0.0; 
+  public double lowPosition = 0.0; 
   public double homePosition = 0.0;
   public boolean enabled = false; 
 
@@ -54,6 +62,7 @@ public class Climber extends SubsystemBase {
   public Climber() { 
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Climb Position", reachPosition); 
+      SmartDashboard.putNumber("Low Position", lowPosition); 
       SmartDashboard.putNumber("Home Position", homePosition); 
     }
   }
@@ -70,7 +79,7 @@ public class Climber extends SubsystemBase {
 
   public void directControl(double left, double right){
     leftClimbMotor.set(left);
-    rightClimbMoter.set(right);
+    rightClimbMotor.set(right);
   }
   
   public void moveLeft(double distance){
@@ -84,56 +93,65 @@ public class Climber extends SubsystemBase {
       // rightClimbMotor.set(ControlMode.Position, distance);
     }
   }
-
+  //highest position
   public void reachUp(){  
     if(enabled){
-      // leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+       leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition)); 
+      
     }
   } 
-
+  //lowest postition
   public void goHome(){ 
     if(enabled){
-      // rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+       rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));  
+      
+    }
+  } 
+  //Position just under bar  
+  public void reachLow(){ 
+    if(enabled){ 
+        rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Low Position", lowPosition)); 
     }
   }
+  
 
-  boolean leftToggle = false;
-  boolean rightToggle = false;
-  boolean leftFrontOff = true;
-  boolean leftBackOff = true;
-  boolean rightFrontOff = true;
-  boolean rightBackOff = true;
-  public boolean isAligned(){
-    if(leftFrontOff && !leftFrontSwitch.get()){
-      leftToggle = !leftToggle;
-      leftFrontOff = false;
-    }
-    if(leftBackOff && !leftBackSwitch.get()){
-      leftToggle = !leftToggle;
-      leftBackOff = false;
-    }
-    if(rightFrontOff && !rightFrontSwitch.get()){
-      rightToggle = !rightToggle;
-      rightFrontOff = false;
-    }
-    if(rightBackOff && !rightBackSwitch.get()){
-      rightToggle = !rightToggle;
-      rightBackOff = false;
-    }
-    if(leftFrontSwitch.get()){
-      leftFrontOff = true;
-    }
-    if(leftBackSwitch.get()){
-      leftBackOff = true;
-    }
-    if(rightFrontSwitch.get()){
-      rightFrontOff = true;
-    }
-    if(rightBackSwitch.get()){
-      rightBackOff = true;
-    }
-    return (rightToggle && leftToggle);
-  }
+  // boolean leftToggle = false;
+  // boolean rightToggle = false;
+  // boolean leftFrontOff = true;
+  // boolean leftBackOff = true;
+  // boolean rightFrontOff = true;
+  // boolean rightBackOff = true;
+  // public boolean isAligned(){
+  //   if(leftFrontOff && !leftFrontSwitch.get()){
+  //     leftToggle = !leftToggle;
+  //     leftFrontOff = false;
+  //   }
+  //   if(leftBackOff && !leftBackSwitch.get()){
+  //     leftToggle = !leftToggle;
+  //     leftBackOff = false;
+  //   }
+  //   if(rightFrontOff && !rightFrontSwitch.get()){
+  //     rightToggle = !rightToggle;
+  //     rightFrontOff = false;
+  //   }
+  //   if(rightBackOff && !rightBackSwitch.get()){
+  //     rightToggle = !rightToggle;
+  //     rightBackOff = false;
+  //   }
+  //   if(leftFrontSwitch.get()){
+  //     leftFrontOff = true;
+  //   }
+  //   if(leftBackSwitch.get()){
+  //     leftBackOff = true;
+  //   }
+  //   if(rightFrontSwitch.get()){
+  //     rightFrontOff = true;
+  //   }
+  //   if(rightBackSwitch.get()){
+  //     rightBackOff = true;
+  //   }
+  //   return (rightToggle && leftToggle);
+  // }
 
   // get lengths in meters
   public double getLeftScissorLength(){

@@ -38,7 +38,6 @@ public class BatteryLED extends CommandBase {
     double voltage = RobotController.getBatteryVoltage();
     //double voltage = SmartDashboard.getNumber("LedVoltageTest", 0);
 
-
     int numberOfLeds = (int)MathTools.map(voltage, Constants.BatteryMonitor.minVoltage, Constants.BatteryMonitor.maxVoltage, 0, Constants.BatteryMonitor.ledCount);
 
     int red = Constants.BatteryMonitor.ledCount / 3;
@@ -47,15 +46,15 @@ public class BatteryLED extends CommandBase {
     for (var i = 0; i < Constants.BatteryMonitor.ledCount; i++) {
       if(i < red)
       {
-        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? Color.kRed : Color.kBlack));
+        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? ledStrip.devideColor(Color.kRed) : ledStrip.devideColor(Color.kBlack)));
       }
       else if(i < yellow)
       {
-        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? Color.kYellow : Color.kBlack));
+        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? ledStrip.devideColor(Color.kYellow) : ledStrip.devideColor(Color.kBlack)));
       }
       else
       {
-        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? Color.kGreen : Color.kBlack));
+        addressableLEDBuffer.setLED(i + Constants.BatteryMonitor.ledStart, (i < numberOfLeds ? ledStrip.devideColor(Color.kGreen) : ledStrip.devideColor(Color.kBlack)));
       }
     }
 

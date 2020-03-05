@@ -8,6 +8,8 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
@@ -16,6 +18,8 @@ import frc.robot.sensors.LEDStrip;
 public class UnderGlow extends CommandBase {
   private LEDStrip ledStrip;
   private AddressableLEDBuffer addressableLEDBuffer;
+  private Alliance team = Alliance.Invalid;
+  private Color teamColor = Color.kForestGreen;
 
 
   public UnderGlow(LEDStrip ledStrip) {
@@ -27,18 +31,31 @@ public class UnderGlow extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
+    team = DriverStation.getInstance().getAlliance();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    if(team == Alliance.Blue)
+    {
+      teamColor = Color.kBlue;
+    }
+    else if(team == Alliance.Red)
+    {
+      teamColor = Color.kRed;
+    }
+
     for(int i = 0; i < Constants.UnderGlow.ledCount; i++)
     {
-      addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, Color.kBlue);
+      addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, ledStrip.devideColor(teamColor));
     }
 
     ledStrip.displayLEDBuffer(addressableLEDBuffer);
   }
+
+  
 
   @Override
   public boolean runsWhenDisabled(){

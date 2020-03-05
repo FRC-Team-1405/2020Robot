@@ -10,6 +10,7 @@ package frc.robot.sensors;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj.util.Color8Bit;
 
 /**
@@ -66,6 +67,15 @@ public class LEDStrip {
 
    public void display(){ 
         port.write(data, data.length);
+   }
+
+   public static Color devideColor(Color color)
+   {
+     double blue = color.blue / 2;
+     double green = color.green / 2;
+     double red = color.red / 2;
+ 
+     return new Color(red, green, blue);
    }
 
    public void testLEDs(){

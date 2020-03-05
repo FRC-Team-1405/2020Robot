@@ -75,7 +75,7 @@ public class RobotContainer {
   private final ArcadeDrive driveBase = new ArcadeDrive();
   private final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
-  // private final Climber climber = new Climber();
+   private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
@@ -106,9 +106,9 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
-    // climber.setDefaultCommand( new RunCommand( () -> {
-    //   climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
-    // }, climber));
+    climber.setDefaultCommand( new RunCommand( () -> {
+      climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
+    }, climber));
 
     // climber.setDefaultCommand( new RunCommand( () -> {
     //   climber.positionControl( this::leftScissorPos, this::rightScissorPos );
@@ -210,7 +210,7 @@ public class RobotContainer {
       testCommandsTab.add(testLauncher);
     }
 
-    // SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
+     SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
