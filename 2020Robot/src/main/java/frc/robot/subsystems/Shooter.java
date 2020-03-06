@@ -198,6 +198,7 @@ public class Shooter extends SubsystemBase {
 
   public void toggleElevation(){
     setLow = !setLow;
+    setElevation();
   }
 
   public void setElevationManual(double elevation){
@@ -205,7 +206,7 @@ public class Shooter extends SubsystemBase {
     rightActuator.set(elevation);
   }
 
-  public void setElevationMin(){
+  public void setElevation(){
     if(setLow){
       leftActuator.set(Constants.ShooterConstants.elevationMin);
       rightActuator.set(Constants.ShooterConstants.elevationMin);
@@ -261,5 +262,9 @@ public class Shooter extends SubsystemBase {
 
   public boolean turretReady(){
     return Math.abs(limelight.getTX()) <= Constants.ShooterConstants.limelightError;
+  }
+
+  public void stopTurret(){
+    turret.set(ControlMode.Position, turret.getSelectedSensorPosition());
   }
 }

@@ -56,6 +56,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -221,7 +222,7 @@ public class RobotContainer {
   
     }
 
-     SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
+    //  SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
   }
 
   /**
@@ -324,17 +325,19 @@ public class RobotContainer {
 
     //Left trigger: manual turret adjust left
     new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.2 )
-    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
-                                            if(launcher.turretTurnIsComplete())
-                                              launcher.turnTurret((int) -MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.2, 1, 1, 10));
-                                            }) );
+    .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
+                                            () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.2, 1, -1, -10));},
+                                            (interrupted) -> {launcher.stopTurret();},
+                                            launcher::turretTurnIsComplete,
+                                            launcher) );
     
   //Right trigger: manual turret adjust right
   new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.2 )
-    .whileActiveOnce( new RunCommand( () -> {launcher.tracking = false;
-                                              if(launcher.turretTurnIsComplete())
-                                              launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.2, 1, 1, 10));
-                                            }) );
+  .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
+                                          () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.2, 1, 1, 10));},
+                                          (interrupted) -> {launcher.stopTurret();},
+                                          launcher::turretTurnIsComplete,
+                                          launcher) );
 
     // //Left trigger: rotation control
     // new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
