@@ -38,7 +38,7 @@ public class TurnToTarget extends SequentialCommandGroup {
                                         shooter.turnTurret();
                                       }},
                                  ()-> { },
-                                 (interrupted) -> {shooter.limelight.setLED((byte) 1);},
+                                 (interrupted) -> {},
                                  () -> {return shooter.turretReady();} )
                                  //()-> { return (shooter.turretTurnIsComplete() || !shooter.tracking); } )
     );

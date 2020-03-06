@@ -71,9 +71,9 @@ public class LEDStrip {
 
    public static Color devideColor(Color color)
    {
-     double blue = color.blue / 2;
-     double green = color.green / 2;
-     double red = color.red / 2;
+     double blue = color.blue / 5;
+     double green = color.green / 5;
+     double red = color.red / 5;
  
      return new Color(red, green, blue);
    }

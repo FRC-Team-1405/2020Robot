@@ -65,7 +65,7 @@ public class Shooter extends SubsystemBase {
   
   public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9)); 
   public double triggerSpeed = 0.6; 
-  private int errorThreshold = 50;
+  private int errorThreshold = 25;
   private int loopsToSettle = 10;
   private int withinThresholdLoops = 0;
   private int targetPosition = Constants.ShooterConstants.unitsMin;
@@ -107,6 +107,8 @@ public class Shooter extends SubsystemBase {
   }
 
   public void stopFlywheels(){
+    limelight.setPipeline((byte) 0);
+    limelight.setLED((byte) 1);
     left.set(ControlMode.PercentOutput, 0.0); 
     right.set(ControlMode.PercentOutput, 0.0); 
     trigger.set(ControlMode.PercentOutput, 0);
@@ -132,6 +134,8 @@ public class Shooter extends SubsystemBase {
                                         new Setting(11000, 0.625), };
 
   public void prepFlywheels(){
+    limelight.setPipeline((byte) 7);
+    limelight.setLED((byte) 3);
     tracking = true;
     turnTurret();
     int lowIndex = 0;
@@ -162,12 +166,16 @@ public class Shooter extends SubsystemBase {
   }
 
   public void prepFlywheels(DoubleSupplier leftV, DoubleSupplier rightV){
+    limelight.setPipeline((byte) 7);
+    limelight.setLED((byte) 3);
     tracking = true;
     turnTurret();
     prepFlywheels(leftV.getAsDouble() - RobotContainer.increase, rightV.getAsDouble() + RobotContainer.increase);
   } 
 
   public void prepFlywheels(double leftV, double rightV){
+    limelight.setPipeline((byte) 7);
+    limelight.setLED((byte) 3);
     tracking = true;
     turnTurret();
     left.set(ControlMode.Velocity, -leftV - RobotContainer.increase);
@@ -221,10 +229,6 @@ public class Shooter extends SubsystemBase {
     return limelight.hasTarget();
   }
 
-  public void togglePipeline(){
-    limelight.togglePipeline();
-  }
-
   public void turnToGoal(ArcadeDrive driveBase){
     withinThresholdLoops = 0;
     Pose2d pose = driveBase.getPose();
@@ -261,7 +265,7 @@ public class Shooter extends SubsystemBase {
   }
 
   public boolean turretReady(){
-    return Math.abs(limelight.getTX()) <= Constants.ShooterConstants.limelightError;
+    return limelight.hasTarget() && (Math.abs(limelight.getTX()) <= Constants.ShooterConstants.limelightError);
   }
 
   public void stopTurret(){

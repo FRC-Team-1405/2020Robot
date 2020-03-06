@@ -7,6 +7,8 @@
 
 package frc.robot.commands;
 
+import javax.lang.model.util.ElementScanner6;
+
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
@@ -31,12 +33,12 @@ public class UnderGlow extends CommandBase {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    team = DriverStation.getInstance().getAlliance();
   }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+    team = DriverStation.getInstance().getAlliance();
 
     if(team == Alliance.Blue)
     {
@@ -46,16 +48,21 @@ public class UnderGlow extends CommandBase {
     {
       teamColor = Color.kRed;
     }
+    else{
+      teamColor = Color.kForestGreen;
+    }
 
     for(int i = 0; i < Constants.UnderGlow.ledCount; i++)
     {
-      addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, ledStrip.devideColor(teamColor));
+      addressableLEDBuffer.setLED(i + Constants.UnderGlow.ledStart, teamColor);
     }
 
     ledStrip.displayLEDBuffer(addressableLEDBuffer);
   }
 
-  
+  public void resetTeamColor(){
+    team = Alliance.Invalid;
+  }
 
   @Override
   public boolean runsWhenDisabled(){
@@ -70,6 +77,6 @@ public class UnderGlow extends CommandBase {
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return false;
+    return  (team != Alliance.Invalid);
   }
 }

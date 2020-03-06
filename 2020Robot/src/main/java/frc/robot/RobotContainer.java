@@ -35,6 +35,7 @@ import frc.robot.commands.FireOnce;
 import frc.robot.commands.FollowPath;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToAngle;
+import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.PathGenerator;
@@ -53,6 +54,7 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
@@ -287,11 +289,15 @@ public class RobotContainer {
 
     //D-pad up: increase power
     new POVButton(driver, 0)
-      .whenPressed( new InstantCommand( () -> {increase += 250;} ));
+      .whenPressed( new InstantCommand( () -> {increase += 250; 
+                                              SmartDashboard.putNumber("Shooter/Increase", increase);
+                                            } ));
 
     //D-pad down: decrease power
     new POVButton(driver, 0)
-      .whenPressed( new InstantCommand( () -> {increase -= 250;} ));
+      .whenPressed( new InstantCommand( () -> {increase -= 250;
+                                              SmartDashboard.putNumber("Shooter/Increase", increase);
+                                            } ));
 
 
 
@@ -308,15 +314,18 @@ public class RobotContainer {
 
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(lowLeft, lowRight); }));
+      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(lowLeft, lowRight);}))
+      .whenPressed( new TurnToTarget(launcher, driveBase));
 
     //B: prep flywheels close
-    new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(midLeft, midRight); }));
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
+      .whenPressed( new TurnToTarget(launcher, driveBase));
 
     //A: prep flywheels far
-    new JoystickButton(operator, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand(() -> {launcher.prepFlywheels(highLeft, highRight); }));
+    new JoystickButton(operator, XboxController.Button.kY.value)
+      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
+      .whenPressed( new TurnToTarget(launcher, driveBase));
 
     //X: stop flywheels
     new JoystickButton(operator, XboxController.Button.kX.value)
@@ -324,17 +333,17 @@ public class RobotContainer {
       .whenPressed( new InstantCommand(launcher::goHome));
 
     //Left trigger: manual turret adjust left
-    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.2 )
+    new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
     .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
-                                            () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.2, 1, -1, -10));},
+                                            () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));},
                                             (interrupted) -> {launcher.stopTurret();},
                                             launcher::turretTurnIsComplete,
                                             launcher) );
     
   //Right trigger: manual turret adjust right
-  new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.2 )
+  new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
   .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
-                                          () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.2, 1, 1, 10));},
+                                          () -> {launcher.turnTurret(-(int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));},
                                           (interrupted) -> {launcher.stopTurret();},
                                           launcher::turretTurnIsComplete,
                                           launcher) );
@@ -376,10 +385,6 @@ public class RobotContainer {
     //                                       (interrupted) -> { controlPanel.stop(); },
     //                                       controlPanel::isRotationComplete,
     //                                       controlPanel)); 
-
-    //D-Pad left: toggle limelight pipeline
-    new POVButton(operator, 270)
-    .whenPressed( new InstantCommand(launcher::togglePipeline));
 
     //D-pad right: toggle shooter elevation
     new POVButton(operator, 90)

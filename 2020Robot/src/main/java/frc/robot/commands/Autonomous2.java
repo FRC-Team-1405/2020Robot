@@ -31,9 +31,9 @@ public class Autonomous2 extends SequentialCommandGroup {
     // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new FireOnce(shooter, driveBase).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
     // new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
 
-    super( new InstantCommand(() -> {shooter.prepFlywheels(10000, 10000);}),
+    super( new InstantCommand(() -> {shooter.prepFlywheels(11000, 11000);}),
           new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
-          new FireOnce(shooter).raceWith(new WaitCommand(5)),
+          new FireOnce(shooter).raceWith(new WaitCommand(7.5)),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
           new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));

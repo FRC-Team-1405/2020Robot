@@ -57,6 +57,7 @@ public class Robot extends TimedRobot {
   @Override
   public void disabledInit() {
     m_robotContainer.batteryMonitor.schedule();
+    m_robotContainer.underGlow.resetTeamColor();;
     m_robotContainer.underGlow.schedule();
   }
 
@@ -72,6 +73,8 @@ public class Robot extends TimedRobot {
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
     fmsAttached = DriverStation.getInstance().isFMSAttached();
+    m_robotContainer.underGlow.resetTeamColor();;
+    m_robotContainer.underGlow.schedule();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -96,8 +99,9 @@ public class Robot extends TimedRobot {
       m_autonomousCommand.cancel();
     }
     fmsAttached = DriverStation.getInstance().isFMSAttached();
-    m_robotContainer.batteryMonitor.schedule();
+    m_robotContainer.underGlow.resetTeamColor();
     m_robotContainer.underGlow.schedule();
+    m_robotContainer.batteryMonitor.schedule();
   }
 
   /**

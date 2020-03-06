@@ -84,7 +84,7 @@ public final class Constants {
         public final static int turretCenter = 1700;
         public final static double elevationMin = 0.2;
         public final static double elevationMax = 0.8;
-        public final static double limelightError = 10.0;
+        public final static double limelightError = 2.0;
         public final static double triggerSpeed = .8; 
     }
 
