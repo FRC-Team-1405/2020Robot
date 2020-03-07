@@ -44,6 +44,7 @@ public class ArcadeDrive extends SubsystemBase {
   boolean driveForward = true;
   
   public ArcadeDrive() {
+    SmartDashboard.putBoolean("Drive Forward", driveForward);
     driveLeft.configNeutralDeadband(0.04, 10);
     driveRight.configNeutralDeadband(0.04, 10);
 
@@ -60,6 +61,7 @@ public class ArcadeDrive extends SubsystemBase {
 
   public void toggleDriveDirection(){
     driveForward = !driveForward;
+    SmartDashboard.putBoolean("Drive Forward", driveForward);
   }
 
   public void driveRobot(double xSpeed, double zRotation, boolean squareInputs){

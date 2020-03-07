@@ -51,17 +51,18 @@ public class Climber extends SubsystemBase {
   //  public WPI_TalonSRX backClampMotorRight = new WPI_TalonSRX(Constants.backClampMotorRight); 
 
   //Configurable values for the climb motor: 
-  public double reachPosition = 0.0; 
-  public double lowPosition = 0.0; 
-  public double homePosition = 0.0;
-  public boolean enabled = true; 
+  public double reachPosition = 109253; 
+  public double lowPosition = 29990; 
+  public double homePosition = 100;
+  public boolean enabled = false; 
 
   DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
   DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
   DigitalInput leftBackSwitch = new DigitalInput(Constants.leftBackSwitchid);
   DigitalInput rightBackSwitch = new DigitalInput(Constants.rightBackSwitchid);
 
-  public Climber() { 
+  public Climber() {
+    SmartDashboard.putBoolean("Climb Enabled", enabled); 
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Climb Position", reachPosition); 
       SmartDashboard.putNumber("Low Position", lowPosition); 
@@ -77,11 +78,14 @@ public class Climber extends SubsystemBase {
 
   public void toggleEnable(){
     enabled = !enabled;
+    SmartDashboard.putBoolean("Climb Enabled", enabled);
   }
 
   public void directControl(double left, double right){
-    leftClimbMotor.set(left);
-    rightClimbMotor.set(right);
+    if(enabled){
+      leftClimbMotor.set(left);
+      rightClimbMotor.set(right);
+    }
   }
 
   // public void directControl(DoubleSupplier left, DoubleSupplier right){
@@ -105,24 +109,27 @@ public class Climber extends SubsystemBase {
   //highest position
   public void reachUp(){  
     if(enabled){
-      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
-      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Climb Position", reachPosition));
+      leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Climb Position", reachPosition));
+      rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Climb Position", reachPosition));
     }
   } 
+  //45"
+  public void reachLow(){   
+    rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Low Position", lowPosition)); 
+    leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Low Position", lowPosition));
+  }
   //lowest postition
   public void goHome(){ 
-    if(enabled){  
-      leftClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
-      rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Home Position", homePosition));
-    }
+    leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Home Position", homePosition));
+    rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Home Position", homePosition));
   }
 
-  boolean leftToggle = false;
-  boolean rightToggle = false;
-  boolean leftFrontOff = true;
-  boolean leftBackOff = true;
-  boolean rightFrontOff = true;
-  boolean rightBackOff = true;
+  // boolean leftToggle = false;
+  // boolean rightToggle = false;
+  // boolean leftFrontOff = true;
+  // boolean leftBackOff = true;
+  // boolean rightFrontOff = true;
+  // boolean rightBackOff = true;
   // public boolean isAligned(){
   //   if(leftFrontOff && !leftFrontSwitch.get()){
   //     leftToggle = !leftToggle;
@@ -134,11 +141,6 @@ public class Climber extends SubsystemBase {
   //   }
   // } 
   //Position just under bar  
-  public void reachLow(){ 
-    if(enabled){ 
-        rightClimbMotor.set(ControlMode.Position, SmartDashboard.getNumber("Low Position", lowPosition)); 
-    }
-  }
   
 
   // boolean leftToggle = false;
@@ -186,5 +188,9 @@ public class Climber extends SubsystemBase {
 
   public double getRightScissorLength(){
     return 0.0;
+  }
+  public void resetClimberEncoders(){
+    leftClimbMotor.setSelectedSensorPosition(0);
+    rightClimbMotor.setSelectedSensorPosition(0);
   }
 }

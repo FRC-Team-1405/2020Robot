@@ -36,10 +36,10 @@ public final class Constants {
     public final static int shooterRight = 10; 
     public final static int turretid = 11;
 
-    public final static int controlPanel = 12;
+    public final static int leftScissor = 12;
+    public final static int rightScissor = 13;
 
-    public final static int leftScissor = 13;
-    public final static int rightScissor = 14;
+    public final static int controlPanel = 14;
 
     public final static int leftActuatorId = 1;
     public final static int rightActuatorId = 2;

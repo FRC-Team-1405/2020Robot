@@ -121,7 +121,7 @@ public class RobotContainer {
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
     climber.setDefaultCommand( new RunCommand( () -> {
-      climber.directControl( -operator.getY(Hand.kLeft), operator.getY(Hand.kRight) );
+      climber.directControl( leftScissorPos(), rightScissorPos() );
     }, climber));
 
     // climber.setDefaultCommand( new RunCommand( () -> {
@@ -156,19 +156,20 @@ public class RobotContainer {
     double pos = -operator.getY(Hand.kLeft);
     if(Math.abs(pos) < Constants.deadBand)
       pos = 0.0;
-    return MathTools.map(pos, -1.0, 1.0, -10.0, 10.0);
+    return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
   private double rightScissorPos(){
     double pos = -operator.getY(Hand.kRight);
     if(Math.abs(pos) < Constants.deadBand)
     pos = 0.0;
-    return MathTools.map(pos, -1.0, 1.0, -10.0, 10.0);
+    return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
   SendableChooser<Integer> autoSelector; 
    
   private void initShuffleBoard(){
+    SmartDashboard.putNumber("Shooter/Increase", increase);
     autoSelector = new SendableChooser<Integer>();
     autoSelector.addOption("Do nothing", 0);
     autoSelector.addOption("Drive forward.", 1);
@@ -226,7 +227,10 @@ public class RobotContainer {
       InstantCommand resetTurret = new InstantCommand(launcher::resetEncoder);
       resetTurret.setName("Reset Turret");
       testCommandsTab.add(resetTurret);
-  
+
+      InstantCommand resetScizzorsCommand = new InstantCommand(climber::resetClimberEncoders);
+      resetScizzorsCommand.setName("Reset Scizzors");
+      testCommandsTab.add(resetScizzorsCommand);
     }
 
     //  SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
@@ -391,8 +395,8 @@ public class RobotContainer {
     //                                       controlPanel::isRotationComplete,
     //                                       controlPanel)); 
 
-    //D-pad right: toggle shooter elevation
-    new POVButton(operator, 90)
+    //Back: toggle shooter elevation
+    new JoystickButton(operator, XboxController.Button.kBack.value)
     .whenPressed(new InstantCommand( launcher::toggleElevation, launcher));
 
     //D-pad up: scissors up
