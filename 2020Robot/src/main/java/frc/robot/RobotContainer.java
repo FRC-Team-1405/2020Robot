@@ -77,9 +77,9 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   private final ArcadeDrive driveBase = new ArcadeDrive();
-  private final Shooter launcher = new Shooter();
+  public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
-   private final Climber climber = new Climber();
+  private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
   private final LIDARCanifier lidar = new LIDARCanifier(16);
   private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
@@ -201,7 +201,8 @@ public class RobotContainer {
       readDistance.setName("Read_Distance");
       testCommandsTab.add(readDistance);
 
-      RunCommand turnTurret = new RunCommand(launcher::turnTurret);
+      SmartDashboard.putNumber("Turret/turnAngle", 0);
+      InstantCommand turnTurret = new InstantCommand( () -> {launcher.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0)); });
       turnTurret.setName("Turn_Turret");
       testCommandsTab.add(turnTurret);
   
@@ -221,6 +222,10 @@ public class RobotContainer {
       InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
       setElevation.setName("Set Elevation");
       testCommandsTab.add(setElevation);
+
+      InstantCommand resetTurret = new InstantCommand(launcher::resetEncoder);
+      resetTurret.setName("Reset Turret");
+      testCommandsTab.add(resetTurret);
   
     }
 

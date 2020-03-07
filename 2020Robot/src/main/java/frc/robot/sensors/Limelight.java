@@ -135,14 +135,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
            return tcornxy.getDoubleArray(new double[] {0.0});
        }
        public double getTXPos() {
-           double x1 = getTCORNXY()[0];
-           double x2 = getTCORNXY()[2];
-           return (x1 + (x2-x1)/2.0);
+           double points[] = getTCORNXY();
+           if (points.length < 4)
+                return getTX();
+           return (points[0] + (points[2]-points[0])/2.0);
        }
        public double getTYPos() {
-            double y1 = getTCORNXY()[1];
-            double y2 = getTCORNXY()[3];
-            return y1 + (y2-y1)/2;
+            double points[] = getTCORNXY();
+            if (points.length < 4)
+                return getTX();
+            return (points[1] + (points[3]-points[1])/2.0);
     }
        /* public double fixedAngleDist(double h1, double h2,
                     double a1) {

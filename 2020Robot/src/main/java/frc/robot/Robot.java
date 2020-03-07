@@ -75,6 +75,7 @@ public class Robot extends TimedRobot {
     fmsAttached = DriverStation.getInstance().isFMSAttached();
     m_robotContainer.underGlow.resetTeamColor();;
     m_robotContainer.underGlow.schedule();
+    m_robotContainer.launcher.stopTurret();
 
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
@@ -102,6 +103,7 @@ public class Robot extends TimedRobot {
     m_robotContainer.underGlow.resetTeamColor();
     m_robotContainer.underGlow.schedule();
     m_robotContainer.batteryMonitor.schedule();
+    m_robotContainer.launcher.stopTurret();
   }
 
   /**

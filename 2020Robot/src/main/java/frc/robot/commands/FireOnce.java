@@ -25,8 +25,7 @@ public class FireOnce extends SequentialCommandGroup {
   public FireOnce(Shooter shooter, ArcadeDrive driveBase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
-    super(new TurnToTarget(shooter, driveBase),
-          new FunctionalCommand(() -> {},
+    super(new FunctionalCommand(() -> {},
                                 () -> { if(shooter.flywheelReady())
                                           shooter.fire();},
                                 (interrupted) -> { shooter.stopIndexer();},

@@ -70,7 +70,7 @@ public final class Constants {
     public final static int lidarBufferSize = 20;
 
     public final static double auto1Speed = -0.25;
-    public final static double auto1Distance = 0.75;//distance in meters
+    public final static double auto1Distance = 0.5;//distance in meters
 
     // meters
     public final static double robotWidth = 6.9342;
@@ -86,6 +86,8 @@ public final class Constants {
         public final static double elevationMax = 0.8;
         public final static double limelightError = 2.0;
         public final static double triggerSpeed = .8; 
+        public final static double unitsPerAngle = (unitsMax - unitsMin) / (angleMax - angleMin);
+        public final static double anglesPerUnit = (angleMax - angleMin) / (unitsMax - unitsMin);
     }
 
     //TrajectoryDrive constants

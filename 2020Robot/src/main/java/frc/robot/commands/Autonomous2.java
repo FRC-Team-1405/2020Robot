@@ -11,6 +11,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -31,9 +32,15 @@ public class Autonomous2 extends SequentialCommandGroup {
     // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new FireOnce(shooter, driveBase).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
     // new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
 
-    super( new InstantCommand(() -> {shooter.prepFlywheels(11000, 11000);}),
-          new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
-          new FireOnce(shooter).raceWith(new WaitCommand(7.5)),
+    super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
+          new InstantCommand(() -> {shooter.prepFlywheels(11000, 11000);
+                                    shooter.limelight.setPipeline((byte) 7);
+                                    shooter.limelight.setLED((byte) 3);
+                                    }),
+          new ParallelCommandGroup(
+                                    new TurnToTarget(shooter, driveBase),
+                                    new FireOnce(shooter).raceWith(new WaitCommand(7.5))
+          ),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
           new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
