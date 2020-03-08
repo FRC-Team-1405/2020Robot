@@ -55,6 +55,11 @@ public class Climber extends SubsystemBase {
   public double lowPosition = 29990; 
   public double homePosition = 100;
   public boolean enabled = false; 
+  public boolean limitsOn = true;
+  private int errorThreshold = 25;
+  private int loopsToSettle = 10;
+  private int targetPosition = Constants.ShooterConstants.unitsMin;
+  private int withinThresholdLoops = 0;
 
   DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
   DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
@@ -62,6 +67,7 @@ public class Climber extends SubsystemBase {
   DigitalInput rightBackSwitch = new DigitalInput(Constants.rightBackSwitchid);
 
   public Climber() {
+    SmartDashboard.putBoolean("Climber/Limits_On", limitsOn);
     SmartDashboard.putBoolean("Climb Enabled", enabled); 
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Climb Position", reachPosition); 
@@ -74,17 +80,34 @@ public class Climber extends SubsystemBase {
   public void periodic() {
     // This method will be called once per scheduler run
     SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
+    if ( leftClimbMotor.getActiveTrajectoryPosition() == targetPosition && Math.abs(leftClimbMotor.getClosedLoopError()) < errorThreshold
+      && rightClimbMotor.getActiveTrajectoryPosition() == targetPosition && Math.abs(rightClimbMotor.getClosedLoopError()) < errorThreshold){
+      withinThresholdLoops++;
+    }else{
+      withinThresholdLoops = 0;
+    }
+
   } 
+  public boolean  climbInPosition(){
+    return (withinThresholdLoops > loopsToSettle);
+  }
 
   public void toggleEnable(){
     enabled = !enabled;
     SmartDashboard.putBoolean("Climb Enabled", enabled);
   }
 
+  public void toggleLimits(){
+    limitsOn = !limitsOn;
+    leftClimbMotor.overrideSoftLimitsEnable(limitsOn);
+    rightClimbMotor.overrideSoftLimitsEnable(limitsOn);
+    SmartDashboard.putBoolean("Climber/Limits_On", limitsOn);
+  }
+
   public void directControl(double left, double right){
     if(enabled){
-      leftClimbMotor.set(left);
-      rightClimbMotor.set(right);
+      leftClimbMotor.set(ControlMode.PercentOutput, left);
+      rightClimbMotor.set(ControlMode.PercentOutput, right);
     }
   }
 
@@ -109,19 +132,22 @@ public class Climber extends SubsystemBase {
   //highest position
   public void reachUp(){  
     if(enabled){
-      leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Climb Position", reachPosition));
-      rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Climb Position", reachPosition));
+      targetPosition = (int)SmartDashboard.getNumber("Climber/Climb Position", reachPosition);
+      leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
+      rightClimbMotor.set(ControlMode.MotionMagic,targetPosition);
     }
   } 
   //45"
   public void reachLow(){   
-    rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Low Position", lowPosition)); 
-    leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Low Position", lowPosition));
+    targetPosition = (int)SmartDashboard.getNumber("Low Position", lowPosition);
+    rightClimbMotor.set(ControlMode.MotionMagic,targetPosition); 
+    leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
   }
   //lowest postition
   public void goHome(){ 
-    leftClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Home Position", homePosition));
-    rightClimbMotor.set(ControlMode.MotionMagic, SmartDashboard.getNumber("Climber/Home Position", homePosition));
+    targetPosition = (int)SmartDashboard.getNumber("Low Position", lowPosition);
+    leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
+    rightClimbMotor.set(ControlMode.MotionMagic, targetPosition);
   }
 
   // boolean leftToggle = false;

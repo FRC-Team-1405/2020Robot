@@ -153,16 +153,24 @@ public class RobotContainer {
 
 
   private double leftScissorPos(){
-    double pos = -operator.getY(Hand.kLeft);
-    if(Math.abs(pos) < Constants.deadBand)
+    double pos;
+    if(operator.getY(Hand.kLeft) < 0)
+      pos = (operator.getY(Hand.kLeft) * operator.getY(Hand.kLeft));
+    else
+      pos = -(operator.getY(Hand.kLeft) * operator.getY(Hand.kLeft));
+    if(Math.abs(pos) < 0.05)
       pos = 0.0;
     return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
   private double rightScissorPos(){
-    double pos = -operator.getY(Hand.kRight);
-    if(Math.abs(pos) < Constants.deadBand)
-    pos = 0.0;
+    double pos;
+    if(operator.getY(Hand.kRight) < 0)
+      pos = (operator.getY(Hand.kRight) * operator.getY(Hand.kRight));
+    else
+      pos = -(operator.getY(Hand.kRight) * operator.getY(Hand.kRight));
+    if(Math.abs(pos) < 0.05)
+      pos = 0.0;
     return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
@@ -231,6 +239,10 @@ public class RobotContainer {
       InstantCommand resetScizzorsCommand = new InstantCommand(climber::resetClimberEncoders);
       resetScizzorsCommand.setName("Reset Scizzors");
       testCommandsTab.add(resetScizzorsCommand);
+
+      InstantCommand toggleClimbLimits = new InstantCommand(climber::toggleLimits);
+      toggleClimbLimits.setName("Toggle Climb Limits");
+      testCommandsTab.add(toggleClimbLimits);
     }
 
     //  SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );
@@ -401,11 +413,27 @@ public class RobotContainer {
 
     //D-pad up: scissors up
     new POVButton(operator, 0)
-      .whenPressed( new InstantCommand( climber::reachUp ));
+      .whenPressed( new FunctionalCommand( () -> climber.reachUp(),
+                                           () -> {},
+                                           (interupted) -> {},
+                                           climber::climbInPosition,
+                                           climber) );
+
+    //D-pad left: scissors to 45"
+    new POVButton(operator, 270)
+      .whenPressed( new FunctionalCommand( () -> climber.reachLow(),
+                                           () -> {},
+                                           (interupted) -> {},
+                                           climber::climbInPosition,
+                                           climber) );
 
     //D-pad down: scissors down
     new POVButton(operator, 180)
-      .whenPressed( new InstantCommand( climber::goHome ));
+      .whenPressed( new FunctionalCommand( () -> climber.goHome(),
+                                           () -> {},
+                                           (interupted) -> {},
+                                           climber::climbInPosition,
+                                           climber) );
 
     //Start: enable scissors
     new JoystickButton(operator, XboxController.Button.kStart.value)

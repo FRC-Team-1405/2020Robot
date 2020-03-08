@@ -53,8 +53,8 @@ public final class Constants {
     // public final static int backClampMotorRight = 15;
     // public final static int buddyBarLiftMotorLeft = 16; 
     // public final static int buddyBarLiftMotorRight = 17; 
-    public final static int leftClimbMotor = 18; 
-    public final static int rightClimbMotor = 19;   
+    public final static int leftClimbMotor = 19; 
+    public final static int rightClimbMotor = 18;   
 
     public final static int leftFrontSwitchid = 0;
     public final static int rightFrontSwitchid = 1;
