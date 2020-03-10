@@ -302,11 +302,7 @@ public class RobotContainer {
 
     //X toggle intake elevation
     new JoystickButton(driver, XboxController.Button.kX.value)
-      .whenPressed( new FunctionalCommand(intake::toggleElevation,
-                                          () -> {},
-                                          (interrupted) -> {intake.stop();}, 
-                                          intake::armInPosition,
-                                          intake ) );
+      .whenPressed( new InstantCommand(() -> {intake.stop(); intake.toggleElevation(); }));
 
     //D-pad up: increase power
     new POVButton(driver, 0)
@@ -339,12 +335,12 @@ public class RobotContainer {
       .whenPressed( new TurnToTarget(launcher, driveBase));
 
     //B: prep flywheels close
-    new JoystickButton(operator, XboxController.Button.kY.value)
+    new JoystickButton(operator, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
       .whenPressed( new TurnToTarget(launcher, driveBase));
 
     //A: prep flywheels far
-    new JoystickButton(operator, XboxController.Button.kY.value)
+    new JoystickButton(operator, XboxController.Button.kA.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
       .whenPressed( new TurnToTarget(launcher, driveBase));
 
@@ -409,7 +405,7 @@ public class RobotContainer {
 
     //Back: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBack.value)
-    .whenPressed(new InstantCommand( launcher::toggleElevation, launcher));
+    .whenPressed(new InstantCommand( launcher::toggleElevation));
 
     //D-pad up: scissors up
     new POVButton(operator, 0)
