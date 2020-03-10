@@ -42,6 +42,10 @@ public class Intake extends SubsystemBase {
         withinThresholdLoops = 0;
       }
     }
+
+    if(targetPosition == Constants.IntakeConstants.DEPLOY_POSITION && armInPosition()){
+      stop();
+    }
     // This method will be called once per scheduler run
   }
 
@@ -60,10 +64,8 @@ public class Intake extends SubsystemBase {
   }
 
   public void stop(){
-    if(!intakeUp){
-      intakeDeploy.set(ControlMode.PercentOutput, 0);
-      movingArm = false;
-    }
+    intakeDeploy.set(ControlMode.PercentOutput, 0);
+    movingArm = false;
   }
 
   public void deploy(){

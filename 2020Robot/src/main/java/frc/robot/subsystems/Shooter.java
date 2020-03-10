@@ -86,11 +86,10 @@ public class Shooter extends SubsystemBase {
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
       SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
-      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
       SmartDashboard.putNumber("Limelight/TXPos", limelight.getTXPos());
       SmartDashboard.putNumber("Limelight/TYPos", limelight.getTYPos());
     }else{
-      lidarLitePWM.getDistance();
+      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }
   }
 
