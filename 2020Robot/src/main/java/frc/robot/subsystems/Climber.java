@@ -134,18 +134,18 @@ public class Climber extends SubsystemBase {
     if(enabled){
       targetPosition = (int)SmartDashboard.getNumber("Climber/Climb Position", reachPosition);
       leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
-      rightClimbMotor.set(ControlMode.MotionMagic,targetPosition);
+      rightClimbMotor.set(ControlMode.MotionMagic, targetPosition);
     }
   } 
   //45"
   public void reachLow(){   
     targetPosition = (int)SmartDashboard.getNumber("Low Position", lowPosition);
-    rightClimbMotor.set(ControlMode.MotionMagic,targetPosition); 
+    rightClimbMotor.set(ControlMode.MotionMagic, targetPosition); 
     leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
   }
   //lowest postition
   public void goHome(){ 
-    targetPosition = (int)SmartDashboard.getNumber("Low Position", lowPosition);
+    targetPosition = (int)SmartDashboard.getNumber("Home Position", homePosition);
     leftClimbMotor.set(ControlMode.MotionMagic, targetPosition);
     rightClimbMotor.set(ControlMode.MotionMagic, targetPosition);
   }

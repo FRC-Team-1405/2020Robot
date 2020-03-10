@@ -81,9 +81,8 @@ public class RobotContainer {
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
   private final ControlPanel controlPanel = new ControlPanel();
-  private final LIDARCanifier lidar = new LIDARCanifier(16);
-  private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
-  private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
+  // private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
+  // private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
   // private final LidarReader lidarReader = new LidarReader();
   private final ColorSensor colorSensor = new ColorSensor();
 
