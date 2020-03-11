@@ -69,11 +69,9 @@ public class Climber extends SubsystemBase {
   public Climber() {
     SmartDashboard.putBoolean("Climber/Limits_On", limitsOn);
     SmartDashboard.putBoolean("Climb Enabled", enabled); 
-    if(!Robot.fmsAttached){
-      SmartDashboard.putNumber("Climb Position", reachPosition); 
-      SmartDashboard.putNumber("Low Position", lowPosition); 
-      SmartDashboard.putNumber("Home Position", homePosition); 
-    }
+    SmartDashboard.putNumber("Climb Position", reachPosition); 
+    SmartDashboard.putNumber("Low Position", lowPosition); 
+    SmartDashboard.putNumber("Home Position", homePosition); 
   }
 
   @Override
