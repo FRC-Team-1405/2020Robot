@@ -205,9 +205,9 @@ public class RobotContainer {
       testCommandsTab.add( batteryMonitor );
       testCommandsTab.add( underGlow );
      
-      RunCommand readDistance = new RunCommand(lidar::readDistance);
-      readDistance.setName("Read_Distance");
-      testCommandsTab.add(readDistance);
+      // RunCommand readDistance = new RunCommand(lidar::readDistance);
+      // readDistance.setName("Read_Distance");
+      // testCommandsTab.add(readDistance);
 
       SmartDashboard.putNumber("Turret/turnAngle", 0);
       InstantCommand turnTurret = new InstantCommand( () -> {launcher.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0)); });

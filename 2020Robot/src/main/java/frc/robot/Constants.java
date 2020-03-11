@@ -83,7 +83,7 @@ public final class Constants {
         public final static int unitsMax = 3500;
         public final static int turretCenter = 1700;
         public final static double elevationMin = 0.2;
-        public final static double elevationMax = 0.8;
+        public final static double elevationMax = 0.7;
         public final static double limelightError = 2.0;
         public final static double triggerSpeed = .8; 
         public final static double unitsPerAngle = (unitsMax - unitsMin) / (angleMax - angleMin);

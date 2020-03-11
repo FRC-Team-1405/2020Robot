@@ -12,10 +12,12 @@ import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
+import frc.robot.lib.SmartSupplier;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Shooter;
 
@@ -26,6 +28,8 @@ public class Autonomous2 extends SequentialCommandGroup {
   /**
    * Creates a new Autonomous2.
    */
+  private static SmartSupplier speedLeft = new SmartSupplier("Autonomous2/Speed/Left", 11000);
+  private static SmartSupplier speedRight = new SmartSupplier("Autonomous2/Speed/Right", 11000);
   public Autonomous2(ArcadeDrive driveBase, Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
@@ -33,14 +37,13 @@ public class Autonomous2 extends SequentialCommandGroup {
     // new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));
 
     super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
-          new InstantCommand(() -> {shooter.prepFlywheels(11000, 11000);
+          new InstantCommand(() -> {shooter.prepFlywheels(speedLeft, speedRight);
                                     shooter.limelight.setPipeline((byte) 7);
                                     shooter.limelight.setLED((byte) 3);
                                     }),
-          new ParallelCommandGroup(
+          new ParallelRaceGroup(
                                     new TurnToTarget(shooter, driveBase),
-                                    new FireOnce(shooter).raceWith(new WaitCommand(7.5))
-          ),
+                                    new FireOnce(shooter).withTimeout(7.5)),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
           new DriveDistance(driveBase, Constants.auto1Distance, Constants.auto1Speed));

@@ -51,8 +51,8 @@ public class Climber extends SubsystemBase {
   //  public WPI_TalonSRX backClampMotorRight = new WPI_TalonSRX(Constants.backClampMotorRight); 
 
   //Configurable values for the climb motor: 
-  public double reachPosition = 109253; 
-  public double lowPosition = 29990; 
+  public double reachPosition = 190000; 
+  public double lowPosition   =  35000; 
   public double homePosition = 100;
   public boolean enabled = false; 
   public boolean limitsOn = true;
