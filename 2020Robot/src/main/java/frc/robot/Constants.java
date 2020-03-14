@@ -44,6 +44,7 @@ public final class Constants {
     public final static int rightActuatorId = 2;
 
     public final static double deadBand = 0.033; 
+    public final static double scissorDeadband = 0.2;
 
     public final static int leftFrontSwitchid = 0;
     public final static int rightFrontSwitchid = 1;

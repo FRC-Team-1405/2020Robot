@@ -77,6 +77,7 @@ public class Shooter extends SubsystemBase {
       SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
       SmartDashboard.putNumber("Limelight/TXPos", limelight.getTXPos());
       SmartDashboard.putNumber("Limelight/TYPos", limelight.getTYPos());
+      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }else{
       SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }

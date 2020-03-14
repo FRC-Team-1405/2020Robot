@@ -119,16 +119,17 @@ public class RobotContainer {
     return rotation;
   }
 
-
   private double leftScissorPos(){
-    double pos;
+    double pos = operator.getY(Hand.kLeft);
+    if (Math.abs(pos) < Constants.scissorDeadband)
+      return 0.0;
+
     if(operator.getY(Hand.kLeft) < 0)
-      pos = (operator.getY(Hand.kLeft) * operator.getY(Hand.kLeft));
+      pos = pos * pos;
     else
-      pos = -(operator.getY(Hand.kLeft) * operator.getY(Hand.kLeft));
-    if(Math.abs(pos) < 0.05)
-      pos = 0.0;
-    return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
+      pos = -(pos * pos);
+
+      return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
   private double rightScissorPos(){
@@ -400,8 +401,9 @@ public class RobotContainer {
                                            climber) );
 
     //Joysticks: manual scissor control
-    new Trigger(() -> (leftScissorPos() != 0.0 || rightScissorPos() != 0.0 ))
-      .whenActive(new RunCommand(() -> {climber.directControl(leftScissorPos(), rightScissorPos());} ));
+    new Trigger(() -> (Math.abs(operator.getY(Hand.kLeft)) > Constants.scissorDeadband) 
+                     || (Math.abs(operator.getY(Hand.kRight)) > Constants.scissorDeadband))
+      .whenActive(new RunCommand(() -> {climber.directControl(leftScissorPos(), rightScissorPos());}, climber ));
 
     //Start: enable scissors
     new JoystickButton(operator, XboxController.Button.kStart.value)
