@@ -9,18 +9,10 @@ package frc.robot.subsystems;
 
 import java.util.function.DoubleSupplier;
 
-import javax.swing.text.Position;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-// import com.revrobotics.CANEncoder;
-// import com.revrobotics.CANPIDController;
-// import com.revrobotics.CANSparkMax;
-// import com.revrobotics.ControlType;
-// import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -28,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.lib.MathTools;
 import frc.robot.sensors.LidarLitePWM;
 import frc.robot.sensors.Limelight;
 
@@ -54,8 +45,6 @@ public class Shooter extends SubsystemBase {
   public Servo rightActuator = new Servo(Constants.rightActuatorId);
   
   public Limelight limelight = new Limelight();
-  //  public CANSparkMax left = new CANSparkMax(20, MotorType.kBrushless); 
-  //  public CANSparkMax right = new CANSparkMax(21, MotorType.kBrushless); 
 
   // public CANEncoder leftEncoder = new CANEncoder(left); 
   // public CANEncoder rightEncoder = new CANEncoder(right); 

@@ -7,7 +7,6 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.ArcadeDrive;
@@ -20,7 +19,7 @@ public class TurnToTarget extends SequentialCommandGroup {
   /**
    * Creates a new TurnToTarget.
    */
-  private Shooter shooter;
+  
   public TurnToTarget(Shooter shooter, ArcadeDrive drivebase) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());

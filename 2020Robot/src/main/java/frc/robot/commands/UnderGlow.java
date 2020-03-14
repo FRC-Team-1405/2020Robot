@@ -7,8 +7,6 @@
 
 package frc.robot.commands;
 
-import javax.lang.model.util.ElementScanner6;
-
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
