@@ -7,21 +7,11 @@
 
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
-
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.ControlType;
-import com.revrobotics.CANPIDController; 
-import com.revrobotics.SparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import frc.robot.Constants;
-import frc.robot.Robot;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
@@ -36,8 +26,8 @@ public class Climber extends SubsystemBase {
   //  public WPI_TalonFX rightClimbMotor = new WPI_TalonFX(Constants.rightClimbMotor); 
   //  public CANSparkMax leftClimbMotor = new CANSparkMax(Constants.leftClimbMotor, MotorType.kBrushless);
   //  public CANSparkMax rightClimbMoter = new CANSparkMax(Constants.rightClimbMotor, MotorType.kBrushless); 
-  public WPI_TalonSRX leftClimbMotor = new WPI_TalonSRX(Constants.leftClimbMotor); 
-  public WPI_TalonSRX rightClimbMotor = new WPI_TalonSRX(Constants.rightClimbMotor); 
+  public WPI_TalonSRX leftClimbMotor = new WPI_TalonSRX(Constants.leftScissor); 
+  public WPI_TalonSRX rightClimbMotor = new WPI_TalonSRX(Constants.rightScissor); 
 
    
    //public CANPIDController rightPIDController = new CANPIDController(rightClimbmotor); 

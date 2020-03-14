@@ -8,44 +8,29 @@
 package frc.robot;
 
 import java.util.Map;
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.networktables.NetworkTableEntry;
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.PowerDistributionPanel;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
-import edu.wpi.first.wpilibj.smartdashboard.SendableBuilder;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.Constants.BatteryMonitor;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.BatteryLED;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveByVelocity;
-import frc.robot.commands.DriveDistance;
 import frc.robot.commands.FireOnce;
-import frc.robot.commands.FollowPath;
 import frc.robot.commands.TestShooter;
-import frc.robot.commands.TurnToAngle;
 import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
-import frc.robot.lib.PathGenerator;
 import frc.robot.lib.SmartSupplier;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
-import frc.robot.sensors.LIDARCanifier;
-import frc.robot.sensors.LidarLitePWM;
-import frc.robot.sensors.LidarReader;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
@@ -54,17 +39,13 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
-import edu.wpi.first.wpilibj2.command.StartEndCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj.Sendable;
 import edu.wpi.first.wpilibj.SlewRateLimiter;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -80,7 +61,7 @@ public class RobotContainer {
   public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
-  private final ControlPanel controlPanel = new ControlPanel();
+  // private final ControlPanel controlPanel = new ControlPanel();
   // private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   // private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
   // private final LidarReader lidarReader = new LidarReader();
@@ -104,7 +85,6 @@ public class RobotContainer {
   private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000);
   public static double increase = 0;
 
-
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -119,15 +99,6 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
 
-    climber.setDefaultCommand( new RunCommand( () -> {
-      climber.directControl( leftScissorPos(), rightScissorPos() );
-    }, climber));
-
-    // climber.setDefaultCommand( new RunCommand( () -> {
-    //   climber.positionControl( this::leftScissorPos, this::rightScissorPos );
-    // }, climber));
-
-    // lidarReader.start();
   }
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
@@ -135,8 +106,6 @@ public class RobotContainer {
     double speed = -driver.getY(Hand.kLeft);
     if(Math.abs(speed) < Constants.deadBand)
       speed = 0.0;
-    // SmartDashboard.putNumber("Drive_Speed", speed);
-    // return driveSpeedFilter.calculate(speed);
     return speed;
   }
 
@@ -429,6 +398,10 @@ public class RobotContainer {
                                            (interupted) -> {},
                                            climber::climbInPosition,
                                            climber) );
+
+    //Joysticks: manual scissor control
+    new Trigger(() -> (leftScissorPos() != 0.0 || rightScissorPos() != 0.0 ))
+      .whenActive(new RunCommand(() -> {climber.directControl(leftScissorPos(), rightScissorPos());} ));
 
     //Start: enable scissors
     new JoystickButton(operator, XboxController.Button.kStart.value)
