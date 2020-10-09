@@ -270,13 +270,15 @@ public class RobotContainer {
      * +Left bumper: shoot
      * +Y: prep flywheels auto
      * +B: prep flywheels close
+     * 
      * +A: prep flywheels far
      * +X: stop flywheels
      * +Left trigger: manual turret adjust left
      * +Right trigger: manual turret adjust right
      * +D-pad left: toggle limelight pipeline
      * +D-pad right toggle shooter elevation
-     * +D-pad up: scissors up
+     * +D-pad up
+     * : scissors up
      * +D-pad down: scissors down
      * +Left joystick: left scissor
      * +Right joystick: right scissor
@@ -288,9 +290,9 @@ public class RobotContainer {
       .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
 
     //Right bumper: intake
-    new JoystickButton(driver, XboxController.Button.kBumperRight.value)
-      .whenHeld( new InstantCommand( intake :: enable))
-      .whenReleased( new InstantCommand(intake :: disable)); 
+    new JoystickButton(driver, XboxController.Button.kBumperRight.value)   
+      .whenHeld( new InstantCommand( intake :: enable))      
+      .whenReleased( new InstantCommand(intake :: disable));    
     
     //Left bumper: outtake 
     new JoystickButton(driver, XboxController.Button.kBumperLeft.value)
@@ -412,7 +414,7 @@ public class RobotContainer {
                                            () -> {},
                                            (interupted) -> {},
                                            climber::climbInPosition,
-                                           climber) );
+                                           climber).withTimeout(5) );
 
     //D-pad left: scissors to 45"
     new POVButton(operator, 270)
@@ -420,7 +422,7 @@ public class RobotContainer {
                                            () -> {},
                                            (interupted) -> {},
                                            climber::climbInPosition,
-                                           climber) );
+                                           climber).withTimeout(5) );
 
     //D-pad down: scissors down
     new POVButton(operator, 180)
@@ -428,11 +430,11 @@ public class RobotContainer {
                                            () -> {},
                                            (interupted) -> {},
                                            climber::climbInPosition,
-                                           climber) );
+                                           climber).withTimeout(5) );
 
     //Start: enable scissors
-    new JoystickButton(operator, XboxController.Button.kStart.value)
-      .whenPressed( new InstantCommand( climber::toggleEnable));
+    // new JoystickButton(operator, XboxController.Button.kStart.value)
+    //   .whenPressed( new InstantCommand( climber::toggleEnable));
 
                                           
     // DoubleSupplier setPoint = new DoubleSupplier(){
@@ -442,7 +444,7 @@ public class RobotContainer {
     // };
 
     // SmartDashboard.putNumber("TurnPID/offset", 15);
-    // new JoystickButton(driver, XboxController.Button.kX.value)
+    // new JoystickButton(operator, XboxController.Button.kStart.value)
     //   .whenPressed( new InstantCommand( () -> {
     //     SmartDashboard.putNumber("TurnPID/setPoint", driveBase.getHeading()+SmartDashboard.getNumber("turnPID/offset", 15));
     //   }) )
@@ -453,12 +455,16 @@ public class RobotContainer {
     //                             })
     //   );
 
-    //   new JoystickButton(driver, XboxController.Button.kStart.value)
-    //     .whenHeld( new FollowPath( PathGenerator.driveCurveTest(), driveBase).andThen( () -> driveBase.stop() ) )
-    //     .whenReleased( () -> driveBase.stop() );
+      // new JoystickButton(driver, XboxController.Button.kStart.value)
+      //   .whenHeld( new FollowPath( PathGenerator.driveTestOne(), driveBase).andThen( () -> driveBase.stop() ) )
+      //   .whenReleased( () -> driveBase.stop()); 
+
+      
 
     //   new JoystickButton(driver, XboxController.Button.kA.value) 
-    //   .whenHeld(new DriveByVelocity(driveBase));                         
+    //   .whenHeld(new DriveByVelocity(driveBase));      
+    
+      new JoystickButton(driver, XboxController.Button.kBack.value).whenPressed(new InstantCommand(driveBase::resetPosition));
   };
 
 

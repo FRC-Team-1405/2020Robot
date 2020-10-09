@@ -14,7 +14,9 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.trajectory.Trajectory;
 import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator; 
+
+
 import frc.robot.Constants;
 
 /**
@@ -26,9 +28,11 @@ public class PathGenerator {
     static public Trajectory driveForward(){
         return TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
-            List.of( new Translation2d(1, 0)
-                     ),
-            new Pose2d(2, 0, new Rotation2d(0)),
+        
+            List.of( new Translation2d(5, 0)
+                     ), 
+            
+            new Pose2d(10, 0, new Rotation2d(0)),
             config
         );
     }
@@ -36,12 +40,24 @@ public class PathGenerator {
     static public Trajectory driveCurveTest(){
         return TrajectoryGenerator.generateTrajectory(
             new Pose2d(0, 0, new Rotation2d(0)),
-            List.of( new Translation2d(0.75, 0.5),
-                     new Translation2d(1.50, 1.0),
-                     new Translation2d(2.25, 0.5)
+            List.of( new Translation2d(1, 1),
+                     new Translation2d(2, -1)
                      ),
             new Pose2d(3, 0, new Rotation2d(0)),
             config
-        );
+        ); }
+        static public Trajectory driveTestOne(){
+            return TrajectoryGenerator.generateTrajectory(
+                new Pose2d(0, 0, new Rotation2d(0)),
+                List.of( 
+                        
+                new Translation2d(1, 0) 
+                        
+                ),
+                new Pose2d(0, 0, new Rotation2d(180)),
+                config
+            ); 
+
+        }
     }
-}
+

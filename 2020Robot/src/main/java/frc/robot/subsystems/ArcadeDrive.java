@@ -15,6 +15,7 @@ import com.ctre.phoenix.motorcontrol.can.WPI_TalonFX;
 
 import com.kauailabs.navx.frc.AHRS;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
@@ -37,7 +38,9 @@ public class ArcadeDrive extends SubsystemBase {
   WPI_TalonFX driveRight = new WPI_TalonFX(Constants.driveRight);
   WPI_TalonFX driveLeftSlave = new WPI_TalonFX(Constants.driveLeftSlave);
   WPI_TalonFX driveRightSlave = new WPI_TalonFX(Constants.driveRightSlave);
-  DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight);
+  DifferentialDrive driveBase = new DifferentialDrive(driveLeft, driveRight); 
+
+  public DigitalInput driveBaseIndicator = new DigitalInput(1); 
 
   private AHRS gyro = new AHRS(I2C.Port.kMXP);
   private final DifferentialDriveOdometry odometry = new DifferentialDriveOdometry(Rotation2d.fromDegrees(getHeading()));
@@ -108,7 +111,9 @@ public class ArcadeDrive extends SubsystemBase {
 
     @Override
     public void periodic() {
-      // This method will be called once per scheduler run
+      // This method will be called once per scheduler run 
+
+      
       if(!Robot.fmsAttached){
         SmartDashboard.putNumber("Velocity", getVelocity());
         SmartDashboard.putNumber("Heading", getHeading());

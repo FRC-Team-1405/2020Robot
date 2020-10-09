@@ -9,6 +9,7 @@ package frc.robot.sensors;
 
 import com.ctre.phoenix.CANifier;
 
+
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.Constants;
 import frc.robot.lib.MeanFilter;
@@ -16,7 +17,8 @@ import frc.robot.lib.MeanFilter;
 public class LIDARCanifier {
   /**
    * Creates a new LIDARCanifier.
-   */
+   */ 
+  
   CANifier canifier;
   double[] tempPWMData = new double[]{0, 0};
   

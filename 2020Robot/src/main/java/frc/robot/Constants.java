@@ -26,7 +26,7 @@ public final class Constants {
     public final static int driveLeft = 1;
     public final static int driveRight = 2;
     public final static int driveLeftSlave = 3;
-    public final static int driveRightSlave = 4;
+    public final static int driveRightSlave = 4; 
 
     public final static int intakeTalon = 5;
     public final static int intakeDeploy = 6;
@@ -53,8 +53,8 @@ public final class Constants {
     // public final static int backClampMotorRight = 15;
     // public final static int buddyBarLiftMotorLeft = 16; 
     // public final static int buddyBarLiftMotorRight = 17; 
-    public final static int leftClimbMotor = 19; 
-    public final static int rightClimbMotor = 18;   
+    public final static int leftClimbMotor = 12; 
+    public final static int rightClimbMotor = 13;   
 
     public final static int leftFrontSwitchid = 0;
     public final static int rightFrontSwitchid = 1;
@@ -79,11 +79,11 @@ public final class Constants {
     public class ShooterConstants {
         public final static int angleMin = 0;
         public final static int angleMax = 70;
-        public final static int unitsMin = 100;
-        public final static int unitsMax = 3500;
-        public final static int turretCenter = 1700;
+        public final static int unitsMin = -1900;
+        public final static int unitsMax = 2000;
+        public final static int turretCenter = 0;
         public final static double elevationMin = 0.2;
-        public final static double elevationMax = 0.7;
+        public final static double elevationMax = 0.4;
         public final static double limelightError = 2.0;
         public final static double triggerSpeed = .8; 
         public final static double unitsPerAngle = (unitsMax - unitsMin) / (angleMax - angleMin);
@@ -144,8 +144,8 @@ public final class Constants {
     }
 
     public static class IntakeConstants {
-        public final static int DEPLOY_POSITION = -1330;
-        public final static int RETRACT_POSITION = 0;
+        public final static int DEPLOY_POSITION = -1500;
+        public final static int RETRACT_POSITION = -250;
         public static double SPEED = -0.8;
     }
 
@@ -155,7 +155,9 @@ public final class Constants {
         public final static double SensorUnitsPerRotation = 2048;
         public final static double DriveBaseReduction = 8.68;
         public final static double InchesPerMeter = 39.37;
-        public final static double SensorToMeters = (1.0 / SensorUnitsPerRotation) * (1.0 / DriveBaseReduction) * WheelCircumference * (1.0 / InchesPerMeter);
+        public final static double SensorToMeters = (1.0 / SensorUnitsPerRotation) * (1.0 / DriveBaseReduction) * WheelCircumference * (1.0 / InchesPerMeter); 
+     
+        public final static double SensorToMetersCIMBot = 1/SensorUnitsPerRotation * WheelCircumference * (1.0 / InchesPerMeter) / 2.0; 
         public final static double MetersToSensor = (1.0 / SensorToMeters);
         public final static double FVelocityToMetersPerSecond = (SensorTimePerSec * WheelCircumference)/(SensorUnitsPerRotation * DriveBaseReduction * InchesPerMeter); 
         public final static double MetersPerSecondToVelocity = 1.0/FVelocityToMetersPerSecond; 

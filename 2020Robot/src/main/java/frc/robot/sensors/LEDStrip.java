@@ -29,7 +29,7 @@ public class LEDStrip {
         ledBuffer = new AddressableLEDBuffer(ledCount);
         led.setLength(ledBuffer.getLength());
         led.setData(ledBuffer);
-        led.start();
+        led.start(); 
     }
     
     public AddressableLEDBuffer getLedBuffer(){

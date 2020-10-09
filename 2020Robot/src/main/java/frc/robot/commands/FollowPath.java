@@ -23,6 +23,7 @@ public class FollowPath extends RamseteCommand {
           new RamseteController(Constants.kRamseteB, Constants.kRamseteZeta), 
           Constants.kDriveKinematics, 
           driveSubsystem::setVelocity, 
-          driveSubsystem);
+          driveSubsystem); 
+         
   }
 }

@@ -8,6 +8,7 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 // import com.revrobotics.CANSparkMax;
 // import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -31,6 +32,14 @@ public class Intake extends SubsystemBase {
   public Intake() {
     intakeTalon.set(ControlMode.PercentOutput, 0);
     intakeDeploy.set(0);
+
+    intakeDeploy.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute); 
+
+    int pos = intakeDeploy.getSensorCollection().getPulseWidthPosition(); 
+
+    intakeDeploy.getSensorCollection().setQuadraturePosition(pos-5295, 0); 
+
+    intakeDeploy.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative); 
   }
 
   @Override

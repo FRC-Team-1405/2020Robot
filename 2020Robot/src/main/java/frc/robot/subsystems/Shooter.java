@@ -12,6 +12,7 @@ import java.util.function.DoubleSupplier;
 import javax.swing.text.Position;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 // import com.revrobotics.CANEncoder;
 // import com.revrobotics.CANPIDController;
@@ -72,24 +73,43 @@ public class Shooter extends SubsystemBase {
   public boolean tracking = false;
 
   public Shooter() { 
-    SmartDashboard.putNumber("Trigger Speed", triggerSpeed);
+    SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
+
+    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
+    int pos = turret.getSensorCollection().getPulseWidthPosition(); 
+    turret.getSensorCollection().setQuadraturePosition(pos-3623, 0); 
+    
+    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
+    
+  
+    
+    
+    
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
+
+    SmartDashboard.putNumber("Turret Position", turret.getSelectedSensorPosition());
+   
+    
+    
     if (turret.getActiveTrajectoryPosition() == targetPosition && Math.abs(turret.getClosedLoopError()) < errorThreshold){
       withinThresholdLoops++;
     }else{
       withinThresholdLoops = 0;
-    }
+    } 
+
+    SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
+
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
       SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
       SmartDashboard.putNumber("Limelight/TXPos", limelight.getTXPos());
       SmartDashboard.putNumber("Limelight/TYPos", limelight.getTYPos());
     }else{
-      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
+      //SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }
   }
 
@@ -256,7 +276,8 @@ public class Shooter extends SubsystemBase {
 
   public void turnTurret(double angle){
     int currentPos = turret.getSelectedSensorPosition();
-    angle = (int) (angle * Constants.ShooterConstants.unitsPerAngle) * 1.25;
+    angle = (int) (angle * Constants.ShooterConstants.unitsPerAngle) * 
+    1.15;
     if(currentPos+angle < Constants.ShooterConstants.unitsMin){
       targetPosition = Constants.ShooterConstants.unitsMin;
       turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.unitsMin);

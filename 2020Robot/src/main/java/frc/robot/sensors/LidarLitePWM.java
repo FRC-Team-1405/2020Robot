@@ -27,7 +27,8 @@ public class LidarLitePWM {
         counter.setMaxPeriod(1.0);
         // Configure for measuring rising to falling pulses
         counter.setSemiPeriodMode(true);
-        counter.reset();
+        counter.reset(); 
+        
     }
 
     /**
