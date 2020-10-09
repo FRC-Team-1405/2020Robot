@@ -8,7 +8,6 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SerialPort;
-import edu.wpi.first.wpilibj.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
@@ -44,17 +43,8 @@ public final class Constants {
     public final static int leftActuatorId = 1;
     public final static int rightActuatorId = 2;
 
-    public final static double deadBand = 0.033;
-
-    //All climb/buddy climb motors here 
-    // public final static int backClampMotorLeft = 12; 
-    // public final static int frontClampMotorLeft = 13; 
-    // public final static int frontClampMotorRight = 14; 
-    // public final static int backClampMotorRight = 15;
-    // public final static int buddyBarLiftMotorLeft = 16; 
-    // public final static int buddyBarLiftMotorRight = 17; 
-    public final static int leftClimbMotor = 12; 
-    public final static int rightClimbMotor = 13;   
+    public final static double deadBand = 0.033; 
+    public final static double scissorDeadband = 0.2;
 
     public final static int leftFrontSwitchid = 0;
     public final static int rightFrontSwitchid = 1;
