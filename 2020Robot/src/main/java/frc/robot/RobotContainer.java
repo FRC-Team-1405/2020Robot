@@ -32,6 +32,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.SwerveDriveBase;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -58,6 +59,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   private final ArcadeDrive driveBase = new ArcadeDrive();
+  private final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();
   public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
@@ -117,6 +119,20 @@ public class RobotContainer {
     // SmartDashboard.putNumber("Drive_Rotation", rotation);
     // return driveRotationFilter.calculate(rotation);
     return rotation;
+  }
+
+  public double getForward() {
+    return -driver.getX(Hand.kLeft);
+  }
+
+  /** Left stick Y (left-right) axis. */
+  public double getStrafe() {
+    return driver.getY(Hand.kLeft);
+  }
+
+  /** Right stick Y (left-right) axis. */
+  public double getYaw() {
+    return driver.getY(Hand.kRight);
   }
 
   private double leftScissorPos(){
