@@ -10,18 +10,13 @@ package frc.robot.subsystems;
 import java.util.function.DoubleSupplier;
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.FeedbackDevice;
 import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
 
-import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.Servo;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.Robot;
 import frc.robot.RobotContainer;
-import frc.robot.sensors.LidarLitePWM;
 import frc.robot.sensors.Limelight;
 
 public class Shooter extends SubsystemBase {
@@ -39,13 +34,10 @@ public class Shooter extends SubsystemBase {
 
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
-  public WPI_TalonSRX turret = new WPI_TalonSRX(Constants.turretid);
   public WPI_TalonSRX indexer = new WPI_TalonSRX(Constants.indexerid);
   public WPI_TalonSRX trigger = new WPI_TalonSRX(Constants.triggerid);
-  public Servo leftActuator = new Servo(Constants.leftActuatorId);
-  public Servo rightActuator = new Servo(Constants.rightActuatorId);
-  
   public Limelight limelight = new Limelight();
+  private Turret turret;
 
   // public CANEncoder leftEncoder = new CANEncoder(left); 
   // public CANEncoder rightEncoder = new CANEncoder(right); 
@@ -53,51 +45,21 @@ public class Shooter extends SubsystemBase {
   // CANPIDController leftPIDController = new CANPIDController(left);  
   // CANPIDController rightPIDController = new CANPIDController(right);
   
-  public final LidarLitePWM lidarLitePWM = new LidarLitePWM(new DigitalInput(9)); 
   public double triggerSpeed = 0.6; 
-  private int errorThreshold = 25;
-  private int loopsToSettle = 10;
-  private int withinThresholdLoops = 0;
-  private int targetPosition = Constants.ShooterConstants.unitsMin;
   public boolean tracking = false;
 
-  public Shooter() { 
+  public Shooter(Turret turret) { 
     SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
-
-    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
-    int pos = turret.getSensorCollection().getPulseWidthPosition(); 
-    turret.getSensorCollection().setQuadraturePosition(pos-3623, 0); 
-    
-    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    
-  
-    
-    
-    
+    this.turret = turret;
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run 
 
-    SmartDashboard.putNumber("Turret Position", turret.getSelectedSensorPosition());
-   
-    
-    
-    if (turret.getActiveTrajectoryPosition() == targetPosition && Math.abs(turret.getClosedLoopError()) < errorThreshold){
-      withinThresholdLoops++;
-    }else{
-      withinThresholdLoops = 0;
-    } 
-
-    SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
-
     if(!Robot.fmsAttached){
       SmartDashboard.putNumber("Left Error", left.getClosedLoopError()); 
       SmartDashboard.putNumber("Right Error", right.getClosedLoopError()); 
-      SmartDashboard.putNumber("Limelight/TXPos", limelight.getTXPos());
-      SmartDashboard.putNumber("Limelight/TYPos", limelight.getTYPos());
-      SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }else{
       //SmartDashboard.putNumber("Lidar_Distance", lidarLitePWM.getDistance());
     }
@@ -146,7 +108,7 @@ public class Shooter extends SubsystemBase {
     limelight.setPipeline((byte) 7);
     limelight.setLED((byte) 3);
     tracking = true;
-    turnTurret();
+    turret.turnTurret();
     int lowIndex = 0;
     int highIndex = 0;
     double power = 0.0;
@@ -178,7 +140,7 @@ public class Shooter extends SubsystemBase {
     limelight.setPipeline((byte) 7);
     limelight.setLED((byte) 3);
     tracking = true;
-    turnTurret();
+    turret.turnTurret();
     prepFlywheels(leftV.getAsDouble() - RobotContainer.increase, rightV.getAsDouble() + RobotContainer.increase);
   } 
 
@@ -206,85 +168,5 @@ public class Shooter extends SubsystemBase {
 
   public boolean flywheelReady() {
     return (Math.abs(left.getClosedLoopError()) <= Constants.maxFlywheelError && Math.abs(right.getClosedLoopError()) <= Constants.maxFlywheelError);
-  }
-
-  public boolean setLow = false;
-
-  public void toggleElevation(){
-    setLow = !setLow;
-    setElevation();
-  }
-
-  public void setElevationManual(double elevation){
-    leftActuator.set(elevation);
-    rightActuator.set(elevation);
-  }
-
-  public void setElevation(){
-    if(setLow){
-      leftActuator.set(Constants.ShooterConstants.elevationMin);
-      rightActuator.set(Constants.ShooterConstants.elevationMin);
-    }else{
-      leftActuator.set(Constants.ShooterConstants.elevationMax); 
-      rightActuator.set(Constants.ShooterConstants.elevationMax);
-    }
-
-  }
-
-  public boolean hasTarget(){
-    return limelight.hasTarget();
-  }
-
-  public void turnToGoal(ArcadeDrive driveBase){
-    withinThresholdLoops = 0;
-    Pose2d pose = driveBase.getPose();
-    double currentX = pose.getTranslation().getX();
-    double currentY = pose.getTranslation().getY();
-    double heading = pose.getRotation().getDegrees();
-    double angle = 90.0 - Math.atan((-currentY)/(Constants.goalX - currentX)) - heading;
-    this.turnTurret((int) angle);
-  }
-
-  public boolean turretTurnIsComplete(){
-    return (withinThresholdLoops > loopsToSettle);
-    //return turret.getClosedLoopError() < Constants.ShooterConstants.turretError;
-  }
-  public void turnTurret(){
-    withinThresholdLoops = 0;
-    if(limelight.getPipeline() == 7){
-      turnTurret(-(int) limelight.getTX());
-    }
-  };
-
-  public void goHome(){
-    turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.turretCenter);
-  }
-
-  public void resetEncoder(){
-    turret.setSelectedSensorPosition(0);
-  }
-
-  public void turnTurret(double angle){
-    int currentPos = turret.getSelectedSensorPosition();
-    angle = (int) (angle * Constants.ShooterConstants.unitsPerAngle) * 
-    1.15;
-    if(currentPos+angle < Constants.ShooterConstants.unitsMin){
-      targetPosition = Constants.ShooterConstants.unitsMin;
-      turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.unitsMin);
-    } else if(currentPos+angle > Constants.ShooterConstants.unitsMax){
-      targetPosition = Constants.ShooterConstants.unitsMax;
-      turret.set(ControlMode.MotionMagic, Constants.ShooterConstants.unitsMax);
-    } else{
-      turret.set(ControlMode.MotionMagic, currentPos+angle);
-      targetPosition = (int) (currentPos+angle);
-    }
-  }
-
-  public boolean turretReady(){
-    return limelight.hasTarget() && (Math.abs(limelight.getTX()) <= Constants.ShooterConstants.limelightError);
-  }
-
-  public void stopTurret(){
-    turret.set(ControlMode.Position, turret.getSelectedSensorPosition());
   }
 }

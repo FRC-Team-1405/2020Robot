@@ -36,6 +36,7 @@ import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -57,8 +58,9 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
+  public final Turret turret = new Turret();
   private final ArcadeDrive driveBase = new ArcadeDrive();
-  public final Shooter launcher = new Shooter();
+  public final Shooter launcher = new Shooter(turret);
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
   // private final ControlPanel controlPanel = new ControlPanel();
@@ -71,7 +73,7 @@ public class RobotContainer {
   private XboxController operator = new XboxController(Constants.operator);
 
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
-  private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
+  private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher, turret);
 
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
   public final UnderGlow underGlow = new  UnderGlow(ledStrip);
@@ -180,7 +182,7 @@ public class RobotContainer {
       // testCommandsTab.add(readDistance);
 
       SmartDashboard.putNumber("Turret/turnAngle", 0);
-      InstantCommand turnTurret = new InstantCommand( () -> {launcher.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0)); });
+      InstantCommand turnTurret = new InstantCommand( () -> {turret.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0)); });
       turnTurret.setName("Turn_Turret");
       testCommandsTab.add(turnTurret);
   
@@ -197,11 +199,11 @@ public class RobotContainer {
       testCommandsTab.add(stopFlywheels);
   
       SmartDashboard.putNumber("Shooter/Elevation", 0);
-      InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
+      InstantCommand setElevation = new InstantCommand( () -> {turret.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
       setElevation.setName("Set Elevation");
       testCommandsTab.add(setElevation);
 
-      InstantCommand resetTurret = new InstantCommand(launcher::resetEncoder);
+      InstantCommand resetTurret = new InstantCommand(turret::resetEncoder);
       resetTurret.setName("Reset Turret");
       testCommandsTab.add(resetTurret);
 
@@ -303,38 +305,38 @@ public class RobotContainer {
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(lowLeft, lowRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher, driveBase, turret));
 
     //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher, driveBase, turret));
 
     //A: prep flywheels far
     new JoystickButton(operator, XboxController.Button.kA.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher, driveBase, turret));
 
     //X: stop flywheels
     new JoystickButton(operator, XboxController.Button.kX.value)
       .whenPressed( new InstantCommand(launcher::stopFlywheels))
-      .whenPressed( new InstantCommand(launcher::goHome));
+      .whenPressed( new InstantCommand(turret::goHome));
 
     //Left trigger: manual turret adjust left
     new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
     .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
-                                            () -> {launcher.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));},
-                                            (interrupted) -> {launcher.stopTurret();},
-                                            launcher::turretTurnIsComplete,
-                                            launcher) );
+                                            () -> {turret.turnTurret((int) MathTools.map(operator.getTriggerAxis(Hand.kLeft), 0.1, 1, 1, 10));},
+                                            (interrupted) -> {turret.stopTurret();},
+                                            turret::turretTurnIsComplete,
+                                            turret) );
     
   //Right trigger: manual turret adjust right
   new Trigger(() -> operator.getTriggerAxis(Hand.kRight) > 0.1 )
   .whileActiveOnce( new FunctionalCommand(() -> {launcher.tracking = false;},
-                                          () -> {launcher.turnTurret(-(int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));},
-                                          (interrupted) -> {launcher.stopTurret();},
-                                          launcher::turretTurnIsComplete,
-                                          launcher) );
+                                          () -> {turret.turnTurret(-(int) MathTools.map(operator.getTriggerAxis(Hand.kRight), 0.1, 1, 1, 10));},
+                                          (interrupted) -> {turret.stopTurret();},
+                                          turret::turretTurnIsComplete,
+                                          turret) );
 
     // //Left trigger: rotation control
     // new Trigger(() -> operator.getTriggerAxis(Hand.kLeft) > 0.1 )
@@ -376,7 +378,7 @@ public class RobotContainer {
 
     //Back: toggle shooter elevation
     new JoystickButton(operator, XboxController.Button.kBack.value)
-    .whenPressed(new InstantCommand( launcher::toggleElevation));
+    .whenPressed(new InstantCommand( turret::toggleElevation));
 
     //D-pad up: scissors up
     new POVButton(operator, 0)

@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -20,7 +21,7 @@ public class TurnToTarget extends SequentialCommandGroup {
    * Creates a new TurnToTarget.
    */
   
-  public TurnToTarget(Shooter shooter, ArcadeDrive drivebase) {
+  public TurnToTarget(Shooter shooter, ArcadeDrive drivebase, Turret turret) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super( 
@@ -34,10 +35,10 @@ public class TurnToTarget extends SequentialCommandGroup {
           new FunctionalCommand( ()-> {if(shooter.tracking){
                                         shooter.limelight.setPipeline((byte) 7);
                                         shooter.limelight.setLED((byte) 3);
-                                        shooter.turnTurret();
+                                        turret.turnTurret();
                                       }},
-                                 ()-> {if(shooter.turretTurnIsComplete() && shooter.tracking){
-                                        shooter.turnTurret();
+                                 ()-> {if(turret.turretTurnIsComplete() && shooter.tracking){
+                                        turret.turnTurret();
                                       } },
                                  (interrupted) -> {},
                                  () -> {return !shooter.tracking;} )

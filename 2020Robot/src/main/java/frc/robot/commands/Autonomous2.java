@@ -16,6 +16,7 @@ import frc.robot.Constants;
 import frc.robot.lib.SmartSupplier;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Shooter;
+import frc.robot.subsystems.Turret;
 
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
@@ -26,7 +27,7 @@ public class Autonomous2 extends SequentialCommandGroup {
    */
   private static SmartSupplier speedLeft = new SmartSupplier("Autonomous2/Speed/Left", 11000);
   private static SmartSupplier speedRight = new SmartSupplier("Autonomous2/Speed/Right", 11000);
-  public Autonomous2(ArcadeDrive driveBase, Shooter shooter) {
+  public Autonomous2(ArcadeDrive driveBase, Shooter shooter, Turret turret) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new FireOnce(shooter, driveBase).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
@@ -38,7 +39,7 @@ public class Autonomous2 extends SequentialCommandGroup {
                                     shooter.limelight.setLED((byte) 3);
                                     }),
           new ParallelRaceGroup(
-                                    new TurnToTarget(shooter, driveBase),
+                                    new TurnToTarget(shooter, driveBase, turret),
                                     new FireOnce(shooter).withTimeout(7.5)),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
