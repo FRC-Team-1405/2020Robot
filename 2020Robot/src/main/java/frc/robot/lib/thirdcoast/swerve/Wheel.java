@@ -25,8 +25,8 @@ import frc.robot.lib.thirdcoast.talon.Errors;
  * rotating the wheel azimuth 180 degrees.
  *
  * <p>Hardware assumed by this class includes a CTRE magnetic encoder on the azimuth motor and no
- * limits on wheel azimuth rotation. Azimuth Talons have an ID in the range 0-3 with corresponding
- * drive Talon IDs in the range 10-13.
+ * limits on wheel azimuth rotation. Azimuth Talons have an ID in the range 1-4 with corresponding
+ * drive Talon IDs in the range 21-24.
  */
 public class Wheel {
   private static final int TICKS = 4096;

@@ -20,7 +20,7 @@ public class TurnToTarget extends SequentialCommandGroup {
    * Creates a new TurnToTarget.
    */
   
-  public TurnToTarget(Shooter shooter, ArcadeDrive drivebase) {
+  public TurnToTarget(Shooter shooter) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super( 

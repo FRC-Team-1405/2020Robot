@@ -23,6 +23,7 @@ import frc.robot.commands.BatteryLED;
 import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.FireOnce;
+import frc.robot.commands.SwerveDrive;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
@@ -34,7 +35,6 @@ import frc.robot.sensors.LEDStrip;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.SwerveDriveBase;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -58,7 +58,7 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
 public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
-  private final ArcadeDrive driveBase = new ArcadeDrive();
+  // private final ArcadeDrive driveBase = new ArcadeDrive();
   private final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();
   public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
@@ -72,8 +72,8 @@ public class RobotContainer {
   private XboxController driver = new XboxController(Constants.pilot);
   private XboxController operator = new XboxController(Constants.operator);
 
-  private final Autonomous1 auto1 = new Autonomous1(driveBase);
-  private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
+  // private final Autonomous1 auto1 = new Autonomous1(driveBase);
+  // private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
   public final UnderGlow underGlow = new  UnderGlow(ledStrip);
@@ -99,7 +99,8 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
+    // driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
+    swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForward, this::getStrafe, this::getYaw, swerveDriveBase) );
 
   }
 
@@ -122,17 +123,17 @@ public class RobotContainer {
   }
 
   public double getForward() {
-    return -driver.getX(Hand.kLeft);
+    return -driver.getY(Hand.kLeft);
   }
 
   /** Left stick Y (left-right) axis. */
   public double getStrafe() {
-    return driver.getY(Hand.kLeft);
+    return driver.getX(Hand.kLeft);
   }
 
   /** Right stick Y (left-right) axis. */
   public double getYaw() {
-    return driver.getY(Hand.kRight);
+    return driver.getX(Hand.kRight);
   }
 
   private double leftScissorPos(){
@@ -182,7 +183,7 @@ public class RobotContainer {
       testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
       testCommandsTab.add( new FireOnce(launcher)
                       .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
-      testCommandsTab.add( new DriveByVelocity(driveBase));
+      // testCommandsTab.add( new DriveByVelocity(driveBase));
 
       RunCommand getColor = new RunCommand( FMSData::getColor );
       getColor.setName("Get_Color");
@@ -204,9 +205,9 @@ public class RobotContainer {
       readColor.setName("Read_Color");
       testCommandsTab.add(readColor);
   
-      InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
-      resetPosition.setName("Reset Position");
-      testCommandsTab.add(resetPosition);
+      // InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
+      // resetPosition.setName("Reset Position");
+      // testCommandsTab.add(resetPosition);
   
       InstantCommand stopFlywheels = new InstantCommand( launcher::stopFlywheels );
       stopFlywheels.setName("Stop Flywheels");
@@ -272,8 +273,8 @@ public class RobotContainer {
      */
 
      //B: drive backwards
-    new JoystickButton(driver, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
+    // new JoystickButton(driver, XboxController.Button.kB.value)
+    //   .whenPressed( new InstantCommand( driveBase::toggleDriveDirection, driveBase) ); 
 
     //Right bumper: intake
     new JoystickButton(driver, XboxController.Button.kBumperRight.value)   
@@ -308,7 +309,7 @@ public class RobotContainer {
 
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
-      .whenHeld( new FireOnce(launcher, driveBase) )
+      .whenHeld( new FireOnce(launcher) )
       .whenReleased(launcher::stopIndexer);
 
     //Right bumper: run indexer
@@ -319,17 +320,17 @@ public class RobotContainer {
     //Y: prep flywheels auto
     new JoystickButton(operator, XboxController.Button.kY.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(lowLeft, lowRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher));
 
     //B: prep flywheels close
     new JoystickButton(operator, XboxController.Button.kB.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher));
 
     //A: prep flywheels far
     new JoystickButton(operator, XboxController.Button.kA.value)
       .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase));
+      .whenPressed( new TurnToTarget(launcher));
 
     //X: stop flywheels
     new JoystickButton(operator, XboxController.Button.kX.value)
@@ -455,7 +456,7 @@ public class RobotContainer {
     //   new JoystickButton(driver, XboxController.Button.kA.value) 
     //   .whenHeld(new DriveByVelocity(driveBase));      
     
-      new JoystickButton(driver, XboxController.Button.kBack.value).whenPressed(new InstantCommand(driveBase::resetPosition));
+      // new JoystickButton(driver, XboxController.Button.kBack.value).whenPressed(new InstantCommand(driveBase::resetPosition));
   };
 
 
@@ -470,25 +471,25 @@ public class RobotContainer {
   // by the selector method at runtime.  Note that selectcommand works on Object(), so the
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
-  private final Command selectCommand =
-      new SelectCommand(
-          // Maps selector values to commands
-          Map.ofEntries(
-              Map.entry(0, new PrintCommand("Do nothing")),
-              Map.entry(1, auto1),
-              Map.entry(2, auto2),
-              Map.entry(3, new PrintCommand("Command three was selected!"))
-          ),
-          this::select
-      );
+  // private final Command selectCommand =
+  //     new SelectCommand(
+  //         // Maps selector values to commands
+  //         Map.ofEntries(
+  //             Map.entry(0, new PrintCommand("Do nothing")),
+  //             Map.entry(1, auto1),
+  //             Map.entry(2, auto2),
+  //             Map.entry(3, new PrintCommand("Command three was selected!"))
+  //         ),
+  //         this::select
+  //     );
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  public Command getAutonomousCommand() {
-    // return autoCommand;
-    return selectCommand;
-  }
+  // public Command getAutonomousCommand() {
+  //   // return autoCommand;
+  //   return selectCommand;
+  // }
 }

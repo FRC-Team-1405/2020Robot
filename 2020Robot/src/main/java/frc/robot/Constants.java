@@ -22,10 +22,23 @@ import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
  */
 public final class Constants { 
     public final static int PDP = 0;
+
     public final static int driveLeft = 1;
     public final static int driveRight = 2;
     public final static int driveLeftSlave = 3;
-    public final static int driveRightSlave = 4; 
+    public final static int driveRightSlave = 4;     
+
+    public final class SwerveBase {
+        public final static int azimuthFrontLeft = 1;
+        public final static int azimuthFrontRight = 2;
+        public final static int azimuthBackLeft = 3;
+        public final static int azimuthBackRight = 4; 
+
+        public final static int driveFrontLeft = 21;
+        public final static int driveFrontRight = 22;
+        public final static int driveBackLeft = 23;
+        public final static int driveBackRight = 24; 
+    }
 
     public final static int intakeTalon = 5;
     public final static int intakeDeploy = 6;

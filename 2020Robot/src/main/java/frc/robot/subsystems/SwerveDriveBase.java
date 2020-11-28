@@ -7,6 +7,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.lib.thirdcoast.swerve.SwerveDrive;
 import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 import frc.robot.lib.thirdcoast.swerve.SwerveDriveConfig;
@@ -76,20 +77,24 @@ public class SwerveDriveBase extends SubsystemBase {
     driveConfig.peakCurrentDuration = 0;
     driveConfig.peakCurrentLimit = 0;
 
-    Wheel[] wheels = new Wheel[4];
-
-    for (int i = 0; i < 4; i++) {
-      TalonSRX azimuthTalon = new TalonSRX(i);
-      azimuthTalon.configAllSettings(azimuthConfig);
-
-      TalonSRX driveTalon = new TalonSRX(i + 10);
-      driveTalon.configAllSettings(driveConfig);
-      driveTalon.setNeutralMode(NeutralMode.Brake);
-
-      Wheel wheel = new Wheel(azimuthTalon, driveTalon, DRIVE_SETPOINT_MAX);
-      wheels[i] = wheel;
-    }
-
+    Wheel[] wheels = new Wheel[] {
+      createWheel(Constants.SwerveBase.azimuthFrontLeft, Constants.SwerveBase.driveFrontLeft, azimuthConfig, driveConfig),
+      createWheel(Constants.SwerveBase.azimuthFrontRight, Constants.SwerveBase.driveFrontRight, azimuthConfig, driveConfig),
+      createWheel(Constants.SwerveBase.azimuthBackLeft, Constants.SwerveBase.driveBackLeft, azimuthConfig, driveConfig),
+      createWheel(Constants.SwerveBase.azimuthBackRight, Constants.SwerveBase.driveBackRight, azimuthConfig, driveConfig)
+    };
+    
     return wheels;
+  }
+
+  private Wheel createWheel(int azimuthId, int driveId, TalonSRXConfiguration azimuthConfig, TalonSRXConfiguration driveConfig){
+    TalonSRX azimuthTalon = new TalonSRX(azimuthId);
+    azimuthTalon.configAllSettings(azimuthConfig);
+
+    TalonSRX driveTalon = new TalonSRX(driveId);
+    driveTalon.configAllSettings(driveConfig);
+    driveTalon.setNeutralMode(NeutralMode.Brake);
+
+    return new Wheel(azimuthTalon, driveTalon, DRIVE_SETPOINT_MAX);
   }
 }

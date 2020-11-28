@@ -38,7 +38,7 @@ public class Autonomous2 extends SequentialCommandGroup {
                                     shooter.limelight.setLED((byte) 3);
                                     }),
           new ParallelRaceGroup(
-                                    new TurnToTarget(shooter, driveBase),
+                                    // new TurnToTarget(shooter, driveBase),
                                     new FireOnce(shooter).withTimeout(7.5)),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),
