@@ -7,7 +7,13 @@
 
 package frc.robot;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
+
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -19,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  * project.
  */
 public class Robot extends TimedRobot {
+  private static final Logger logger = Logger.getLogger(Robot.class.getName());
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -30,6 +37,7 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    configLogging() ;
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -125,4 +133,16 @@ public class Robot extends TimedRobot {
   @Override
   public void testPeriodic() {
   }
+
+  private void configLogging(){
+    try {
+      String logFile = Filesystem.getDeployDirectory().getAbsolutePath() + "/logging.properties";
+      LogManager.getLogManager().readConfiguration( new FileInputStream(logFile) );
+      logger.config( String.format("Logger Config: %s, %s", logger.getHandlers(), logger.getLevel()));
+    } catch (IOException ex) {
+      System.out.println("WARNING: Could not open configuration file");
+      System.out.println("WARNING: Logging not configured (console output only)");
+    }
+  }
+
 }
