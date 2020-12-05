@@ -101,6 +101,8 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     // driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
     swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForward, this::getStrafe, this::getYaw, swerveDriveBase) );
+    swerveDriveBase.zeroAzimuthEncoders();
+    swerveDriveBase.zeroGyro();
 
   }
 

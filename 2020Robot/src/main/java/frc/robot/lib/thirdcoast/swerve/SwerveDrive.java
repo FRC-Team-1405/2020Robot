@@ -1,5 +1,7 @@
 package frc.robot.lib.thirdcoast.swerve;
 
+import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
+
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Preferences;
 import org.slf4j.Logger;
@@ -36,6 +38,14 @@ public class SwerveDrive {
     gyro = config.gyro;
     wheels = config.wheels;
 
+    Preferences prefs = Preferences.getInstance();
+    for (int i = 0; i < WHEEL_COUNT; i++) {
+      String key = getPreferenceKeyForWheel(i) ;
+      if (!prefs.containsKey(key)) {
+        prefs.putInt(key, DEFAULT_ABSOLUTE_AZIMUTH_OFFSET);
+      }
+    }
+  
     final boolean summarizeErrors = config.summarizeTalonErrors;
     Errors.setSummarized(summarizeErrors);
     Errors.setCount(0);
