@@ -32,6 +32,7 @@ import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.Carousel;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
@@ -39,9 +40,12 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -61,9 +65,12 @@ public class RobotContainer {
   public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
+  private final Carousel carousel = new Carousel();
   // private final ControlPanel controlPanel = new ControlPanel();
-  // private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
-  // private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
+  // private final LidarLitePWM leftLidar = new LidarLitePWM(new
+  // DigitalInput(10));
+  // private final LidarLitePWM rightLidar = new LidarLitePWM(new
+  // DigitalInput(11));
   // private final LidarReader lidarReader = new LidarReader();
   private final ColorSensor colorSensor = new ColorSensor();
 
@@ -74,7 +81,7 @@ public class RobotContainer {
   private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
 
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
-  public final UnderGlow underGlow = new  UnderGlow(ledStrip);
+  public final UnderGlow underGlow = new UnderGlow(ledStrip);
   public final BatteryLED batteryMonitor = new BatteryLED(ledStrip);
 
   private SmartSupplier lowLeft = new SmartSupplier("Shooter/Low/Left", 10000);
@@ -97,55 +104,57 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
+    driveBase.setDefaultCommand(new DefaultDrive(this::driveSpeed, this::driveRotation, driveBase));
 
   }
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);
-  private double driveSpeed(){
+
+  private double driveSpeed() {
     double speed = -driver.getY(Hand.kLeft);
-    if(Math.abs(speed) < Constants.deadBand)
+    if (Math.abs(speed) < Constants.deadBand)
       speed = 0.0;
     return speed;
   }
 
   SlewRateLimiter driveRotationFilter = new SlewRateLimiter(0.5);
-  private double driveRotation(){
+
+  private double driveRotation() {
     double rotation = driver.getX(Hand.kRight);
-    if(Math.abs(rotation) < Constants.deadBand)
+    if (Math.abs(rotation) < Constants.deadBand)
       rotation = 0.0;
     // SmartDashboard.putNumber("Drive_Rotation", rotation);
     // return driveRotationFilter.calculate(rotation);
     return rotation;
   }
 
-  private double leftScissorPos(){
+  private double leftScissorPos() {
     double pos = operator.getY(Hand.kLeft);
     if (Math.abs(pos) < Constants.scissorDeadband)
       return 0.0;
 
-    if(operator.getY(Hand.kLeft) < 0)
+    if (operator.getY(Hand.kLeft) < 0)
       pos = pos * pos;
     else
       pos = -(pos * pos);
 
-      return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
+    return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
-  private double rightScissorPos(){
+  private double rightScissorPos() {
     double pos;
-    if(operator.getY(Hand.kRight) < 0)
+    if (operator.getY(Hand.kRight) < 0)
       pos = (operator.getY(Hand.kRight) * operator.getY(Hand.kRight));
     else
       pos = -(operator.getY(Hand.kRight) * operator.getY(Hand.kRight));
-    if(Math.abs(pos) < 0.05)
+    if (Math.abs(pos) < 0.05)
       pos = 0.0;
     return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
   }
 
-  SendableChooser<Integer> autoSelector; 
-   
-  private void initShuffleBoard(){
+  SendableChooser<Integer> autoSelector;
+
+  private void initShuffleBoard() {
     SmartDashboard.putNumber("Shooter/Increase", increase);
     autoSelector = new SendableChooser<Integer>();
     autoSelector.addOption("Do nothing", 0);
@@ -154,50 +163,56 @@ public class RobotContainer {
     autoSelector.addOption("Auto 3", 3);
     autoSelector.setDefaultOption("Do nothing", 0);
 
-    ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
-    autoTab.add(autoSelector)
-            .withWidget(BuiltInWidgets.kComboBoxChooser);
+    ShuffleboardTab autoTab = Shuffleboard.getTab("Auto");
+    autoTab.add(autoSelector).withWidget(BuiltInWidgets.kComboBoxChooser);
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
-    autoTab.add("Auto/Initial_Delay", 0); 
+    autoTab.add("Auto/Initial_Delay", 0);
 
-  
-    if(!Robot.fmsAttached){
-      ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands"); 
-      testCommandsTab.add( new TestShooter(launcher, driver::getPOV));
-      testCommandsTab.add( new FireOnce(launcher)
-                      .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) ));
-      testCommandsTab.add( new DriveByVelocity(driveBase));
+    if (!Robot.fmsAttached) {
+      ShuffleboardTab testCommandsTab = Shuffleboard.getTab("Test Commands");
+      testCommandsTab.add(new TestShooter(launcher, driver::getPOV));
+      testCommandsTab.add(new FireOnce(launcher).andThen(new InstantCommand(() -> {
+        launcher.stopFlywheels();
+        launcher.stopIndexer();
+      })));
+      testCommandsTab.add(new DriveByVelocity(driveBase));
 
-      RunCommand getColor = new RunCommand( FMSData::getColor );
+      RunCommand getColor = new RunCommand(FMSData::getColor);
       getColor.setName("Get_Color");
       testCommandsTab.add(getColor);
-  
-      testCommandsTab.add( batteryMonitor );
-      testCommandsTab.add( underGlow );
-     
+
+      testCommandsTab.add(batteryMonitor);
+      testCommandsTab.add(underGlow);
+
       // RunCommand readDistance = new RunCommand(lidar::readDistance);
       // readDistance.setName("Read_Distance");
       // testCommandsTab.add(readDistance);
 
       SmartDashboard.putNumber("Turret/turnAngle", 0);
-      InstantCommand turnTurret = new InstantCommand( () -> {launcher.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0)); });
+      InstantCommand turnTurret = new InstantCommand(() -> {
+        launcher.turnTurret(SmartDashboard.getNumber("Turret/turnAngle", 0));
+      });
       turnTurret.setName("Turn_Turret");
       testCommandsTab.add(turnTurret);
-  
+
       RunCommand readColor = new RunCommand(colorSensor::readColor);
       readColor.setName("Read_Color");
       testCommandsTab.add(readColor);
-  
-      InstantCommand resetPosition = new InstantCommand( () -> { driveBase.resetPosition(); } );
+
+      InstantCommand resetPosition = new InstantCommand(() -> {
+        driveBase.resetPosition();
+      });
       resetPosition.setName("Reset Position");
       testCommandsTab.add(resetPosition);
-  
-      InstantCommand stopFlywheels = new InstantCommand( launcher::stopFlywheels );
+
+      InstantCommand stopFlywheels = new InstantCommand(launcher::stopFlywheels);
       stopFlywheels.setName("Stop Flywheels");
       testCommandsTab.add(stopFlywheels);
-  
+
       SmartDashboard.putNumber("Shooter/Elevation", 0);
-      InstantCommand setElevation = new InstantCommand( () -> {launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0)); });
+      InstantCommand setElevation = new InstantCommand(() -> {
+        launcher.setElevationManual(SmartDashboard.getNumber("Shooter/Elevation", 0));
+      });
       setElevation.setName("Set Elevation");
       testCommandsTab.add(setElevation);
 
@@ -212,6 +227,18 @@ public class RobotContainer {
       InstantCommand toggleClimbLimits = new InstantCommand(climber::toggleLimits);
       toggleClimbLimits.setName("Toggle Climb Limits");
       testCommandsTab.add(toggleClimbLimits);
+
+      SequentialCommandGroup runClockwise = new InstantCommand(carousel::clockwise)
+                      .andThen (new WaitCommand(10))
+                      .andThen( new InstantCommand(carousel::stop));
+      runClockwise.setName("Carrousel clockwise");
+      testCommandsTab.add(runClockwise);
+      
+      SequentialCommandGroup runCounterClockwise = new InstantCommand(carousel::counterclockwise)
+                      .andThen (new WaitCommand(10))
+                      .andThen( new InstantCommand(carousel::stop));
+      runCounterClockwise.setName("Carrousel counterclockwise");
+      testCommandsTab.add(runCounterClockwise);
     }
 
     //  SmartDashboard.putData( new PowerDistributionPanel(Constants.PDP) );

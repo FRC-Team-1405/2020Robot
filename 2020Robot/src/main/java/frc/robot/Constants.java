@@ -40,6 +40,8 @@ public final class Constants {
 
     public final static int controlPanel = 14;
 
+    public final static int spinDexerId = 15;
+
     public final static int leftActuatorId = 1;
     public final static int rightActuatorId = 2;
 
