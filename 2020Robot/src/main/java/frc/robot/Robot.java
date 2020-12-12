@@ -138,7 +138,7 @@ public class Robot extends TimedRobot {
     try {
       String logFile = Filesystem.getDeployDirectory().getAbsolutePath() + "/logging.properties";
       LogManager.getLogManager().readConfiguration( new FileInputStream(logFile) );
-      logger.config( String.format("Logger Config: %s, %s", logger.getHandlers(), logger.getLevel()));
+      logger.config( () -> String.format("Logger Config: %s", logFile) );
     } catch (IOException ex) {
       System.out.println("WARNING: Could not open configuration file");
       System.out.println("WARNING: Logging not configured (console output only)");
