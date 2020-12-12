@@ -11,6 +11,7 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDriveBase;
+import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 
 
 public final class SwerveDrive extends CommandBase {
@@ -31,7 +32,7 @@ public final class SwerveDrive extends CommandBase {
 
   @Override
   public void initialize() {
-    // driveBase.setDriveMode(TELEOP);
+    driveBase.setDriveMode(DriveMode.TELEOP);
   }
 
   @Override
