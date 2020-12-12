@@ -27,6 +27,10 @@ public class SwerveDriveBase extends SubsystemBase {
     swerve.setDriveMode(mode);
   }
 
+  public void stop() {
+    swerve.stop();
+  }
+
   public void zeroAzimuthEncoders() {
     swerve.zeroAzimuthEncoders();
   }

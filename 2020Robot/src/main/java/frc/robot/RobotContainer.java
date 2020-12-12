@@ -59,7 +59,7 @@ public class RobotContainer {
   // The robot's subsystems and commands are defined here...
 
   // private final ArcadeDrive driveBase = new ArcadeDrive();
-  private final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();
+  public final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();
   public final Shooter launcher = new Shooter();
   private Intake intake = new Intake();
   private final Climber climber = new Climber();
@@ -101,6 +101,7 @@ public class RobotContainer {
     // Set the default drive command to split-stick arcade drive
     // driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
     swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForward, this::getStrafe, this::getYaw, swerveDriveBase) );
+    swerveDriveBase.stop();
     swerveDriveBase.zeroAzimuthEncoders();
     swerveDriveBase.zeroGyro();
 
