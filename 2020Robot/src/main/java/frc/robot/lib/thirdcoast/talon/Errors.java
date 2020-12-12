@@ -2,7 +2,7 @@ package frc.robot.lib.thirdcoast.talon;
 
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import org.slf4j.Logger;
+import java.util.logging.Logger;
 
 /** Utility class to check for and display TalonSRX configuration errors. */
 public class Errors {
@@ -13,14 +13,14 @@ public class Errors {
   public static void check(ErrorCode error, Logger logger) {
     if (error != null && error != ErrorCode.OK) {
       if (summarized) count++;
-      else logger.error("error while configuring Talon: {}", error);
+      else logger.severe(String.format("error while configuring Talon: %s", error));
     }
   }
 
   public static void check(TalonSRX talon, String method, ErrorCode error, Logger logger) {
     if (error != null && error != ErrorCode.OK) {
       if (summarized) count++;
-      else logger.error("Talon {}: {} error {}", talon.getDeviceID(), method, error);
+      else logger.severe(String.format("Talon %d: %s error %s", talon.getDeviceID(), method, error));
     }
   }
 

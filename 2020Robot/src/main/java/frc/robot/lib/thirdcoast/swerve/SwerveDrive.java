@@ -4,8 +4,8 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Preferences;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.LogManager;
+import java.util.logging.Logger;
 import frc.robot.lib.thirdcoast.talon.Errors;
 
 /**
@@ -23,7 +23,7 @@ import frc.robot.lib.thirdcoast.talon.Errors;
 public class SwerveDrive {
 
   public static final int DEFAULT_ABSOLUTE_AZIMUTH_OFFSET = 200;
-  private static final Logger logger = LoggerFactory.getLogger(SwerveDrive.class);
+  private static final Logger logger = Logger.getLogger(SwerveDrive.class.getName());
   private static final int WHEEL_COUNT = 4;
   private final AHRS gyro;
   private final double kLengthComponent;
@@ -49,7 +49,7 @@ public class SwerveDrive {
     final boolean summarizeErrors = config.summarizeTalonErrors;
     Errors.setSummarized(summarizeErrors);
     Errors.setCount(0);
-    logger.debug("TalonSRX configuration errors summarized = {}", summarizeErrors);
+    logger.warning(String.format("TalonSRX configuration errors summarized = %b", summarizeErrors));
 
     double length = config.length;
     double width = config.width;
@@ -57,8 +57,8 @@ public class SwerveDrive {
     kLengthComponent = length / radius;
     kWidthComponent = width / radius;
 
-    logger.info("gyro is configured: {}", gyro != null);
-    logger.info("gyro is connected: {}", gyro != null && gyro.isConnected());
+    logger.info(String.format("gyro is configured: %b", gyro != null));
+    logger.info(String.format("gyro is connected: %b", gyro != null && gyro.isConnected()));
     setFieldOriented(gyro != null && gyro.isConnected());
 
     if (isFieldOriented) {
@@ -68,16 +68,16 @@ public class SwerveDrive {
       int rate = gyro.getActualUpdateRate();
       double gyroPeriod = 1.0 / rate;
       kGyroRateCorrection = (robotPeriod / gyroPeriod) * gyroRateCoeff;
-      logger.debug("gyro frequency = {} Hz", rate);
+      logger.config(String.format("gyro frequency = %d Hz", rate));
     } else {
-      logger.warn("gyro is missing or not enabled");
+      logger.warning("gyro is missing or not enabled");
       kGyroRateCorrection = 0;
     }
 
-    logger.debug("length = {}", length);
-    logger.debug("width = {}", width);
-    logger.debug("enableGyroLogging = {}", config.gyroLoggingEnabled);
-    logger.debug("gyroRateCorrection = {}", kGyroRateCorrection);
+    logger.config(String.format("length = %f", length));
+    logger.config(String.format("width = %f", width));
+    logger.config(String.format("enableGyroLogging = %b", config.gyroLoggingEnabled));
+    logger.config(String.format("gyroRateCorrection = %f", kGyroRateCorrection));
   }
 
   /**
@@ -99,7 +99,7 @@ public class SwerveDrive {
     for (Wheel wheel : wheels) {
       wheel.setDriveMode(driveMode);
     }
-    logger.info("drive mode = {}", driveMode);
+    logger.config(String.format("drive mode = %s", driveMode));
   }
 
   /**
@@ -198,7 +198,7 @@ public class SwerveDrive {
     for (int i = 0; i < WHEEL_COUNT; i++) {
       int position = wheels[i].getAzimuthAbsolutePosition();
       prefs.putInt(getPreferenceKeyForWheel(i), position);
-      logger.info("azimuth {}: saved zero = {}", i, position);
+      logger.info(String.format("azimuth %d: saved zero = %d", i, position));
     }
   }
 
@@ -218,10 +218,10 @@ public class SwerveDrive {
     for (int i = 0; i < WHEEL_COUNT; i++) {
       int position = prefs.getInt(getPreferenceKeyForWheel(i), DEFAULT_ABSOLUTE_AZIMUTH_OFFSET);
       wheels[i].setAzimuthZero(position);
-      logger.info("azimuth {}: loaded zero = {}", i, position);
+      logger.info(String.format("azimuth %d: loaded zero = %d", i, position));
     }
     int errorCount = Errors.getCount();
-    if (errorCount > 0) logger.error("TalonSRX set azimuth zero error count = {}", errorCount);
+    if (errorCount > 0) logger.warning(String.format("TalonSRX set azimuth zero error count = {}", errorCount));
   }
 
   /**
@@ -259,7 +259,7 @@ public class SwerveDrive {
    */
   public void setFieldOriented(boolean enabled) {
     isFieldOriented = enabled;
-    logger.info("field orientation driving is {}", isFieldOriented ? "ENABLED" : "DISABLED");
+    logger.info(String.format("field orientation driving is %s", isFieldOriented ? "ENABLED" : "DISABLED"));
   }
 
   /**
