@@ -8,6 +8,7 @@
 package frc.robot;
 
 import java.util.Map;
+import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController;
@@ -56,7 +57,9 @@ import edu.wpi.first.wpilibj.SlewRateLimiter;
  * commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+  // The robot's subsystems and commands are defined here... 
+
+  private static final Logger logger = Logger.getLogger(RobotContainer.class.getName());
 
   // private final ArcadeDrive driveBase = new ArcadeDrive();
   public final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();

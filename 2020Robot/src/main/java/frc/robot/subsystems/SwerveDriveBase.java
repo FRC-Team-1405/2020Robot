@@ -61,43 +61,48 @@ public class SwerveDriveBase extends SubsystemBase {
   }
 
   private Wheel[] getWheels() {
-    TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
-    azimuthConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
-    azimuthConfig.continuousCurrentLimit = 10;
-    azimuthConfig.peakCurrentDuration = 0;
-    azimuthConfig.peakCurrentLimit = 0;
-    azimuthConfig.slot0.kP = 10.0;
-    azimuthConfig.slot0.kI = 0.0;
-    azimuthConfig.slot0.kD = 100.0;
-    azimuthConfig.slot0.kF = 0.0;
-    azimuthConfig.slot0.integralZone = 0;
-    azimuthConfig.slot0.allowableClosedloopError = 0;
-    azimuthConfig.motionAcceleration = 10_000;
-    azimuthConfig.motionCruiseVelocity = 800;
+    // TalonSRXConfiguration azimuthConfig = new TalonSRXConfiguration();
+    // azimuthConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
+    // azimuthConfig.continuousCurrentLimit = 10;
+    // azimuthConfig.peakCurrentDuration = 0;
+    // azimuthConfig.peakCurrentLimit = 0;
+    // azimuthConfig.slot0.kP = 10.0;
+    // azimuthConfig.slot0.kI = 0.0;
+    // azimuthConfig.slot0.kD = 100.0;
+    // azimuthConfig.slot0.kF = 0.0;
+    // azimuthConfig.slot0.integralZone = 0;
+    // azimuthConfig.slot0.allowableClosedloopError = 0;
+    // azimuthConfig.motionAcceleration = 10_000;
+    // azimuthConfig.motionCruiseVelocity = 800;
 
-    TalonSRXConfiguration driveConfig = new TalonSRXConfiguration();
-    driveConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
-    driveConfig.continuousCurrentLimit = 40;
-    driveConfig.peakCurrentDuration = 0;
-    driveConfig.peakCurrentLimit = 0;
+    // TalonSRXConfiguration driveConfig = new TalonSRXConfiguration();
+    // driveConfig.primaryPID.selectedFeedbackSensor = FeedbackDevice.CTRE_MagEncoder_Relative;
+    // driveConfig.continuousCurrentLimit = 40;
+    // driveConfig.peakCurrentDuration = 0;
+    // driveConfig.peakCurrentLimit = 0;
 
+    // wheels should be created in the array as
+    // [0] -> front_right
+    // [1] -> front_left
+    // [2] -> rear_left
+    // [3] -> rear_right
     Wheel[] wheels = new Wheel[] {
-      createWheel(Constants.SwerveBase.azimuthFrontLeft, Constants.SwerveBase.driveFrontLeft, azimuthConfig, driveConfig),
-      createWheel(Constants.SwerveBase.azimuthFrontRight, Constants.SwerveBase.driveFrontRight, azimuthConfig, driveConfig),
-      createWheel(Constants.SwerveBase.azimuthBackLeft, Constants.SwerveBase.driveBackLeft, azimuthConfig, driveConfig),
-      createWheel(Constants.SwerveBase.azimuthBackRight, Constants.SwerveBase.driveBackRight, azimuthConfig, driveConfig)
+      createWheel(Constants.SwerveBase.azimuthFrontRight, Constants.SwerveBase.driveFrontRight),
+      createWheel(Constants.SwerveBase.azimuthFrontLeft, Constants.SwerveBase.driveFrontLeft),
+      createWheel(Constants.SwerveBase.azimuthBackLeft, Constants.SwerveBase.driveBackLeft),
+      createWheel(Constants.SwerveBase.azimuthBackRight, Constants.SwerveBase.driveBackRight)
     };
     
     return wheels;
   }
 
-  private Wheel createWheel(int azimuthId, int driveId, TalonSRXConfiguration azimuthConfig, TalonSRXConfiguration driveConfig){
+  private Wheel createWheel(int azimuthId, int driveId){
     TalonSRX azimuthTalon = new TalonSRX(azimuthId);
-    azimuthTalon.configAllSettings(azimuthConfig);
+    // azimuthTalon.configAllSettings(azimuthConfig);
 
     TalonSRX driveTalon = new TalonSRX(driveId);
-    driveTalon.configAllSettings(driveConfig);
-    driveTalon.setNeutralMode(NeutralMode.Brake);
+    // driveTalon.configAllSettings(driveConfig);
+    // driveTalon.setNeutralMode(NeutralMode.Brake);
 
     return new Wheel(azimuthTalon, driveTalon, DRIVE_SETPOINT_MAX);
   }

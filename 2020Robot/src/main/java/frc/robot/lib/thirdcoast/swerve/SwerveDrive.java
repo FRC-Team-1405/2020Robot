@@ -162,6 +162,7 @@ public class SwerveDrive {
       }
     }
 
+    logger.finer( () -> String.format("Angle FL(%f) FR(%f) BL(%f) BR(%f)", wa[1], wa[0], wa[2], wa[3]));
     // set wheels
     for (int i = 0; i < WHEEL_COUNT; i++) {
       wheels[i].set(wa[i], ws[i]);

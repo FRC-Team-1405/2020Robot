@@ -29,15 +29,15 @@ public final class Constants {
     public final static int driveRightSlave = 4;     
 
     public final class SwerveBase {
-        public final static int azimuthFrontLeft = 1;
-        public final static int azimuthFrontRight = 2;
-        public final static int azimuthBackLeft = 3;
-        public final static int azimuthBackRight = 4; 
+        public final static int driveFrontLeft = 1;
+        public final static int driveFrontRight = 2;
+        public final static int driveBackLeft = 3;
+        public final static int driveBackRight = 4; 
 
-        public final static int driveFrontLeft = 21;
-        public final static int driveFrontRight = 22;
-        public final static int driveBackLeft = 23;
-        public final static int driveBackRight = 24; 
+        public final static int azimuthFrontLeft = 21;
+        public final static int azimuthFrontRight = 22;
+        public final static int azimuthBackLeft = 23;
+        public final static int azimuthBackRight = 24; 
     }
 
     public final static int intakeTalon = 5;

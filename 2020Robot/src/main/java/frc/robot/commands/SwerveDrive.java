@@ -8,6 +8,8 @@
 package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
+import java.util.logging.Logger;
+
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.SwerveDriveBase;
@@ -15,7 +17,9 @@ import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 
 
 public final class SwerveDrive extends CommandBase {
-  private static final double DEADBAND = 0.05;
+  private static final Logger logger = Logger.getLogger(SwerveDrive.class.getName());
+
+  private static final double DEADBAND = 0.2;
 
   private SwerveDriveBase driveBase;
   private DoubleSupplier getForward;
@@ -41,6 +45,7 @@ public final class SwerveDrive extends CommandBase {
     double strafe = deadband(getStrafe.getAsDouble());
     double azimuth = deadband(getYaw.getAsDouble());
 
+    logger.fine( () -> String.format("Forward: %f Strafe: %f Azimuth %f", forward, strafe, azimuth)) ;
     driveBase.drive(forward, strafe, azimuth);
   }
 
