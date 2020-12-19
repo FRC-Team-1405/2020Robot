@@ -8,8 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import java.util.Objects;
 import java.util.function.DoubleConsumer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.logging.Logger;
 import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 import frc.robot.lib.thirdcoast.talon.Errors;
 
@@ -31,7 +30,7 @@ import frc.robot.lib.thirdcoast.talon.Errors;
 public class Wheel {
   private static final int TICKS = 4096;
 
-  private static final Logger logger = LoggerFactory.getLogger(Wheel.class);
+  private static final Logger logger = Logger.getLogger(Wheel.class.getName());
   private final double driveSetpointMax;
   private final BaseTalon driveTalon;
   private final TalonSRX azimuthTalon;
@@ -56,10 +55,10 @@ public class Wheel {
     driveTalon = Objects.requireNonNull(drive);
 
     setDriveMode(TELEOP);
-
-    logger.debug("azimuth = {} drive = {}", azimuthTalon.getDeviceID(), driveTalon.getDeviceID());
-    logger.debug("driveSetpointMax = {}", driveSetpointMax);
-    if (driveSetpointMax == 0.0) logger.warn("driveSetpointMax may not have been configured");
+    
+    logger.config(String.format("azimuth = %d, drive = %d", azimuthTalon.getDeviceID(), driveTalon.getDeviceID()));
+    logger.config(String.format("driveSetpointMax = %f", driveSetpointMax));
+    if (driveSetpointMax == 0.0) logger.warning("driveSetpointMax may not have been configured");
   }
 
   /**
