@@ -86,8 +86,12 @@ public class SwerveDrive {
    * @param wheel the wheel number
    * @return the String key
    */
+  
+   private static final String[] WHEELNAME = {"FL", "FR", "BL", "BR" };
+
   public static String getPreferenceKeyForWheel(int wheel) {
-    return String.format("%s/wheel.%d", SwerveDrive.class.getSimpleName(), wheel);
+    return String.format("%s/wheel.%s", SwerveDrive.class.getSimpleName(), WHEELNAME[wheel]);
+
   }
 
   /**
