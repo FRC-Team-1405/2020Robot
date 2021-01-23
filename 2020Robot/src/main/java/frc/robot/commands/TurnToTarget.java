@@ -9,6 +9,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Shooter;
 
@@ -20,7 +21,7 @@ public class TurnToTarget extends SequentialCommandGroup {
    * Creates a new TurnToTarget.
    */
   
-  public TurnToTarget(Shooter shooter, ArcadeDrive drivebase) {
+  public TurnToTarget(Shooter shooter, ArcadeDrive drivebase, Limelight limelight) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     super( 
@@ -32,8 +33,8 @@ public class TurnToTarget extends SequentialCommandGroup {
       //                             ()-> { return (shooter.turretTurnIsComplete() || !shooter.tracking); } ),
 
           new FunctionalCommand( ()-> {if(shooter.tracking){
-                                        shooter.limelight.setPipeline((byte) 7);
-                                        shooter.limelight.setLED((byte) 3);
+                                        limelight.setPipeline((byte) 7);
+                                        limelight.setLED((byte) 3);
                                         shooter.turnTurret();
                                       }},
                                  ()-> {if(shooter.turretTurnIsComplete() && shooter.tracking){

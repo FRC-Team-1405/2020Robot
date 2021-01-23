@@ -45,7 +45,7 @@ public class Shooter extends SubsystemBase {
   public Servo leftActuator = new Servo(Constants.leftActuatorId);
   public Servo rightActuator = new Servo(Constants.rightActuatorId);
   
-  public Limelight limelight = new Limelight();
+  private Limelight limelight;
 
   // public CANEncoder leftEncoder = new CANEncoder(left); 
   // public CANEncoder rightEncoder = new CANEncoder(right); 
@@ -61,19 +61,16 @@ public class Shooter extends SubsystemBase {
   private int targetPosition = Constants.ShooterConstants.unitsMin;
   public boolean tracking = false;
 
-  public Shooter() { 
+  public Shooter(Limelight limelight) { 
+    this.limelight = limelight;
+
     SmartDashboard.putNumber("Trigger Speed", triggerSpeed); 
 
     turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Absolute);
     int pos = turret.getSensorCollection().getPulseWidthPosition(); 
     turret.getSensorCollection().setQuadraturePosition(pos-3623, 0); 
     
-    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
-    
-  
-    
-    
-    
+    turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative); 
   }
 
   @Override
