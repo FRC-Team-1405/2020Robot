@@ -73,7 +73,9 @@ public final class Constants {
         public final static int unitsMax = 2000;
         public final static int turretCenter = 0;
         public final static double elevationMin = 0.2;
-        public final static double elevationMax = 0.4;
+        //I changed the elevationMax constant so that I could use the lidar camera
+        //It was at 0.4
+        public final static double elevationMax = 1.0;
         public final static double limelightError = 2.0;
         public final static double triggerSpeed = .8; 
         public final static double unitsPerAngle = (unitsMax - unitsMin) / (angleMax - angleMin);

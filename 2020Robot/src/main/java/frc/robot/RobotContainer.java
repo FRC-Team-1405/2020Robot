@@ -25,6 +25,7 @@ import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveToBall;
 import frc.robot.commands.FireOnce;
 import frc.robot.commands.TestShooter;
+import frc.robot.commands.TurnToBall;
 import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
@@ -41,9 +42,11 @@ import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.FunctionalCommand;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -293,10 +296,12 @@ public class RobotContainer {
                                             } ));
 
     new JoystickButton(driver, XboxController.Button.kA.value)
-      .whenHeld( new DriveToBall(limelight, driveBase));
-
-
-
+      .whenHeld(new SequentialCommandGroup(new TurnToBall(driveBase, limelight, 0.1),
+                new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase)),
+                new ParallelCommandGroup(new InstantCommand(intake::disable), new TurnToBall(driveBase, limelight, 0.1)),
+                new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase))
+      ))
+      .whenReleased(intake::disable);
 
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)

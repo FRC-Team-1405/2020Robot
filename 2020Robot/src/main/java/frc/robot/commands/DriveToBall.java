@@ -17,7 +17,11 @@ public class DriveToBall extends CommandBase {
   private Limelight limelight;
   private ArcadeDrive arcadeDrive;
   private SmartSupplier speed = new SmartSupplier("Drive to ball/Rotation", 0.2);
-  private SmartSupplier rotation = new SmartSupplier("Drive to ball/Speed", 0.05);
+  private SmartSupplier rotation = new SmartSupplier("Drive to ball/Speed", 0.1);
+
+  //One secound of delay
+  private double endDelay = 1000;
+  private long start = System.currentTimeMillis();
 
   public DriveToBall(Limelight limelight, ArcadeDrive arcadeDrive) {  
     this.limelight = limelight;
@@ -37,8 +41,12 @@ public class DriveToBall extends CommandBase {
   @Override
   public void execute() {
     if(!limelight.hasTarget())
+    {
+      arcadeDrive.driveRobot(speed.getAsDouble(), 0, false);
       return;
-    
+    }
+
+    //Start trying to pickup the balls
     if(limelight.getTX() < 1){
       //Move left
       arcadeDrive.driveRobot(speed.getAsDouble(), -rotation.getAsDouble(), false);
@@ -48,21 +56,18 @@ public class DriveToBall extends CommandBase {
     }else{
       arcadeDrive.driveRobot(speed.getAsDouble(), 0, false);
     }
-
-
-
-
-
-  }
-
-  // Called once the command ends or is interrupted.
-  @Override
-  public void end(boolean interrupted) {
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
+    if(limelight.hasTarget()){
+        start = System.currentTimeMillis();
+    }else{
+        long finish = System.currentTimeMillis();
+        if(finish - start >= endDelay)
+            return true;
+    }
     return false;
   }
 }
