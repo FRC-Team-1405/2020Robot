@@ -24,6 +24,7 @@ import frc.robot.commands.DefaultDrive;
 import frc.robot.commands.DriveByVelocity;
 import frc.robot.commands.DriveToBall;
 import frc.robot.commands.FireOnce;
+import frc.robot.commands.Indexer;
 import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToBall;
 import frc.robot.commands.TurnToTarget;
@@ -36,7 +37,6 @@ import frc.robot.sensors.LEDStrip;
 import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Climber;
-import frc.robot.subsystems.ControlPanel;
 import frc.robot.subsystems.Intake;
 import frc.robot.subsystems.Shooter;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -298,10 +298,10 @@ public class RobotContainer {
     new JoystickButton(driver, XboxController.Button.kA.value)
       .whenHeld(new SequentialCommandGroup(new TurnToBall(driveBase, limelight, 0.1),
                 new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase)),
-                new ParallelCommandGroup(new InstantCommand(intake::disable), new TurnToBall(driveBase, limelight, 0.1)),
+                new ParallelCommandGroup(new InstantCommand(intake::disable), new Indexer(launcher).withTimeout(0.5), new TurnToBall(driveBase, limelight, 0.1)),
                 new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase))
       ))
-      .whenReleased(intake::disable);
+      .whenReleased(new ParallelCommandGroup(new InstantCommand(intake::disable), new InstantCommand(launcher::stopIndexer)));
 
     //Left bumper: fire auto
     new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
