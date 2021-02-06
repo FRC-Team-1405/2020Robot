@@ -6,6 +6,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.lib.thirdcoast.swerve.SwerveDrive;
@@ -19,11 +20,17 @@ public class SwerveDriveBase extends SubsystemBase {
   private static final double ROBOT_LENGTH = 1.0;
   private static final double ROBOT_WIDTH = 1.0;
 
+
+
   private final SwerveDrive swerve = getSwerve();
 
-  public SwerveDriveBase() {}
 
-  public void setDriveMode(DriveMode mode) {
+
+  public SwerveDriveBase() {
+
+  }
+
+public void setDriveMode(DriveMode mode) {
     swerve.setDriveMode(mode);
   }
 
@@ -33,6 +40,10 @@ public class SwerveDriveBase extends SubsystemBase {
 
   public void zeroAzimuthEncoders() {
     swerve.zeroAzimuthEncoders();
+  } 
+
+  public void writeAzimuthPositions(){ 
+    swerve.saveAzimuthPositions();
   }
 
   public void drive(double forward, double strafe, double azimuth) {
@@ -42,9 +53,9 @@ public class SwerveDriveBase extends SubsystemBase {
   public void zeroGyro() {
     AHRS gyro = swerve.getGyro();
     gyro.setAngleAdjustment(0);
-    double adj = gyro.getAngle() % 360;
+    double adj = (gyro.getAngle() % 360) + SwerveDriveConfig.gyroHardwareOffset;
     gyro.setAngleAdjustment(-adj);
-  }
+  } 
 
   // Swerve configuration
 
@@ -105,5 +116,11 @@ public class SwerveDriveBase extends SubsystemBase {
     // driveTalon.setNeutralMode(NeutralMode.Brake);
 
     return new Wheel(azimuthTalon, driveTalon, DRIVE_SETPOINT_MAX);
-  }
+  }  
+
+  @Override
+  public void periodic() {  
+
+    swerve.updateOdometry(); 
+}
 }

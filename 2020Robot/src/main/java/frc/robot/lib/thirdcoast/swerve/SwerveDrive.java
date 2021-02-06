@@ -4,8 +4,18 @@ import javax.swing.text.html.HTMLDocument.HTMLReader.PreAction;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.Preferences;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
+
+import frc.robot.Constants;
 import frc.robot.lib.thirdcoast.talon.Errors;
 
 /**
@@ -32,7 +42,18 @@ public class SwerveDrive {
   private final Wheel[] wheels;
   private final double[] ws = new double[WHEEL_COUNT];
   private final double[] wa = new double[WHEEL_COUNT];
-  private boolean isFieldOriented;
+  private boolean isFieldOriented; 
+
+  //values in meters of swerve module relative to NavX
+  Translation2d m_frontLeftLocation = new Translation2d(0.279, 0.203);
+  Translation2d m_frontRightLocation = new Translation2d(0.254, -0.203);
+  Translation2d m_backLeftLocation = new Translation2d(-0.279, 0.330);
+  Translation2d m_backRightLocation = new Translation2d(-0.254, -0.330); 
+
+  SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_frontLeftLocation, m_frontRightLocation,
+  m_backLeftLocation, m_backRightLocation);
+
+  SwerveDriveOdometry m_odometry; 
 
   public SwerveDrive(SwerveDriveConfig config) {
     gyro = config.gyro;
@@ -73,6 +94,9 @@ public class SwerveDrive {
       logger.warning("gyro is missing or not enabled");
       kGyroRateCorrection = 0;
     }
+
+
+    m_odometry = new SwerveDriveOdometry(m_kinematics, getRotation2d());
 
     logger.config(String.format("length = %f", length));
     logger.config(String.format("width = %f", width));
@@ -131,7 +155,7 @@ public class SwerveDrive {
     // Use gyro for field-oriented drive. We use getAngle instead of getYaw to enable arbitrary
     // autonomous starting positions.
     if (isFieldOriented) {
-      double angle = gyro.getAngle();
+      double angle = gyro.getAngle(); 
       angle += gyro.getRate() * kGyroRateCorrection;
       angle = Math.IEEEremainder(angle, 360.0);
 
@@ -292,5 +316,36 @@ public class SwerveDrive {
     TELEOP,
     TRAJECTORY,
     AZIMUTH
+  }  
+
+   
+   Rotation2d getRotation2d() {
+    return Rotation2d.fromDegrees(-gyro.getAngle());
   }
+
+  public void updateOdometry() {
+  // Get my gyro angle. We are negating the value because gyros return positive
+  // values as the robot turns clockwise. This is not standard convention that is
+  // used by the WPILib classes.
+  var gyroAngle = Rotation2d.fromDegrees(-gyro.getAngle());
+
+  // Update the pose
+  m_odometry.update(gyroAngle, wheels[0].getState(), wheels[1].getState(), wheels[2].getState(), wheels[3].getState()); 
+
+  SmartDashboard.putNumber("Odometry Angle", -gyro.getAngle());
+  
+  SwerveModuleState wheelState;
+  wheelState = wheels[0].getState();
+  SmartDashboard.putNumber("FL Angle", wheelState.angle.getDegrees());
+  SmartDashboard.putNumber("FL Speed", wheelState.speedMetersPerSecond); 
+  wheelState = wheels[1].getState();
+  SmartDashboard.putNumber("FR Angle", wheelState.angle.getDegrees());
+  SmartDashboard.putNumber("FR Speed", wheelState.speedMetersPerSecond); 
+  wheelState = wheels[2].getState();
+  SmartDashboard.putNumber("BL Angle", wheelState.angle.getDegrees());
+  SmartDashboard.putNumber("BL Speed", wheelState.speedMetersPerSecond); 
+  wheelState = wheels[3].getState();
+  SmartDashboard.putNumber("BR Angle", wheelState.angle.getDegrees());
+  SmartDashboard.putNumber("BR Speed", wheelState.speedMetersPerSecond); 
+}
 }

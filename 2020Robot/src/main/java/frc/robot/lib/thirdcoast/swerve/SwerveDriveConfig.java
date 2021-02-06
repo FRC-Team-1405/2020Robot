@@ -2,6 +2,7 @@ package frc.robot.lib.thirdcoast.swerve;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.TimedRobot;
+import frc.robot.lib.SmartSupplier;
 
 public class SwerveDriveConfig {
 
@@ -36,5 +37,8 @@ public class SwerveDriveConfig {
    * Summarize Talon configuration errors. If false, will log error messages as each error is
    * encountered.
    */
-  public boolean summarizeTalonErrors = false;
+  public boolean summarizeTalonErrors = false; 
+
+
+  public static double gyroHardwareOffset = 0;
 }

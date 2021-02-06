@@ -83,7 +83,7 @@ public class Robot extends TimedRobot {
     fmsAttached = DriverStation.getInstance().isFMSAttached();
     m_robotContainer.underGlow.resetTeamColor();;
     m_robotContainer.underGlow.schedule();
-    m_robotContainer.launcher.stopTurret();
+    // m_robotContainer.launcher.stopTurret();
     m_robotContainer.swerveDriveBase.stop();
 
     // schedule the autonomous command (example)
@@ -106,14 +106,15 @@ public class Robot extends TimedRobot {
     // continue until interrupted by another command, remove
     // this line or comment it out.
     if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
+      m_autonomousCommand.cancel(); 
     }
     fmsAttached = DriverStation.getInstance().isFMSAttached();
     m_robotContainer.underGlow.resetTeamColor();
     m_robotContainer.underGlow.schedule();
     m_robotContainer.batteryMonitor.schedule();
-    m_robotContainer.launcher.stopTurret();
-    m_robotContainer.swerveDriveBase.stop();
+    // m_robotContainer.launcher.stopTurret();
+    m_robotContainer.swerveDriveBase.stop(); 
+    logger.fine("----Drivebase----Stopped----"); 
   }
 
   /**

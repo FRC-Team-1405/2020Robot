@@ -6,9 +6,16 @@ import static frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode.TELEOP;
 import com.ctre.phoenix.ErrorCode;
 import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+
 import java.util.Objects;
 import java.util.function.DoubleConsumer;
 import java.util.logging.Logger;
+
+import frc.robot.Constants;
+import frc.robot.lib.MathTools;
 import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 import frc.robot.lib.thirdcoast.talon.Errors;
 
@@ -136,7 +143,8 @@ public class Wheel {
    * current position in case the wheel has been manually rotated away from its previous setpoint.
    */
   public void stop() {
-    azimuthTalon.set(MotionMagic, azimuthTalon.getSelectedSensorPosition(0));
+    azimuthTalon.set(MotionMagic, azimuthTalon.getSelectedSensorPosition(0)); 
+    logger.config(String.format("----Stop----Set---- %d", azimuthTalon.getSelectedSensorPosition()));  
     driver.accept(0d);
   }
 
@@ -194,6 +202,15 @@ public class Wheel {
 
   public boolean isInverted() {
     return isInverted;
+  } 
+
+  public SwerveModuleState getState(){ 
+    return new SwerveModuleState(
+      driveTalon.getSelectedSensorVelocity() 
+       * Constants.VelocityConversions.SwerveSensorToMeters, 
+    new Rotation2d(MathTools.map(getAzimuthAbsolutePosition(), 0, 4095, 0, 2 * Math.PI))); 
+
+    
   }
 
   @Override
@@ -206,5 +223,6 @@ public class Wheel {
         + ", driveSetpointMax="
         + driveSetpointMax
         + '}';
-  }
+  } 
+
 }

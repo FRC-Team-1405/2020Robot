@@ -57,6 +57,7 @@ public final class Constants {
     public final static int rightActuatorId = 2;
 
     public final static double deadBand = 0.033; 
+    public final static double swerveDeadBand = 0.033;
     public final static double scissorDeadband = 0.2;
 
     public final static int leftFrontSwitchid = 0;
@@ -91,9 +92,9 @@ public final class Constants {
         public final static double triggerSpeed = .8; 
         public final static double unitsPerAngle = (unitsMax - unitsMin) / (angleMax - angleMin);
         public final static double anglesPerUnit = (angleMax - angleMin) / (unitsMax - unitsMin);
-    }
+    } 
 
-    //TrajectoryDrive constants
+     //TrajectoryDrive constants
     public static final double kTrackwidthMeters = 0.5461;
     public static final DifferentialDriveKinematics kDriveKinematics = new DifferentialDriveKinematics(kTrackwidthMeters);
 	public static final double maxVelocity = 1;
@@ -154,12 +155,14 @@ public final class Constants {
 
     public static class VelocityConversions{
         public final static double SensorTimePerSec = 10;
-        public final static double WheelCircumference = (6*Math.PI);
-        public final static double SensorUnitsPerRotation = 2048;
+        public final static double WheelCircumference = (6 * Math.PI);
+        public final static double SensorUnitsPerRotation = 2048; 
+        public final static double SwerveSensorUnitsPerRotation = 4096; 
+        public final static double SwerveWheelCircumference = (4 * Math.PI); 
         public final static double DriveBaseReduction = 8.68;
         public final static double InchesPerMeter = 39.37;
         public final static double SensorToMeters = (1.0 / SensorUnitsPerRotation) * (1.0 / DriveBaseReduction) * WheelCircumference * (1.0 / InchesPerMeter); 
-     
+        public final static double SwerveSensorToMeters = ((1.0 / SwerveSensorUnitsPerRotation) * SwerveWheelCircumference * (1 / InchesPerMeter));  
         public final static double SensorToMetersCIMBot = 1/SensorUnitsPerRotation * WheelCircumference * (1.0 / InchesPerMeter) / 2.0; 
         public final static double MetersToSensor = (1.0 / SensorToMeters);
         public final static double FVelocityToMetersPerSecond = (SensorTimePerSec * WheelCircumference)/(SensorUnitsPerRotation * DriveBaseReduction * InchesPerMeter); 

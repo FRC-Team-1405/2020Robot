@@ -20,8 +20,10 @@ public class SmartSupplier implements DoubleSupplier{
 
     public SmartSupplier(String key, double defaultValue){
         this.key = key;
-        this.defaultValue = defaultValue;
-        SmartDashboard.putNumber(key, defaultValue);
+        this.defaultValue = defaultValue; 
+        if(!SmartDashboard.containsKey(key)){
+            SmartDashboard.putNumber(key, defaultValue);
+        }
     }
 
     @Override
