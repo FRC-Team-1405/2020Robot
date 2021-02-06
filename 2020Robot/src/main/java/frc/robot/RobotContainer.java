@@ -28,6 +28,7 @@ import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
 import frc.robot.lib.MathTools;
+import frc.robot.lib.RobotConfigBoard;
 import frc.robot.lib.SmartSupplier;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
@@ -102,7 +103,7 @@ public class RobotContainer {
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
     driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
-
+    RobotConfigBoard robotConfigBoard= new RobotConfigBoard(0);
   }
 
   SlewRateLimiter driveSpeedFilter = new SlewRateLimiter(0.5);

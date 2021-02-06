@@ -37,7 +37,11 @@ public class DriveToBall extends CommandBase {
   @Override
   public void execute() {
     if(!limelight.hasTarget())
+    {
+      //Look for balls
+      arcadeDrive.driveRobot(0, 0.1, false);
       return;
+    }
     
     if(limelight.getTX() < 1){
       //Move left
