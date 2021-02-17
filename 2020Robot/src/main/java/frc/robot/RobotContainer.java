@@ -141,7 +141,8 @@ public class RobotContainer {
 
   /** Right stick Y (left-right) axis. */
   public double getYawSwerve() {
-    return driver.getX(Hand.kRight) * 0.25;
+    //return driver.getX(Hand.kRight) * speedLimit.getAsDouble(); 
+    return driver.getRawAxis(2) * speedLimit.getAsDouble(); 
   }
 
   private double leftScissorPos(){
