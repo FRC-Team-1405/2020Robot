@@ -11,6 +11,7 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import frc.robot.lib.SmartSupplier;
 
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
@@ -43,6 +44,7 @@ public class SwerveDrive {
   private final double[] ws = new double[WHEEL_COUNT];
   private final double[] wa = new double[WHEEL_COUNT];
   private boolean isFieldOriented; 
+  private double speedLimit = new SmartSupplier("Drivebase/SpeedLimit", 0.35).getAsDouble();
 
   //values in meters of swerve module relative to NavX
   Translation2d m_frontLeftLocation = new Translation2d(0.279, 0.203);
@@ -171,10 +173,10 @@ public class SwerveDrive {
     final double d = forward + azimuth * kWidthComponent;
 
     // wheel speed
-    ws[0] = Math.hypot(b, d);
-    ws[1] = Math.hypot(b, c);
-    ws[2] = Math.hypot(a, d);
-    ws[3] = Math.hypot(a, c);
+    ws[0] = Math.hypot(b, d)  * speedLimit;
+    ws[1] = Math.hypot(b, c)  * speedLimit;
+    ws[2] = Math.hypot(a, d)  * speedLimit;
+    ws[3] = Math.hypot(a, c)  * speedLimit;
 
     // wheel azimuth
     wa[0] = Math.atan2(b, d) * 0.5 / Math.PI;

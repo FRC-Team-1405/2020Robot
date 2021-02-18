@@ -89,7 +89,6 @@ public class RobotContainer {
   private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 11000);
   private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 16000);
   private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000); 
-  private SmartSupplier speedLimit = new SmartSupplier("Drivebase/SpeedLimit", 0.35); 
   public static double increase = 0;
 
   /**
@@ -131,18 +130,17 @@ public class RobotContainer {
   }
 
   public double getForwardSwerve() {
-    return -driver.getY(Hand.kLeft) * speedLimit.getAsDouble(); 
+    return -driver.getY(Hand.kLeft); 
   }
 
   /** Left stick Y (left-right) axis. */
   public double getStrafeSwerve() {
-    return driver.getX(Hand.kLeft) * speedLimit.getAsDouble();
+    return driver.getX(Hand.kLeft);
   }
 
   /** Right stick Y (left-right) axis. */
   public double getYawSwerve() {
-    //return driver.getX(Hand.kRight) * speedLimit.getAsDouble(); 
-    return driver.getRawAxis(2) * speedLimit.getAsDouble(); 
+    return driver.getRawAxis(2); 
   }
 
   private double leftScissorPos(){
