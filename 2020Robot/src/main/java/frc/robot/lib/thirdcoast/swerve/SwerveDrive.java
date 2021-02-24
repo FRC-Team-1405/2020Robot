@@ -11,8 +11,6 @@ import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import frc.robot.lib.SmartSupplier;
-
 import java.util.logging.LogManager;
 import java.util.logging.Logger;
 
@@ -44,7 +42,7 @@ public class SwerveDrive {
   private final double[] ws = new double[WHEEL_COUNT];
   private final double[] wa = new double[WHEEL_COUNT];
   private boolean isFieldOriented; 
-  private double speedLimit = new SmartSupplier("Drivebase/SpeedLimit", 0.35).getAsDouble();
+  
 
   //values in meters of swerve module relative to NavX
   Translation2d m_frontLeftLocation = new Translation2d(0.279, 0.203);
@@ -152,7 +150,7 @@ public class SwerveDrive {
    * @param strafe X-axis movement, from -1.0 (left) to 1.0 (right)
    * @param azimuth robot rotation, from -1.0 (CCW) to 1.0 (CW)
    */
-  public void drive(double forward, double strafe, double azimuth) {
+  public void drive(double forward, double strafe, double azimuth, double speedLimit) {
 
     // Use gyro for field-oriented drive. We use getAngle instead of getYaw to enable arbitrary
     // autonomous starting positions.
@@ -165,7 +163,14 @@ public class SwerveDrive {
       final double temp = forward * Math.cos(angle) + strafe * Math.sin(angle);
       strafe = strafe * Math.cos(angle) - forward * Math.sin(angle);
       forward = temp;
-    }
+    } 
+
+    // if(forward == 0.0 && strafe == 0.0){ 
+    //   wa[0] = azimuth; 
+    //   wa[1] = azimuth; 
+    //   wa[2] = azimuth; 
+    //   wa[3] = azimuth; 
+    // }
 
     final double a = strafe - azimuth * kLengthComponent;
     final double b = strafe + azimuth * kLengthComponent;
@@ -335,19 +340,19 @@ public class SwerveDrive {
   m_odometry.update(gyroAngle, wheels[0].getState(), wheels[1].getState(), wheels[2].getState(), wheels[3].getState()); 
 
   SmartDashboard.putNumber("Odometry Angle", -gyro.getAngle());
-  
-  SwerveModuleState wheelState;
-  wheelState = wheels[0].getState();
-  SmartDashboard.putNumber("FL Angle", wheelState.angle.getDegrees());
-  SmartDashboard.putNumber("FL Speed", wheelState.speedMetersPerSecond); 
-  wheelState = wheels[1].getState();
-  SmartDashboard.putNumber("FR Angle", wheelState.angle.getDegrees());
-  SmartDashboard.putNumber("FR Speed", wheelState.speedMetersPerSecond); 
-  wheelState = wheels[2].getState();
-  SmartDashboard.putNumber("BL Angle", wheelState.angle.getDegrees());
-  SmartDashboard.putNumber("BL Speed", wheelState.speedMetersPerSecond); 
-  wheelState = wheels[3].getState();
-  SmartDashboard.putNumber("BR Angle", wheelState.angle.getDegrees());
-  SmartDashboard.putNumber("BR Speed", wheelState.speedMetersPerSecond); 
+  //m_odometry.getPoseMeters().
+  // SwerveModuleState wheelState;
+  // wheelState = wheels[0].getState();
+  // SmartDashboard.putNumber("FL Angle", wheelState.angle.getDegrees());
+  // SmartDashboard.putNumber("FL Speed", wheelState.speedMetersPerSecond); 
+  // wheelState = wheels[1].getState();
+  // SmartDashboard.putNumber("FR Angle", wheelState.angle.getDegrees());
+  // SmartDashboard.putNumber("FR Speed", wheelState.speedMetersPerSecond); 
+  // wheelState = wheels[2].getState();
+  // SmartDashboard.putNumber("BL Angle", wheelState.angle.getDegrees());
+  // SmartDashboard.putNumber("BL Speed", wheelState.speedMetersPerSecond); 
+  // wheelState = wheels[3].getState();
+  // SmartDashboard.putNumber("BR Angle", wheelState.angle.getDegrees());
+  // SmartDashboard.putNumber("BR Speed", wheelState.speedMetersPerSecond); 
 }
 }

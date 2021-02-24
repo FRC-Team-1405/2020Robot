@@ -23,13 +23,15 @@ public final class SwerveDrive extends CommandBase {
 
   private SwerveDriveBase driveBase;
   private DoubleSupplier getForward;
-  private DoubleSupplier getStrafe;
+  private DoubleSupplier getStrafe; 
+  private DoubleSupplier speedLimit; 
   private DoubleSupplier getYaw;
 
-  public SwerveDrive(DoubleSupplier getForward, DoubleSupplier getStrafe, DoubleSupplier getYaw, SwerveDriveBase driveBase) {
+  public SwerveDrive(DoubleSupplier getForward, DoubleSupplier getStrafe, DoubleSupplier getYaw, DoubleSupplier speedLimit, SwerveDriveBase driveBase) {
     this.getForward = getForward;
     this.getStrafe = getStrafe;
-    this.getYaw = getYaw;
+    this.getYaw = getYaw; 
+    this.speedLimit = speedLimit; 
     this.driveBase = driveBase;
     addRequirements(driveBase);
   }
@@ -43,10 +45,9 @@ public final class SwerveDrive extends CommandBase {
   public void execute() {
     double forward = deadband(getForward.getAsDouble());
     double strafe = deadband(getStrafe.getAsDouble());
-    double azimuth = deadband(getYaw.getAsDouble());
-
+    double azimuth = deadband(getYaw.getAsDouble()); 
     logger.fine( () -> String.format("Forward: %f Strafe: %f Azimuth %f", forward, strafe, azimuth)) ;
-    driveBase.drive(forward, strafe, azimuth);
+    driveBase.drive(forward, strafe, azimuth, speedLimit.getAsDouble());
   }
 
   @Override
@@ -56,7 +57,7 @@ public final class SwerveDrive extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    driveBase.drive(0.0, 0.0, 0.0);
+    driveBase.drive(0.0, 0.0, 0.0, 0.0);
   }
 
   private double deadband(double value) {

@@ -46,8 +46,8 @@ public void setDriveMode(DriveMode mode) {
     swerve.saveAzimuthPositions();
   }
 
-  public void drive(double forward, double strafe, double azimuth) {
-    swerve.drive(forward, strafe, azimuth);
+  public void drive(double forward, double strafe, double azimuth, double speedLimit) {
+    swerve.drive(forward, strafe, azimuth, speedLimit);
   }
 
   public void zeroGyro() {
@@ -122,5 +122,6 @@ public void setDriveMode(DriveMode mode) {
   public void periodic() {  
 
     swerve.updateOdometry(); 
+    
 }
 }

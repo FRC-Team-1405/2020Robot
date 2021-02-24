@@ -39,6 +39,10 @@ public class Shooter extends SubsystemBase {
 
   public WPI_TalonSRX left = new WPI_TalonSRX(Constants.shooterLeft); 
   public WPI_TalonSRX right = new WPI_TalonSRX(Constants.shooterRight); 
+
+  public WPI_TalonSRX hoodLeft = new WPI_TalonSRX(27); 
+  public WPI_TalonSRX hoodRight = new WPI_TalonSRX(28);
+  
   public WPI_TalonSRX turret = new WPI_TalonSRX(Constants.turretid);
   public WPI_TalonSRX indexer = new WPI_TalonSRX(Constants.indexerid);
   public WPI_TalonSRX trigger = new WPI_TalonSRX(Constants.triggerid);
@@ -70,6 +74,7 @@ public class Shooter extends SubsystemBase {
     
     turret.configSelectedFeedbackSensor(FeedbackDevice.CTRE_MagEncoder_Relative);
     
+    hoodLeft.follow(hoodRight);
   
     
     

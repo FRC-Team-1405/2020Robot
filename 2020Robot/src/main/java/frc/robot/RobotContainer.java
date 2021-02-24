@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.GenericHID;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
@@ -48,7 +49,8 @@ import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj.SlewRateLimiter;
+import edu.wpi.first.wpilibj.SlewRateLimiter; 
+import frc.robot.lib.SmartBooleanSupplier;
 
 /**
  * This class is where the bulk of the robot should be declared. Since
@@ -73,8 +75,9 @@ public class RobotContainer {
   // private final LidarReader lidarReader = new LidarReader();
   // private final ColorSensor colorSensor = new ColorSensor();
 
-  private XboxController driver = new XboxController(Constants.pilot);
-  private XboxController operator = new XboxController(Constants.operator);
+  private XboxController driver = new XboxController(Constants.pilot); 
+  private XboxController operator = new XboxController(Constants.operator); 
+  
 
   // private final Autonomous1 auto1 = new Autonomous1(driveBase);
   // private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher);
@@ -89,7 +92,8 @@ public class RobotContainer {
   private SmartSupplier midRight = new SmartSupplier("Shooter/Mid/Right", 11000);
   private SmartSupplier highLeft = new SmartSupplier("Shooter/High/Left", 16000);
   private SmartSupplier highRight = new SmartSupplier("Shooter/High/Right", 16000); 
-  public static double increase = 0;
+  private double speedLimit = new SmartSupplier("Drivebase/SpeedLimit", 0.35).getAsDouble();
+  public static double increase = 0; 
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -103,8 +107,35 @@ public class RobotContainer {
 
     // Configure default commands
     // Set the default drive command to split-stick arcade drive
-    // driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );
-    swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForwardSwerve, this::getStrafeSwerve, this::getYawSwerve, swerveDriveBase) );
+    // driveBase.setDefaultCommand( new DefaultDrive( this::driveSpeed, this::driveRotation, driveBase) );  
+
+    boolean isLogitech = new SmartBooleanSupplier("Use Logitech Controller", false).getAsBoolean(); 
+
+    swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForwardSwerve, 
+    this::getStrafeSwerve, 
+    isLogitech ? this::getYawSwerveLogitech : this::getYawSwerveXboxController, 
+    isLogitech ? this::getSpeedLimitLogitech : this::getSpeedLimitXboxController,
+    swerveDriveBase) ); 
+
+
+/*
+    switch(joystickSelector.getSelected()){
+      case "Logitech":
+        swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForwardSwerve, 
+                                                            this::getStrafeSwerve, 
+                                                            this::getYawSwerveLogitech, 
+                                                            this::getSpeedLimitLogitech,
+                                                            swerveDriveBase) ); 
+        break;
+      case "XboxController": 
+      default:
+        swerveDriveBase.setDefaultCommand( new SwerveDrive( this::getForwardSwerve, 
+                                                            this::getStrafeSwerve, 
+                                                            this::getYawSwerveXboxController, 
+                                                            this::getSpeedLimitXboxController,
+                                                            swerveDriveBase) );
+    }
+*/
     swerveDriveBase.stop();
     swerveDriveBase.zeroAzimuthEncoders();
     swerveDriveBase.zeroGyro();
@@ -136,11 +167,28 @@ public class RobotContainer {
   /** Left stick Y (left-right) axis. */
   public double getStrafeSwerve() {
     return driver.getX(Hand.kLeft);
-  }
+  } 
+
+
 
   /** Right stick Y (left-right) axis. */
-  public double getYawSwerve() {
-    return driver.getRawAxis(2); 
+  public double getYawSwerveXboxController() {
+    return driver.getX(Hand.kRight); 
+  }  
+
+  public double getYawSwerveLogitech() { 
+    return driver.getRawAxis(2);
+  }
+
+  public double getSpeedLimitXboxController() { 
+    System.out.print("XBox");
+    return MathTools.map(driver.getTriggerAxis(Hand.kRight), 0.0, 1.0, speedLimit, 1.0);
+    //return speedLimit; 
+  } 
+
+  public double getSpeedLimitLogitech() { 
+    System.out.print("Logitech");
+    return MathTools.map(driver.getRawAxis(3), -1, 1, 1.0, speedLimit); 
   }
 
   private double leftScissorPos(){
@@ -165,7 +213,9 @@ public class RobotContainer {
     if(Math.abs(pos) < 0.05)
       pos = 0.0;
     return MathTools.map(pos, -1.0, 1.0, -0.75, 0.75);
-  }
+  } 
+
+
 
   SendableChooser<Integer> autoSelector; 
    
@@ -176,13 +226,14 @@ public class RobotContainer {
     autoSelector.addOption("Drive forward.", 1);
     autoSelector.addOption("Shoot then drive", 2);
     autoSelector.addOption("Auto 3", 3);
-    autoSelector.setDefaultOption("Do nothing", 0);
-
+    autoSelector.setDefaultOption("Do nothing", 0); 
+    
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
     autoTab.add(autoSelector)
             .withWidget(BuiltInWidgets.kComboBoxChooser);
     SmartDashboard.putNumber("Auto/Selected_Auto", 1);
     autoTab.add("Auto/Initial_Delay", 0); 
+
 
   
     if(!Robot.fmsAttached){

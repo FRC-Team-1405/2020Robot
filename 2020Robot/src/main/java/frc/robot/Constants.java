@@ -69,7 +69,7 @@ public final class Constants {
     public final static int ledLength =20; 
 
     public final static int pilot = 0;
-    public final static int operator = 1;
+    public final static int operator = 1; 
 
     public final static int lidarBufferSize = 20;
 
