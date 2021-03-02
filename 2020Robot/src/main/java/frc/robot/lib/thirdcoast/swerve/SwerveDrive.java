@@ -339,8 +339,15 @@ public class SwerveDrive {
   // Update the pose
   m_odometry.update(gyroAngle, wheels[0].getState(), wheels[1].getState(), wheels[2].getState(), wheels[3].getState()); 
 
-  SmartDashboard.putNumber("Odometry Angle", -gyro.getAngle());
-  //m_odometry.getPoseMeters().
+  SmartDashboard.putNumber("Odometry Angle", -gyro.getAngle()); 
+
+    Translation2d xy = m_odometry.getPoseMeters().getTranslation() ;
+
+  SmartDashboard.putNumber("Distance X", xy.getX()); 
+
+  SmartDashboard.putNumber("Distance Y", xy.getY()); 
+  
+
   // SwerveModuleState wheelState;
   // wheelState = wheels[0].getState();
   // SmartDashboard.putNumber("FL Angle", wheelState.angle.getDegrees());
