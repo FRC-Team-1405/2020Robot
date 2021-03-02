@@ -177,17 +177,18 @@ public class RobotContainer {
   }  
 
   public double getYawSwerveLogitech() { 
-    return driver.getRawAxis(2);
+    double yaw = driver.getRawAxis(2);
+    if (Math.abs(yaw) < Constants.deadBand){
+      return 0.0;
+    } 
+    return yaw;
   }
 
   public double getSpeedLimitXboxController() { 
-    System.out.print("XBox");
     return MathTools.map(driver.getTriggerAxis(Hand.kRight), 0.0, 1.0, speedLimit, 1.0);
-    //return speedLimit; 
   } 
 
   public double getSpeedLimitLogitech() { 
-    System.out.print("Logitech");
     return MathTools.map(driver.getRawAxis(3), -1, 1, 1.0, speedLimit); 
   }
 
