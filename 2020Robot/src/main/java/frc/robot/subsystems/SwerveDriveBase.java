@@ -19,15 +19,9 @@ public class SwerveDriveBase extends SubsystemBase {
   private static final double DRIVE_SETPOINT_MAX = 0.0;
   private static final double ROBOT_LENGTH = 1.0;
   private static final double ROBOT_WIDTH = 1.0;
-
-
-
   private final SwerveDrive swerve = getSwerve();
 
-
-
   public SwerveDriveBase() {
-
   }
 
 public void setDriveMode(DriveMode mode) {
@@ -48,6 +42,12 @@ public void setDriveMode(DriveMode mode) {
 
   public void drive(double forward, double strafe, double azimuth, double speedLimit) {
     swerve.drive(forward, strafe, azimuth, speedLimit);
+  }
+
+  // Drive the robot in a straight line using the navX front heading 
+  public void driveStraight(double speed, double azimuth, double speedLimit){
+    double angle = swerve.getGyro().getAngle();  
+    drive(speed * Math.sin(angle), speed * Math.cos(angle), azimuth, speedLimit); 
   }
 
   public void zeroGyro() {

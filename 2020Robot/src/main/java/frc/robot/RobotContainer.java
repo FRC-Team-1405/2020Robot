@@ -73,8 +73,8 @@ public class RobotContainer {
   // private final ArcadeDrive driveBase = new ArcadeDrive();
   public final SwerveDriveBase swerveDriveBase = new SwerveDriveBase();
   private Limelight limelight = new Limelight();
-  public final Shooter launcher = new Shooter(limelight);
-  private Intake intake = new Intake();
+  // public final Shooter launcher = new Shooter(limelight);
+  // private Intake intake = new Intake();
   // private final Climber climber = new Climber();
 
   private final ArcadeDrive driveBase = new ArcadeDrive();
@@ -89,7 +89,7 @@ public class RobotContainer {
   
 
   private final Autonomous1 auto1 = new Autonomous1(driveBase);
-  private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher, limelight);
+  // private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher, limelight);
 
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
   public final UnderGlow underGlow = new  UnderGlow(ledStrip);
@@ -374,14 +374,16 @@ public class RobotContainer {
                                               SmartDashboard.putNumber("Shooter/Increase", increase);
                                             } ));
 
-    new JoystickButton(driver, XboxController.Button.kA.value)
-      .whenHeld(new SequentialCommandGroup(new TurnToBall(driveBase, limelight, 0.1),
-                new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase)),
-                new ParallelCommandGroup(new InstantCommand(intake::disable), new Indexer(launcher).withTimeout(0.5), new TurnToBall(driveBase, limelight, 0.1)),
-                new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase))
-      ))
-      .whenReleased(new ParallelCommandGroup(new InstantCommand(intake::disable), new InstantCommand(launcher::stopIndexer)));
+    // new JoystickButton(driver, XboxController.Button.kA.value)
+    //   .whenHeld(new SequentialCommandGroup(new TurnToBall(driveBase, limelight, 0.1),
+    //             new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase)),
+    //             new ParallelCommandGroup(new InstantCommand(intake::disable), new Indexer(launcher).withTimeout(0.5), new TurnToBall(driveBase, limelight, 0.1)),
+    //             new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase))
+    //   ))
+    //   .whenReleased(new ParallelCommandGroup(new InstantCommand(intake::disable), new InstantCommand(launcher::stopIndexer)));
 
+    new JoystickButton(driver, XboxController.Button.kB.value) 
+        .whenHeld(new TurnToBall(swerveDriveBase, limelight, 0.0, 0.1));
     //Left bumper: fire auto
     // new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
     //   .whenHeld( new FireOnce(launcher) )
@@ -393,19 +395,19 @@ public class RobotContainer {
     //   .whenReleased(launcher::stopIndexer);
 
     //Y: prep flywheels auto
-    new JoystickButton(operator, XboxController.Button.kY.value)
-      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(lowLeft, lowRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
+    // new JoystickButton(operator, XboxController.Button.kY.value)
+    //   .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(lowLeft, lowRight);}))
+    //   .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
 
     //B: prep flywheels close
-    new JoystickButton(operator, XboxController.Button.kB.value)
-      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
+    // new JoystickButton(operator, XboxController.Button.kB.value)
+    //   .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(midLeft, midRight);}))
+    //   .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
 
     //A: prep flywheels far
-    new JoystickButton(operator, XboxController.Button.kA.value)
-      .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
-      .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
+    // new JoystickButton(operator, XboxController.Button.kA.value)
+    //   .whenPressed( new InstantCommand( () -> {launcher.prepFlywheels(highLeft, highRight);}))
+    //   .whenPressed( new TurnToTarget(launcher, driveBase, limelight));
 
     //X: stop flywheels
     // new JoystickButton(operator, XboxController.Button.kX.value)
