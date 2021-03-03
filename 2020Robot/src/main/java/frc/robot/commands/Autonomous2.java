@@ -14,6 +14,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants;
 import frc.robot.lib.SmartSupplier;
+import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.ArcadeDrive;
 import frc.robot.subsystems.Shooter;
 
@@ -26,7 +27,7 @@ public class Autonomous2 extends SequentialCommandGroup {
    */
   private static SmartSupplier speedLeft = new SmartSupplier("Autonomous2/Speed/Left", 11000);
   private static SmartSupplier speedRight = new SmartSupplier("Autonomous2/Speed/Right", 11000);
-  public Autonomous2(ArcadeDrive driveBase, Shooter shooter) {
+  public Autonomous2(ArcadeDrive driveBase, Shooter shooter, Limelight limelight) {
     // Add your commands in the super() call, e.g.
     // super(new FooCommand(), new BarCommand());
     // super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)), new FireOnce(shooter, driveBase).withTimeout(12  - SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
@@ -34,11 +35,11 @@ public class Autonomous2 extends SequentialCommandGroup {
 
     super( new WaitCommand(SmartDashboard.getNumber("Auto/Initial_Delay", 0)),
           new InstantCommand(() -> {shooter.prepFlywheels(speedLeft, speedRight);
-                                    shooter.limelight.setPipeline((byte) 7);
-                                    shooter.limelight.setLED((byte) 3);
+                                    limelight.setPipeline((byte) 7);
+                                    limelight.setLED((byte) 3);
                                     }),
           new ParallelRaceGroup(
-                                    // new TurnToTarget(shooter, driveBase),
+                                    new TurnToTarget(shooter, driveBase, limelight),
                                     new FireOnce(shooter).withTimeout(7.5)),
           // new InstantCommand(shooter::fire),
           new InstantCommand(() -> {shooter.stopFlywheels(); shooter.stopIndexer();}),

@@ -51,10 +51,10 @@ public class Climber extends SubsystemBase {
   private int targetPosition = Constants.ShooterConstants.unitsMin;
   private int withinThresholdLoops = 0;
 
-  DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
-  DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
-  DigitalInput leftBackSwitch = new DigitalInput(Constants.leftBackSwitchid);
-  DigitalInput rightBackSwitch = new DigitalInput(Constants.rightBackSwitchid);
+  //DigitalInput leftFrontSwitch = new DigitalInput(Constants.leftFrontSwitchid);
+  //DigitalInput rightFrontSwitch = new DigitalInput(Constants.rightFrontSwitchid);
+  //DigitalInput leftBackSwitch = new DigitalInput(Constants.leftBackSwitchid);
+  //DigitalInput rightBackSwitch = new DigitalInput(Constants.rightBackSwitchid);
 
   public Climber() {
     SmartDashboard.putBoolean("Climber/Limits_On", limitsOn);
@@ -67,7 +67,7 @@ public class Climber extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-    SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
+    //SmartDashboard.putBoolean("Climber Sensor Reading", leftFrontSwitch.get());
     if ( leftClimbMotor.getActiveTrajectoryPosition() == targetPosition && Math.abs(leftClimbMotor.getClosedLoopError()) < errorThreshold
       && rightClimbMotor.getActiveTrajectoryPosition() == targetPosition && Math.abs(rightClimbMotor.getClosedLoopError()) < errorThreshold){
       withinThresholdLoops++;

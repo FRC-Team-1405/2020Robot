@@ -13,18 +13,18 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.lib.MathTools;
 import frc.robot.sensors.LEDStrip;
-import frc.robot.subsystems.Shooter;
+import frc.robot.sensors.Limelight;
 
 public class LimelightLED extends CommandBase {
   private LEDStrip ledStrip;
-  private Shooter shooter;
+  private Limelight limelight;
   private AddressableLEDBuffer addressableLEDBuffer;
   /**
    * Creates a new LimelightLED.
    */
-  public LimelightLED(LEDStrip ledStrip, Shooter shooter) {
+  public LimelightLED(LEDStrip ledStrip, Limelight limelight) {
     this.ledStrip = ledStrip;
-    this.shooter = shooter;
+    this.limelight = limelight;
     this.addressableLEDBuffer = ledStrip.getLedBuffer() ;
     // Use addRequirements() here to declare subsystem dependencies.
   }
@@ -37,7 +37,7 @@ public class LimelightLED extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    double offset = Math.abs(shooter.limelight.getTX());
+    double offset = Math.abs(limelight.getTX());
     int numberOfLeds = MathTools.map((int) offset, 0, 29, 0, Constants.UnderGlow.ledCount);
     if(offset <= Constants.ShooterConstants.limelightError){
       for(int i = 0; i < numberOfLeds; i++){
