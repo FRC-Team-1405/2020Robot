@@ -225,7 +225,11 @@ public class Shooter extends SubsystemBase {
       leftActuator.set(Constants.ShooterConstants.elevationMax); 
       rightActuator.set(Constants.ShooterConstants.elevationMax);
     }
+  }
 
+  public void setMaxElevation(){    
+    leftActuator.set(1);
+    rightActuator.set(1);
   }
 
   public boolean hasTarget(){

@@ -8,41 +8,40 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.ArcadeDrive;
 
-public class TurnToBall extends CommandBase {
+public class TurnToZero extends CommandBase {
   ArcadeDrive arcadeDrive;
-  Limelight limelight;
   double speed;
+  double angle;
 
-  //Do -speed if you want to turn left
-  public TurnToBall(ArcadeDrive arcadeDrive, Limelight limelight, double speed) {
+  public TurnToZero(ArcadeDrive arcadeDrive, double speed) {
     this.arcadeDrive = arcadeDrive;
     this.speed = speed;
-    this.limelight = limelight;
 
     addRequirements(arcadeDrive);
   }
 
   @Override
-  public void initialize() {
-    limelight.setPipeline((byte) 9);
-    limelight.setLED((byte) 0);
-  }
-
-  @Override
   public void execute() {
-    arcadeDrive.driveRobot(0, speed, false);
+    if(arcadeDrive.getHeading() <= 180){
+      arcadeDrive.driveRobot(0, -speed, false);
+    }
+    else{
+      arcadeDrive.driveRobot(0, speed, false);
+    }
+
+    angle = arcadeDrive.getHeading();
   }
 
   @Override
   public boolean isFinished() {
-    if(limelight.hasTarget())
+    if(angle < 1 || angle > 1)
     {
-      arcadeDrive.stop();
       return true;
     }
-    return false;
+    else{
+      return false;
+    }    
   }
 }

@@ -296,7 +296,8 @@ public class RobotContainer {
                                             } ));
 
     new JoystickButton(driver, XboxController.Button.kA.value)
-      .whenHeld(new SequentialCommandGroup(new TurnToBall(driveBase, limelight, 0.1),
+      .whenHeld(new SequentialCommandGroup(
+                new ParallelCommandGroup(new TurnToBall(driveBase, limelight, 0.1), new InstantCommand(launcher::setMaxElevation)),
                 new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase)),
                 new ParallelCommandGroup(new InstantCommand(intake::disable), new Indexer(launcher).withTimeout(0.5), new TurnToBall(driveBase, limelight, 0.1)),
                 new ParallelCommandGroup(new InstantCommand(intake::enable), new DriveToBall(limelight, driveBase))
