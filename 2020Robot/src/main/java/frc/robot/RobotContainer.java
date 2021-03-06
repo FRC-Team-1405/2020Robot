@@ -77,7 +77,7 @@ public class RobotContainer {
   // private Intake intake = new Intake();
   // private final Climber climber = new Climber();
 
-  private final ArcadeDrive driveBase = new ArcadeDrive();
+  //private final ArcadeDrive driveBase = new ArcadeDrive();
   // private final ControlPanel controlPanel = new ControlPanel();
   // private final LidarLitePWM leftLidar = new LidarLitePWM(new DigitalInput(10));
   // private final LidarLitePWM rightLidar = new LidarLitePWM(new DigitalInput(11));
@@ -88,7 +88,7 @@ public class RobotContainer {
   private XboxController operator = new XboxController(Constants.operator); 
   
 
-  private final Autonomous1 auto1 = new Autonomous1(driveBase);
+  //private final Autonomous1 auto1 = new Autonomous1(driveBase);
   // private final Autonomous2 auto2 = new Autonomous2(driveBase, launcher, limelight);
 
   private LEDStrip ledStrip = new LEDStrip(Constants.PWM_Port.leds, Constants.PWM_Port.totalLEDCount);
@@ -383,7 +383,9 @@ public class RobotContainer {
     //   .whenReleased(new ParallelCommandGroup(new InstantCommand(intake::disable), new InstantCommand(launcher::stopIndexer)));
 
     new JoystickButton(driver, XboxController.Button.kB.value) 
-        .whenHeld(new TurnToBall(swerveDriveBase, limelight, 0.0, 0.1));
+        .whenHeld(new SequentialCommandGroup(
+                        new TurnToBall(swerveDriveBase, limelight, 0.1), 
+                        new DriveToBall(swerveDriveBase, limelight)));
     //Left bumper: fire auto
     // new JoystickButton(operator, XboxController.Button.kBumperLeft.value)
     //   .whenHeld( new FireOnce(launcher) )

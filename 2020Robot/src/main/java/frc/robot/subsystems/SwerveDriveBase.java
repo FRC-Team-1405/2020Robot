@@ -42,12 +42,13 @@ public void setDriveMode(DriveMode mode) {
 
   public void drive(double forward, double strafe, double azimuth, double speedLimit) {
     swerve.drive(forward, strafe, azimuth, speedLimit);
-  }
+   }
 
-  // Drive the robot in a straight line using the navX front heading 
-  public void driveStraight(double speed, double azimuth, double speedLimit){
-    double angle = swerve.getGyro().getAngle();  
-    drive(speed * Math.sin(angle), speed * Math.cos(angle), azimuth, speedLimit); 
+  // Drive the robot in a straight line without using navX
+  public void driveStraight(double speed, double turnspeed, double speedLimit){
+    swerve.setFieldOriented(false);
+    swerve.drive(speed, 0, turnspeed, speedLimit);
+    swerve.setFieldOriented(true);
   }
 
   public void zeroGyro() {

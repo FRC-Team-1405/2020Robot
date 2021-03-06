@@ -11,11 +11,13 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.lib.SmartSupplier;
 import frc.robot.sensors.Limelight;
 import frc.robot.subsystems.ArcadeDrive;
+import frc.robot.subsystems.SwerveDriveBase;;
 
 public class DriveToBall extends CommandBase {
   
   private Limelight limelight;
   private ArcadeDrive arcadeDrive;
+  SwerveDriveBase swerveDrive;
   private SmartSupplier speed = new SmartSupplier("Drive to ball/Rotation", 0.2);
   private SmartSupplier rotation = new SmartSupplier("Drive to ball/Speed", 0.1);
 
@@ -23,11 +25,18 @@ public class DriveToBall extends CommandBase {
   private double endDelay = 1000;
   private long start = System.currentTimeMillis();
 
-  public DriveToBall(Limelight limelight, ArcadeDrive arcadeDrive) {  
+  public DriveToBall(ArcadeDrive arcadeDrive, Limelight limelight) {  
     this.limelight = limelight;
     this.arcadeDrive = arcadeDrive;
 
     addRequirements(arcadeDrive);
+  }
+
+  public DriveToBall(SwerveDriveBase swerveDrive, Limelight limelight) {  
+    this.limelight = limelight;
+    this.swerveDrive = swerveDrive;
+
+    addRequirements(swerveDrive);
   }
 
   // Called when the command is initially scheduled.
@@ -42,19 +51,19 @@ public class DriveToBall extends CommandBase {
   public void execute() {
     if(!limelight.hasTarget())
     {
-      arcadeDrive.driveRobot(speed.getAsDouble(), 0, false);
+      drive(speed.getAsDouble(), 0);
       return;
     }
 
     //Start trying to pickup the balls
     if(limelight.getTX() < 1){
       //Move left
-      arcadeDrive.driveRobot(speed.getAsDouble(), -rotation.getAsDouble(), false);
+      drive(speed.getAsDouble(), -rotation.getAsDouble());
     }else if(limelight.getTX() > 1){
       //Move right
-      arcadeDrive.driveRobot(speed.getAsDouble(), rotation.getAsDouble(), false);
+      drive(speed.getAsDouble(), rotation.getAsDouble());
     }else{
-      arcadeDrive.driveRobot(speed.getAsDouble(), 0, false);
+      drive(speed.getAsDouble(), 0);
     }
   }
 
@@ -69,5 +78,14 @@ public class DriveToBall extends CommandBase {
             return true;
     }
     return false;
+  }
+
+  private void drive(double speed, double turnSpeed){
+    if (arcadeDrive != null){
+      arcadeDrive.driveRobot(speed, turnSpeed, false);
+    }
+    else if (swerveDrive != null){
+      swerveDrive.driveStraight(speed, turnSpeed, 1.0);
+    }
   }
 }

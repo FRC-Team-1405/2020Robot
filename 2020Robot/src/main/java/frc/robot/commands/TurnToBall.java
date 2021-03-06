@@ -16,20 +16,17 @@ public class TurnToBall extends CommandBase {
   ArcadeDrive arcadeDrive;
   SwerveDriveBase swerveDrive;
   Limelight limelight;
-  double forwardSpeed; 
   double turnSpeed; 
 
   public TurnToBall(ArcadeDrive arcadeDrive, Limelight limelight, double speed) {
     this.arcadeDrive = arcadeDrive;
-    this.forwardSpeed = speed;
     this.limelight = limelight;
 
     addRequirements(arcadeDrive);
   }
 
-  public TurnToBall(SwerveDriveBase swerveDrive, Limelight limelight, double forwardSpeed, double turnSpeed) {
+  public TurnToBall(SwerveDriveBase swerveDrive, Limelight limelight, double turnSpeed) {
     this.swerveDrive = swerveDrive;
-    this.forwardSpeed = forwardSpeed; 
     this.turnSpeed = turnSpeed; 
     this.limelight = limelight;
 
@@ -45,16 +42,16 @@ public class TurnToBall extends CommandBase {
   @Override
   public void execute() {
     if (arcadeDrive != null){
-      arcadeDrive.driveRobot(0, forwardSpeed, false);
+      arcadeDrive.driveRobot(0, turnSpeed, false);
     }
     if (swerveDrive != null) {
-      swerveDrive.driveStraight(forwardSpeed, turnSpeed, 1.0);
+      swerveDrive.driveStraight(0, turnSpeed, 1.0);
     }
   }
 
   @Override
   public boolean isFinished() {
-    if(limelight.hasTarget())
+    if(limelight.hasTarget() && Math.abs(limelight.getTX()) <= 20.0)
     {
       if (arcadeDrive != null){
         arcadeDrive.stop();
