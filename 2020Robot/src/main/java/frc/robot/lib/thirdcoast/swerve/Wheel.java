@@ -8,6 +8,7 @@ import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
 import java.util.Objects;
@@ -41,6 +42,7 @@ public class Wheel {
   private final double driveSetpointMax;
   private final BaseTalon driveTalon;
   private final TalonSRX azimuthTalon;
+  private final Translation2d position;
   protected DoubleConsumer driver;
   private boolean isInverted = false;
 
@@ -56,10 +58,11 @@ public class Wheel {
    * @param drive the configured drive TalonSRX
    * @param driveSetpointMax scales closed-loop drive output to this value when drive setpoint = 1.0
    */
-  public Wheel(TalonSRX azimuth, BaseTalon drive, double driveSetpointMax) {
+  public Wheel(TalonSRX azimuth, BaseTalon drive, Translation2d position, double driveSetpointMax) {
     this.driveSetpointMax = driveSetpointMax;
     azimuthTalon = Objects.requireNonNull(azimuth);
     driveTalon = Objects.requireNonNull(drive);
+    this.position = Objects.requireNonNull(position);
 
     setDriveMode(TELEOP);
     
@@ -204,13 +207,25 @@ public class Wheel {
     return isInverted;
   } 
 
-  public SwerveModuleState getState(){ 
-    return new SwerveModuleState(
-      driveTalon.getSelectedSensorVelocity() 
-       * Constants.VelocityConversions.SwerveSensorToMeters, 
-    new Rotation2d(MathTools.map(getAzimuthAbsolutePosition(), 0, 4095, 0, 2 * Math.PI))); 
+  public double getAzimuthRadians() {
+    double position = azimuthTalon.getSelectedSensorPosition() ;
+    if (isInverted()){
+      position -= Math.copySign(0.5 * TICKS, position) ;
+    }
+    double azimuth = Math.IEEEremainder( position, TICKS);
+    return (double)azimuth/4096.0 * 2.0 * Math.PI; 
+  }
 
-    
+  public double getMetersPerSecond() {
+    return Math.abs(driveTalon.getSelectedSensorVelocity() * Constants.VelocityConversions.SwerveSensorToMeters) ;
+  }
+
+  public SwerveModuleState getState(){ 
+    return new SwerveModuleState(getMetersPerSecond(), new Rotation2d(getAzimuthRadians())); 
+  }
+
+  public Translation2d getPostion(){
+    return position;
   }
 
   @Override

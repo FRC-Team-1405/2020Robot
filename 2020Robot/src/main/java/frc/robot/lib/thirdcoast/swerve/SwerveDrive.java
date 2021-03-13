@@ -43,16 +43,6 @@ public class SwerveDrive {
   private final double[] wa = new double[WHEEL_COUNT];
   private boolean isFieldOriented; 
   
-
-  //values in meters of swerve module relative to NavX
-  Translation2d m_frontLeftLocation = new Translation2d(0.279, 0.203);
-  Translation2d m_frontRightLocation = new Translation2d(0.254, -0.203);
-  Translation2d m_backLeftLocation = new Translation2d(-0.279, 0.330);
-  Translation2d m_backRightLocation = new Translation2d(-0.254, -0.330); 
-
-  SwerveDriveKinematics m_kinematics = new SwerveDriveKinematics(m_frontLeftLocation, m_frontRightLocation,
-  m_backLeftLocation, m_backRightLocation);
-
   SwerveDriveOdometry m_odometry; 
 
   public SwerveDrive(SwerveDriveConfig config) {
@@ -96,7 +86,9 @@ public class SwerveDrive {
     }
 
 
-    m_odometry = new SwerveDriveOdometry(m_kinematics, getRotation2d());
+    SwerveDriveKinematics kinematics = new SwerveDriveKinematics(wheels[0].getPostion(), wheels[1].getPostion(), wheels[2].getPostion(), wheels[3].getPostion());
+
+    m_odometry = new SwerveDriveOdometry(kinematics, getGyroAngle());
 
     logger.config(String.format("length = %f", length));
     logger.config(String.format("width = %f", width));
@@ -164,13 +156,6 @@ public class SwerveDrive {
       strafe = strafe * Math.cos(angle) - forward * Math.sin(angle);
       forward = temp;
     } 
-
-    // if(forward == 0.0 && strafe == 0.0){ 
-    //   wa[0] = azimuth; 
-    //   wa[1] = azimuth; 
-    //   wa[2] = azimuth; 
-    //   wa[3] = azimuth; 
-    // }
 
     final double a = strafe - azimuth * kLengthComponent;
     final double b = strafe + azimuth * kLengthComponent;
@@ -325,41 +310,32 @@ public class SwerveDrive {
     AZIMUTH
   }  
 
-   
-   Rotation2d getRotation2d() {
-    return Rotation2d.fromDegrees(-gyro.getAngle());
-  }
-
-  public void updateOdometry() {
+  private Rotation2d getGyroAngle(){
   // Get my gyro angle. We are negating the value because gyros return positive
   // values as the robot turns clockwise. This is not standard convention that is
   // used by the WPILib classes.
-  var gyroAngle = Rotation2d.fromDegrees(-gyro.getAngle());
+  return Rotation2d.fromDegrees(Math.IEEEremainder(-gyro.getAngle(), 360));
+  }
 
+  public void updateOdometry() {
   // Update the pose
-  m_odometry.update(gyroAngle, wheels[0].getState(), wheels[1].getState(), wheels[2].getState(), wheels[3].getState()); 
+  m_odometry.update(getGyroAngle(), wheels[0].getState(), wheels[1].getState(), wheels[2].getState(), wheels[3].getState()); 
 
-  SmartDashboard.putNumber("Odometry Angle", -gyro.getAngle()); 
+  // System.out.printf("Wheel Angles %10.2f %10.2f %10.2f %10.2f\n", wheels[0].getState().angle.getDegrees(), wheels[1].getState().angle.getDegrees(), wheels[2].getState().angle.getDegrees(), wheels[3].getState().angle.getDegrees());
+  // if (Math.abs(wheels[0].getState().speedMetersPerSecond) > 0.01){
+  //   System.out.printf("Wheel Speed %10.2f %10.2f %10.2f %10.2f\n", wheels[0].getState().speedMetersPerSecond, wheels[1].getState().speedMetersPerSecond, wheels[2].getState().speedMetersPerSecond, wheels[3].getState().speedMetersPerSecond);
+  // }
+  
+  SmartDashboard.putNumber("Odometry Angle", gyro.getAngle()); 
 
-    Translation2d xy = m_odometry.getPoseMeters().getTranslation() ;
+  Translation2d xy = m_odometry.getPoseMeters().getTranslation() ;
 
   SmartDashboard.putNumber("Distance X", xy.getX()); 
 
   SmartDashboard.putNumber("Distance Y", xy.getY()); 
-  
+} 
 
-  // SwerveModuleState wheelState;
-  // wheelState = wheels[0].getState();
-  // SmartDashboard.putNumber("FL Angle", wheelState.angle.getDegrees());
-  // SmartDashboard.putNumber("FL Speed", wheelState.speedMetersPerSecond); 
-  // wheelState = wheels[1].getState();
-  // SmartDashboard.putNumber("FR Angle", wheelState.angle.getDegrees());
-  // SmartDashboard.putNumber("FR Speed", wheelState.speedMetersPerSecond); 
-  // wheelState = wheels[2].getState();
-  // SmartDashboard.putNumber("BL Angle", wheelState.angle.getDegrees());
-  // SmartDashboard.putNumber("BL Speed", wheelState.speedMetersPerSecond); 
-  // wheelState = wheels[3].getState();
-  // SmartDashboard.putNumber("BR Angle", wheelState.angle.getDegrees());
-  // SmartDashboard.putNumber("BR Speed", wheelState.speedMetersPerSecond); 
+public void resetOdometry(){ 
+  m_odometry.resetPosition(new Pose2d(), getGyroAngle());
 }
 }

@@ -8,6 +8,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.DifferentialDriveKinematics;
 
 /**
@@ -28,7 +29,7 @@ public final class Constants {
     public final static int driveLeftSlave = 3;
     public final static int driveRightSlave = 4;     
 
-    public final class SwerveBase {
+    public final static class SwerveBase {
         public final static int driveFrontLeft = 1;
         public final static int driveFrontRight = 2;
         public final static int driveBackLeft = 3;
@@ -38,6 +39,12 @@ public final class Constants {
         public final static int azimuthFrontRight = 22;
         public final static int azimuthBackLeft = 23;
         public final static int azimuthBackRight = 24; 
+
+        public final static Translation2d frontLeftLocation = new Translation2d(0.279, 0.203);
+        public final static Translation2d frontRightLocation = new Translation2d(0.254, -0.203);
+        public final static Translation2d backLeftLocation = new Translation2d(-0.279, 0.330);
+        public final static Translation2d backRightLocation = new Translation2d(-0.254, -0.330); 
+      
     }
 
     public final static int intakeTalon = 5;
@@ -159,7 +166,7 @@ public final class Constants {
         public final static double SensorTimePerSec = 10;
         public final static double WheelCircumference = (6 * Math.PI);
         public final static double SensorUnitsPerRotation = 2048; 
-        public final static double SwerveSensorUnitsPerRotation = 4096; 
+        public final static double SwerveSensorUnitsPerRotation = 2048; 
         public final static double SwerveWheelCircumference = (4 * Math.PI); 
         public final static double DriveBaseReduction = 8.68;
         public final static double InchesPerMeter = 39.37;

@@ -32,6 +32,7 @@ import frc.robot.commands.TestShooter;
 import frc.robot.commands.TurnToBall;
 import frc.robot.commands.TurnToTarget;
 import frc.robot.commands.UnderGlow;
+import frc.robot.commands.ZeroizeOdometry;
 import frc.robot.commands.ZeroizeSwerveModules;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.SmartSupplier;
@@ -252,6 +253,7 @@ public class RobotContainer {
       // testCommandsTab.add( new FireOnce(launcher)
       //                 .andThen(new InstantCommand( () -> {launcher.stopFlywheels(); launcher.stopIndexer();}) )); 
       testCommandsTab.add(new ZeroizeSwerveModules(swerveDriveBase)); 
+      testCommandsTab.add(new ZeroizeOdometry(swerveDriveBase));
       // testCommandsTab.add( new DriveByVelocity(driveBase));
 
       RunCommand getColor = new RunCommand( FMSData::getColor );
