@@ -7,18 +7,29 @@
 
 package frc.robot;
 
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Logger;
 
 import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.GenericHID.Hand;
+import edu.wpi.first.wpilibj.controller.PIDController;
+import edu.wpi.first.wpilibj.controller.ProfiledPIDController;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInWidgets;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.trajectory.Trajectory;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
+import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.trajectory.TrapezoidProfile;
 import frc.robot.commands.Autonomous1;
 import frc.robot.commands.Autonomous2;
 import frc.robot.commands.BatteryLED;
@@ -36,6 +47,7 @@ import frc.robot.commands.ZeroizeOdometry;
 import frc.robot.commands.ZeroizeSwerveModules;
 import frc.robot.lib.MathTools;
 import frc.robot.lib.SmartSupplier;
+import frc.robot.lib.thirdcoast.swerve.SwerveDrive.DriveMode;
 import frc.robot.sensors.ColorSensor;
 import frc.robot.sensors.FMSData;
 import frc.robot.sensors.LEDStrip;
@@ -53,6 +65,7 @@ import edu.wpi.first.wpilibj2.command.PrintCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SelectCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -236,7 +249,7 @@ public class RobotContainer {
     autoSelector.addOption("Do nothing", 0);
     autoSelector.addOption("Drive forward.", 1);
     autoSelector.addOption("Shoot then drive", 2);
-    autoSelector.addOption("Auto 3", 3);
+    autoSelector.addOption("Swerve Test Auto", 3);
     autoSelector.setDefaultOption("Do nothing", 0); 
     
     ShuffleboardTab autoTab = Shuffleboard.getTab("Auto") ;
@@ -552,25 +565,89 @@ public class RobotContainer {
   // by the selector method at runtime.  Note that selectcommand works on Object(), so the
   // selector does not have to be an enum; it could be any desired type (string, integer,
   // boolean, double...)
-  // private final Command selectCommand =
-  //     new SelectCommand(
-  //         // Maps selector values to commands
-  //         Map.ofEntries(
-  //             Map.entry(0, new PrintCommand("Do nothing")),
-  //             Map.entry(1, auto1),
-  //             Map.entry(2, auto2),
-  //             Map.entry(3, new PrintCommand("Command three was selected!"))
-  //         ),
-  //         this::select
-  //     );
+  private final Command selectCommand =
+      new SelectCommand(
+          // Maps selector values to commands
+          Map.ofEntries(
+              Map.entry(0, new PrintCommand("Do nothing")),
+              // Map.entry(1, auto1),
+              // Map.entry(2, auto2),
+              Map.entry(3, getSwerveAutoTest()) 
+          ),
+          this::select
+      );
 
   /**
    * Use this to pass the autonomous command to the main {@link Robot} class.
    *
    * @return the command to run in autonomous
    */
-  // public Command getAutonomousCommand() {
-  //   // return autoCommand;
-  //   return selectCommand;
-  // }
+  public Command getAutonomousCommand() {
+    // return autoCommand;
+    return selectCommand;
+  } 
+
+  private Command getSwerveAutoTest(){
+    if (swerveDriveBase == null){
+      return new PrintCommand("Wrong drivebase -- expecting swerve");
+    } 
+
+    // Create config for trajectory
+    TrajectoryConfig config =
+    new TrajectoryConfig(
+            Constants.SwerveBase.maxSpeed,
+            Constants.SwerveBase.maxAcceleration)
+        // Add kinematics to ensure max speed is actually obeyed
+        .setKinematics(swerveDriveBase.getKinematics());
+
+    // An example trajectory to follow.  All units in meters.
+    Trajectory exampleTrajectory =
+        TrajectoryGenerator.generateTrajectory(
+            // Start at the origin facing the +X direction
+            new Pose2d(0, 0, new Rotation2d(0)),
+            // Pass through these two interior waypoints, making an 's' curve path
+            List.of(new Translation2d(1, 0), new Translation2d(2, 0)),
+            // End 3 meters straight ahead of where we started, facing forward
+            new Pose2d(3, 0, new Rotation2d(0)),
+            config);
+
+    var thetaController =
+        new ProfiledPIDController(
+            new SmartSupplier("Swerve rP", 0).getAsDouble(),
+            new SmartSupplier("Swerve rI", 0).getAsDouble(), 
+            new SmartSupplier("Swerve rD", 0).getAsDouble(), 
+            new TrapezoidProfile.Constraints(Constants.SwerveBase.maxAngularSpeed, Constants.SwerveBase.maxAngularAccelerartion));
+    thetaController.enableContinuousInput(-Math.PI, Math.PI);
+
+    SwerveControllerCommand swerveControllerCommand =
+        new SwerveControllerCommand(
+            exampleTrajectory,
+            swerveDriveBase::getPose, // Functional interface to feed supplier
+            swerveDriveBase.getKinematics(),
+
+            // Position controllers
+            new PIDController(  new SmartSupplier("Swerve xP", 0).getAsDouble(),
+                                new SmartSupplier("Swerve xI", 0).getAsDouble(), 
+                                new SmartSupplier("Swerve xD", 0).getAsDouble()),
+            new PIDController(  new SmartSupplier("Swerve yP", 0).getAsDouble(),
+                                new SmartSupplier("Swerve yI", 0).getAsDouble(), 
+                                new SmartSupplier("Swerve yD", 0).getAsDouble()),
+            thetaController,
+            swerveDriveBase::setModuleStates,
+            swerveDriveBase);
+
+    // Reset odometry to the starting pose of the trajectory.
+    swerveDriveBase.resetOdometry(exampleTrajectory.getInitialPose());
+
+    // Run path following command, then stop at the end.
+    return new SequentialCommandGroup( 
+      new InstantCommand(() -> {
+        swerveDriveBase.setDriveMode(DriveMode.CLOSED_LOOP);
+      }), 
+      swerveControllerCommand, 
+      new InstantCommand(() -> {
+        swerveDriveBase.stop(); 
+        swerveDriveBase.setDriveMode(DriveMode.OPEN_LOOP);
+      }));
+  }
 }

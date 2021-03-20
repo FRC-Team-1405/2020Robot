@@ -115,8 +115,8 @@ public class ArcadeDrive extends SubsystemBase {
         SmartDashboard.putNumber("Velocity", getVelocity());
         SmartDashboard.putNumber("Heading", getHeading());
       }
-      odometry.update(Rotation2d.fromDegrees(-getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters,
-                      -driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorToMeters);
+      odometry.update(Rotation2d.fromDegrees(-getHeading()), driveLeft.getSelectedSensorPosition()*Constants.VelocityConversions.SensorVelocityToMetersPerSecond,
+                      -driveRight.getSelectedSensorPosition()*Constants.VelocityConversions.SensorVelocityToMetersPerSecond);
     }
     public void resetPosition(){
       resetPosition(0,0);
@@ -153,7 +153,7 @@ public class ArcadeDrive extends SubsystemBase {
     public double getDistance(){
       double distance = (((driveLeft.getSelectedSensorPosition()
               -driveRight.getSelectedSensorPosition())/2.0)
-                  *Constants.VelocityConversions.SensorToMeters);
+                  *Constants.VelocityConversions.SensorVelocityToMetersPerSecond);
       if(!Robot.fmsAttached){
         SmartDashboard.putNumber("ArcadeDrive/Distance", distance);
       }

@@ -6,7 +6,10 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRXConfiguration;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
@@ -43,7 +46,7 @@ public void setDriveMode(DriveMode mode) {
 
   public void drive(double forward, double strafe, double azimuth, double speedLimit) {
     swerve.drive(forward, strafe, azimuth, speedLimit);
-   }
+   } 
 
   // Drive the robot in a straight line without using navX
   public void driveStraight(double speed, double turnspeed, double speedLimit){
@@ -103,6 +106,21 @@ public void setDriveMode(DriveMode mode) {
 
   public void zeroizeOdometry(){
     swerve.resetOdometry(); 
-    swerve.getGyro().reset();
+    } 
+
+  public void resetOdometry(Pose2d pose){
+      swerve.resetOdometry(pose); 
+      } 
+  
+    public SwerveDriveKinematics getKinematics(){ 
+   return swerve.getKinematics(); 
+  } 
+
+  public void setModuleStates(SwerveModuleState[] states){ 
+    swerve.setModuleStates(states);
+  } 
+
+  public Pose2d getPose(){ 
+   return swerve.getPose();
   }
 }

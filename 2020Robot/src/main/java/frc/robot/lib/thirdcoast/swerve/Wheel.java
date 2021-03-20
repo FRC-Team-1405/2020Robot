@@ -217,13 +217,21 @@ public class Wheel {
   }
 
   public double getMetersPerSecond() {
-    return Math.abs(driveTalon.getSelectedSensorVelocity() * Constants.VelocityConversions.SwerveSensorToMeters) ;
+    return Math.abs(driveTalon.getSelectedSensorVelocity() * Constants.VelocityConversions.SwerveSensorVelocityToMetersPerSecond) ;
   }
 
   public SwerveModuleState getState(){ 
     return new SwerveModuleState(getMetersPerSecond(), new Rotation2d(getAzimuthRadians())); 
   }
+  
+  public void setState(SwerveModuleState state){
+    double angle = MathTools.map(state.angle.getRadians(), 0, 2 * Math.PI, 0, 4096);
+    double speed = state.speedMetersPerSecond * Constants.VelocityConversions.SwerveMetersPerSecondToSensorVelocity;   
 
+    azimuthTalon.set(MotionMagic, angle);
+    driver.accept(speed);
+
+  }
   public Translation2d getPostion(){
     return position;
   }

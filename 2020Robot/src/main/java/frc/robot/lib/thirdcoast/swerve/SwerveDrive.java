@@ -42,6 +42,7 @@ public class SwerveDrive {
   private final double[] ws = new double[WHEEL_COUNT];
   private final double[] wa = new double[WHEEL_COUNT];
   private boolean isFieldOriented; 
+  private SwerveDriveKinematics kinematics; 
   
   SwerveDriveOdometry m_odometry; 
 
@@ -86,7 +87,7 @@ public class SwerveDrive {
     }
 
 
-    SwerveDriveKinematics kinematics = new SwerveDriveKinematics(wheels[0].getPostion(), wheels[1].getPostion(), wheels[2].getPostion(), wheels[3].getPostion());
+    kinematics = new SwerveDriveKinematics(wheels[0].getPostion(), wheels[1].getPostion(), wheels[2].getPostion(), wheels[3].getPostion());
 
     m_odometry = new SwerveDriveOdometry(kinematics, getGyroAngle());
 
@@ -95,6 +96,10 @@ public class SwerveDrive {
     logger.config(String.format("enableGyroLogging = %b", config.gyroLoggingEnabled));
     logger.config(String.format("gyroRateCorrection = %f", kGyroRateCorrection));
   }
+
+  public SwerveDriveKinematics getKinematics(){ 
+    return kinematics; 
+  } 
 
   /**
    * Return key that wheel zero information is stored under in WPI preferences.
@@ -335,7 +340,22 @@ public class SwerveDrive {
   SmartDashboard.putNumber("Distance Y", xy.getY()); 
 } 
 
+public void setModuleStates(SwerveModuleState[] states){ 
+  wheels[0].setState(states[0]);
+  wheels[1].setState(states[1]); 
+  wheels[2].setState(states[2]);
+  wheels[3].setState(states[3]);
+}
+
 public void resetOdometry(){ 
   m_odometry.resetPosition(new Pose2d(), getGyroAngle());
+}
+
+public void resetOdometry(Pose2d pose){ 
+  m_odometry.resetPosition(pose, getGyroAngle());
+} 
+
+public Pose2d getPose(){ 
+  return m_odometry.getPoseMeters();
 }
 }
